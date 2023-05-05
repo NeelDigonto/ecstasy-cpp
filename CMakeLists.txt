@@ -1,14 +1,65 @@
+# Webgpu 
+# SDL 2
+# Igmui
 cmake_minimum_required(VERSION 3.21)
-find_program(CCACHE_PROGRAM ccache)
 
-set(CMAKE_C_COMPILER "clang-15")
-set(CMAKE_CXX_COMPILER "clang++-15")
+# set(CMAKE_C_COMPILER "clang")
+# set(CMAKE_CXX_COMPILER "clang++")
+# 
+# set(MIN_CLANG_VERSION "16.0")
+# 
+# if (CMAKE_C_COMPILER_ID MATCHES "Clang")
+#     if (CMAKE_C_COMPILER_VERSION VERSION_LESS MIN_CLANG_VERSION)
+#         message(FATAL_ERROR "Detected C compiler Clang ${CMAKE_C_COMPILER_VERSION} < ${MIN_CLANG_VERSION}")
+#     endif()
+# endif()
+# 
+# if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+#     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS MIN_CLANG_VERSION)
+#         message(FATAL_ERROR "Detected CXX compiler Clang ${CMAKE_CXX_COMPILER_VERSION} < ${MIN_CLANG_VERSION}")
+#     endif()
+# endif()
 
-set (CMAKE_C_STANDARD 23)
-set (CMAKE_CXX_STANDARD 23)
+# https://github.com/nothings/stb
+# https://gitlab.com/libeigen/eigen
+# https://github.com/libsdl-org/SDL
+# https://github.com/ocornut/imgui
+# https://github.com/fmtlib/fmt
+# https://github.com/hexops/mach-gpu-dawn
+# https://github.com/zlib-ng/zlib-ng
+# https://github.com/deepmind/mujoco
+
+# https://github.com/odygrd/quill
+# https://github.com/skypjack/entt
+# https://github.com/google/googletest
+# https://github.com/cameron314/readerwriterqueue
+# https://github.com/cameron314/concurrentqueue
+# https://github.com/wolfpld/tracy
+# https://github.com/uNetworking/uWebSockets
+# https://boringssl.googlesource.com/boringssl
+# https://github.com/bulletphysics/bullet3
+# https://github.com/NVIDIA-Omniverse/PhysX  --> https://developer.nvidia.com/physx-sdk
+
+project(Ecstasy
+    DESCRIPTION "A Modern Webgpu Renderer"
+    LANGUAGES C CXX
+    )
+
+
+include(FetchContent)
+include(cmake/download_file.cmake)
+include(cmake/dll_utils.cmake)
+
+if(MSVC)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+    #set(BUILD_SHARED_LIBS TRUE)
+    #set(BUILD_STATIC_LIBS TRUE)
+endif()
+
+set(ECSTASY_LIB "ecstasy")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-project("Ecstasy")
+find_program(CCACHE_PROGRAM ccache)
 
 if(CCACHE_PROGRAM)
     MESSAGE("CCACHE support enabled")
@@ -16,17 +67,44 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
 endif()
 
+#set(CMAKE_C_STANDARD 23)
+set(CMAKE_CXX_STANDARD 23)
+#set(CMAKE_CXX_FLAGS "-std=c++23")
+
 set(FETCHCONTENT_QUIET FALSE)
-include(FetchContent)
+get_filename_component(fc_cache "../.fetchcontent_cache"
+                       REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
+set(FETCHCONTENT_BASE_DIR ${fc_cache})
 
-option(ECSTASY_BUILD_TESTS "Generate build targets for the ecstasy unit tests." ON)
-option(ECSTASY_BUILD_COVERAGE "Generate coverage report. Require ECSTASY_BUILD_TESTS." OFF)
-option(ECSTASY_BUILD_SHARED_LIB "Generate the Ecstasy shared library." OFF)
-option(ECSTASY_BUILD_STATIC_LIB "Generate the Ecstasy static library." ON)
-option(ECSTASY_BUILD_TOOLS "Generate tools." ON)
-option(ECSTASY_BUILD_FUZZING "Generate fuzzing test tools." OFF)
-option(ECSTASY_BUILD_EXAMPLE "Generate examples." ON)
+include_directories(ecstasy/include)
 
-set(BUILD_SHARED_LIBS ECSTASY_BUILD_SHARED_LIB)
-set(BUILD_STATIC_LIBS ECSTASY_BUILD_STATIC_LIB)
-set(BUILD_TESTING OFF)
+FetchContent_Declare(
+    fmtlib
+    GIT_REPOSITORY "https://github.com/fmtlib/fmt"
+    GIT_TAG 9.1.0
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(fmtlib)
+include_directories(${fmtlib_SOURCE_DIR}/include) # public to all targets
+#target_include_directories(${ECSTASY_LIB} PRIVATE ${fmtlib_SOURCE_DIR}/include) -- dont look
+
+FetchContent_Declare(
+    eigen
+    GIT_REPOSITORY "https://gitlab.com/libeigen/eigen"
+    GIT_TAG 3.4.0
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(eigen)
+
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY "https://github.com/nothings/stb"
+    GIT_TAG 5736b15f7ea0ffb08dd38af21067c314d6a3aae9
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(stb)
+include_directories(${stb_SOURCE_DIR})
+
+add_subdirectory(ecstasy)
+add_subdirectory(sample)
+
