@@ -1,59 +1,43 @@
-// #include <SDL.h>
-#include <fmt/core.h>
-#include <stdio.h>
 
 #include <ecstasy.hpp>
-
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-
-#include <Eigen/Dense>
-#include <iostream>
+/**
+ * This file is part of the "Learn WebGPU for C++" book.
+ *   https://eliemichel.github.io/LearnWebGPU
+ *
+ * MIT License
+ * Copyright (c) 2022-2023 Elie Michel
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 #include <glfw3webgpu.h>
+#include "./webgpu_compat.h"
 
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
 #include <webgpu/webgpu.h>
 
-using Eigen::MatrixXd;
+#include <cassert>
+#include <iostream>
+#include <vector>
 
-/* void Ecstasy::display() {
-  // SDL2 Hello, World!
-  // This should display a white screen for 2 seconds
-  // compile with: clang++ main.cpp -o hello_sdl2 -lSDL2
-  // run with: ./hello_sdl2
-
-  SDL_Window* window = NULL;
-  SDL_Surface* screenSurface = NULL;
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError());
-    return;
-  }
-  window = SDL_CreateWindow("hello_sdl2", SDL_WINDOWPOS_UNDEFINED,
-                            SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                            SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-  if (window == NULL) {
-    fprintf(stderr, "could not create window: %s\n", SDL_GetError());
-    return;
-  }
-  screenSurface = SDL_GetWindowSurface(window);
-  SDL_FillRect(screenSurface, NULL,
-               SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-  SDL_UpdateWindowSurface(window);
-  SDL_Delay(2000);
-  SDL_DestroyWindow(window);
-  SDL_Quit();
-} */
-
-/* void Ecstasy::compute() {
-  MatrixXd m(2, 2);
-  m(0, 0) = 3;
-  m(1, 0) = 2.5;
-  m(0, 1) = -1;
-  m(1, 1) = m(1, 0) + m(0, 1);
-  std::cout << m << std::endl;
-} */
+#define UNUSED(x) (void)x;
 
 /**
  * Utility function to get a WebGPU adapter, so that
@@ -71,25 +55,20 @@ WGPUAdapter requestAdapter(WGPUInstance instance,
     };
     UserData userData;
 
-    // Callback called by wgpuInstanceRequestAdapter when the request
-    // returns This is a C++ lambda function, but could be any function
-    // defined in the global scope. It must be non-capturing (the brackets
-    // [] are empty) so that it behaves like a regular C function pointer,
-    // which is what wgpuInstanceRequestAdapter expects (WebGPU being a C
-    // API). The workaround is to convey what we want to capture through the
-    // pUserData pointer, provided as the last argument of
-    // wgpuInstanceRequestAdapter and received by the callback as its last
-    // argument.
+    // Callback called by wgpuInstanceRequestAdapter when the request returns
+    // This is a C++ lambda function, but could be any function defined in the
+    // global scope. It must be non-capturing (the brackets [] are empty) so
+    // that it behaves like a regular C function pointer, which is what
+    // wgpuInstanceRequestAdapter expects (WebGPU being a C API). The workaround
+    // is to convey what we want to capture through the pUserData pointer,
+    // provided as the last argument of wgpuInstanceRequestAdapter and received
+    // by the callback as its last argument.
     auto onAdapterRequestEnded = [](WGPURequestAdapterStatus status,
                                     WGPUAdapter adapter, char const* message,
                                     void* pUserData) {
         UserData& userData = *reinterpret_cast<UserData*>(pUserData);
         if (status == WGPURequestAdapterStatus_Success) {
             userData.adapter = adapter;
-            /*   std::cout << "Adapter Status: " << status << " |
-               message: | "
-               << message
-                        << std::endl; */
         } else {
             std::cout << "Could not get WebGPU adapter: " << message
                       << std::endl;
@@ -104,31 +83,159 @@ WGPUAdapter requestAdapter(WGPUInstance instance,
 
     // In theory we should wait until onAdapterReady has been called, which
     // could take some time (what the 'await' keyword does in the JavaScript
-    // code). In practice, we know that when the
-    // wgpuInstanceRequestAdapter() function returns its callback has been
-    // called.
+    // code). In practice, we know that when the wgpuInstanceRequestAdapter()
+    // function returns its callback has been called.
     assert(userData.requestEnded);
 
     return userData.adapter;
 }
 
+/**
+ * An example of how we can inspect the capabilities of the hardware through
+ * the adapter object.
+ */
+void inspectAdapter(WGPUAdapter adapter) {
+    std::vector<WGPUFeatureName> features;
+    size_t featureCount = wgpuAdapterEnumerateFeatures(adapter, nullptr);
+    features.resize(featureCount);
+    wgpuAdapterEnumerateFeatures(adapter, features.data());
+
+    std::cout << "Adapter features:" << std::endl;
+    for (auto f : features) {
+        std::cout << " - " << f << std::endl;
+    }
+
+    WGPUSupportedLimits limits = {};
+    limits.nextInChain = nullptr;
+    bool success = wgpuAdapterGetLimits(adapter, &limits);
+    if (success) {
+        std::cout << "Adapter limits:" << std::endl;
+        std::cout << " - maxTextureDimension1D: "
+                  << limits.limits.maxTextureDimension1D << std::endl;
+        std::cout << " - maxTextureDimension2D: "
+                  << limits.limits.maxTextureDimension2D << std::endl;
+        std::cout << " - maxTextureDimension3D: "
+                  << limits.limits.maxTextureDimension3D << std::endl;
+        std::cout << " - maxTextureArrayLayers: "
+                  << limits.limits.maxTextureArrayLayers << std::endl;
+        std::cout << " - maxBindGroups: " << limits.limits.maxBindGroups
+                  << std::endl;
+        std::cout << " - maxDynamicUniformBuffersPerPipelineLayout: "
+                  << limits.limits.maxDynamicUniformBuffersPerPipelineLayout
+                  << std::endl;
+        std::cout << " - maxDynamicStorageBuffersPerPipelineLayout: "
+                  << limits.limits.maxDynamicStorageBuffersPerPipelineLayout
+                  << std::endl;
+        std::cout << " - maxSampledTexturesPerShaderStage: "
+                  << limits.limits.maxSampledTexturesPerShaderStage
+                  << std::endl;
+        std::cout << " - maxSamplersPerShaderStage: "
+                  << limits.limits.maxSamplersPerShaderStage << std::endl;
+        std::cout << " - maxStorageBuffersPerShaderStage: "
+                  << limits.limits.maxStorageBuffersPerShaderStage << std::endl;
+        std::cout << " - maxStorageTexturesPerShaderStage: "
+                  << limits.limits.maxStorageTexturesPerShaderStage
+                  << std::endl;
+        std::cout << " - maxUniformBuffersPerShaderStage: "
+                  << limits.limits.maxUniformBuffersPerShaderStage << std::endl;
+        std::cout << " - maxUniformBufferBindingSize: "
+                  << limits.limits.maxUniformBufferBindingSize << std::endl;
+        std::cout << " - maxStorageBufferBindingSize: "
+                  << limits.limits.maxStorageBufferBindingSize << std::endl;
+        std::cout << " - minUniformBufferOffsetAlignment: "
+                  << limits.limits.minUniformBufferOffsetAlignment << std::endl;
+        std::cout << " - minStorageBufferOffsetAlignment: "
+                  << limits.limits.minStorageBufferOffsetAlignment << std::endl;
+        std::cout << " - maxVertexBuffers: " << limits.limits.maxVertexBuffers
+                  << std::endl;
+        std::cout << " - maxVertexAttributes: "
+                  << limits.limits.maxVertexAttributes << std::endl;
+        std::cout << " - maxVertexBufferArrayStride: "
+                  << limits.limits.maxVertexBufferArrayStride << std::endl;
+        std::cout << " - maxInterStageShaderComponents: "
+                  << limits.limits.maxInterStageShaderComponents << std::endl;
+        std::cout << " - maxComputeWorkgroupStorageSize: "
+                  << limits.limits.maxComputeWorkgroupStorageSize << std::endl;
+        std::cout << " - maxComputeInvocationsPerWorkgroup: "
+                  << limits.limits.maxComputeInvocationsPerWorkgroup
+                  << std::endl;
+        std::cout << " - maxComputeWorkgroupSizeX: "
+                  << limits.limits.maxComputeWorkgroupSizeX << std::endl;
+        std::cout << " - maxComputeWorkgroupSizeY: "
+                  << limits.limits.maxComputeWorkgroupSizeY << std::endl;
+        std::cout << " - maxComputeWorkgroupSizeZ: "
+                  << limits.limits.maxComputeWorkgroupSizeZ << std::endl;
+        std::cout << " - maxComputeWorkgroupsPerDimension: "
+                  << limits.limits.maxComputeWorkgroupsPerDimension
+                  << std::endl;
+    }
+
+    WGPUAdapterProperties properties = {};
+    properties.nextInChain = nullptr;
+    wgpuAdapterGetProperties(adapter, &properties);
+    std::cout << "Adapter properties:" << std::endl;
+    std::cout << " - vendorID: " << properties.vendorID << std::endl;
+    std::cout << " - deviceID: " << properties.deviceID << std::endl;
+    std::cout << " - name: " << properties.name << std::endl;
+    if (properties.driverDescription) {
+        std::cout << " - driverDescription: " << properties.driverDescription
+                  << std::endl;
+    }
+    std::cout << " - adapterType: " << properties.adapterType << std::endl;
+    std::cout << " - backendType: " << properties.backendType << std::endl;
+}
+
 void Ecstasy::webgpu() {
     WGPUInstanceDescriptor desc = {};
     desc.nextInChain = nullptr;
-
-    // 2. We create the instance using this descriptor
     WGPUInstance instance = wgpuCreateInstance(&desc);
-
-    // 3. We can check whether there is actually an instance created
     if (!instance) {
         std::cerr << "Could not initialize WebGPU!" << std::endl;
         return;
     }
 
-    // 4. Display the object (WGPUInstance is a simple pointer, it may be
-    // copied around without worrying about its size).
-    std::cout << "WGPU instance: " << instance << std::endl;
+    if (!glfwInit()) {
+        std::cerr << "Could not initialize GLFW!" << std::endl;
+        return;
+    }
 
+    // We ask GLFW not to set up any graphics API, we'll do it manually
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+    GLFWwindow* window = glfwCreateWindow(640, 480, "Learn WebGPU", NULL, NULL);
+    if (!window) {
+        std::cerr << "Could not open window!" << std::endl;
+        return;
+    }
+
+    std::cout << "Requesting adapter..." << std::endl;
+
+    // Utility function provided by glfw3webgpu.h
+    WGPUSurface surface = glfwGetWGPUSurface(instance, window);
+
+    // Adapter options: we need the adapter to draw to the window's surface
     WGPURequestAdapterOptions adapterOpts = {};
+    adapterOpts.nextInChain = nullptr;
+    adapterOpts.compatibleSurface = surface;
+
+    // Get the adapter, see the comments in the definition of the body of the
+    // requestAdapter function above.
     WGPUAdapter adapter = requestAdapter(instance, &adapterOpts);
+
+    std::cout << "Got adapter: " << adapter << std::endl;
+
+    inspectAdapter(adapter);
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+    }
+
+    // Don't forget to release the adapter
+    wgpuAdapterRelease(adapter);
+    wgpuInstanceRelease(instance);
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    return;
 }
