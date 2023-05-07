@@ -6,6 +6,7 @@
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+#include <webgpu/webgpu.h>
 
 #include <Eigen/Dense>
 #include <iostream>
@@ -47,4 +48,22 @@ void Ecstasy::compute() {
   m(0, 1) = -1;
   m(1, 1) = m(1, 0) + m(0, 1);
   std::cout << m << std::endl;
+}
+
+void Ecstasy::dawnTest() {
+  WGPUInstanceDescriptor desc = {};
+  desc.nextInChain = nullptr;
+
+  // 2. We create the instance using this descriptor
+  WGPUInstance instance = wgpuCreateInstance(&desc);
+
+  // 3. We can check whether there is actually an instance created
+  if (!instance) {
+    std::cerr << "Could not initialize WebGPU!" << std::endl;
+    return;
+  }
+
+  // 4. Display the object (WGPUInstance is a simple pointer, it may be
+  // copied around without worrying about its size).
+  std::cout << "WGPU instance: " << instance << std::endl;
 }

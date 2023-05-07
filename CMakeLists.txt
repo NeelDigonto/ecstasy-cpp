@@ -1,25 +1,4 @@
-# Webgpu 
-# SDL 2
-# Igmui
 cmake_minimum_required(VERSION 3.21)
-
-# set(CMAKE_C_COMPILER "clang")
-# set(CMAKE_CXX_COMPILER "clang++")
-# 
-# set(MIN_CLANG_VERSION "16.0")
-# 
-# if (CMAKE_C_COMPILER_ID MATCHES "Clang")
-#     if (CMAKE_C_COMPILER_VERSION VERSION_LESS MIN_CLANG_VERSION)
-#         message(FATAL_ERROR "Detected C compiler Clang ${CMAKE_C_COMPILER_VERSION} < ${MIN_CLANG_VERSION}")
-#     endif()
-# endif()
-# 
-# if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-#     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS MIN_CLANG_VERSION)
-#         message(FATAL_ERROR "Detected CXX compiler Clang ${CMAKE_CXX_COMPILER_VERSION} < ${MIN_CLANG_VERSION}")
-#     endif()
-# endif()
-
 # https://github.com/nothings/stb
 # https://gitlab.com/libeigen/eigen
 # https://github.com/libsdl-org/SDL
@@ -45,15 +24,14 @@ project(Ecstasy
     LANGUAGES C CXX
     )
 
-
 include(FetchContent)
 include(cmake/download_file.cmake)
 include(cmake/dll_utils.cmake)
 
 if(MSVC)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-    #set(BUILD_SHARED_LIBS TRUE)
-    #set(BUILD_STATIC_LIBS TRUE)
+    set(BUILD_SHARED_LIBS OFF)
+    set(BUILD_STATIC_LIBS ON)
 endif()
 
 set(ECSTASY_LIB "ecstasy")
@@ -104,6 +82,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(stb)
 include_directories(${stb_SOURCE_DIR})
+
+set(WEBGPU_BACKEND "wgpu")
+FetchContent_Declare(
+  webgpu
+  GIT_REPOSITORY https://github.com/eliemichel/WebGPU-distribution
+  GIT_TAG        main
+)
+FetchContent_MakeAvailable(webgpu)
+# move it deeper later, cause we dont need webgpu to eb exposed in global space, doing it now for exposing target_copy_webgpu_binaries() to samples
 
 add_subdirectory(ecstasy)
 add_subdirectory(sample)

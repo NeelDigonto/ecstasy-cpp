@@ -17,4 +17,4 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glfw)
 
 add_subdirectory(src)
-add_subdirectory(third_party)
+#add_subdirectory(third_party)

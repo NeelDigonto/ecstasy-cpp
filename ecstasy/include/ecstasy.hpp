@@ -8,4 +8,5 @@ struct Event {
 
 void display();
 void compute();
+void dawnTest();
 }  // namespace Ecstasy
