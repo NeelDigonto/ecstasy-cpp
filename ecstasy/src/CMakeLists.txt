@@ -25,5 +25,6 @@ target_include_directories(
     ${SDL2_SOURCE_DIR}/include
     )
 #MESSAGE("SDL2_LIBRARIES ${SDL2_LIBRARIES}")
-target_link_libraries(${ECSTASY_LIB} PRIVATE fmt::fmt SDL2main SDL2-static glfw Eigen3::Eigen webgpu)
+target_link_libraries(${ECSTASY_LIB} PRIVATE fmt::fmt glfw Eigen3::Eigen webgpu glfw3webgpu)
 
+# SDL2main SDL2-static 

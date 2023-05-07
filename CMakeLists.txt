@@ -86,7 +86,7 @@ include_directories(${stb_SOURCE_DIR})
 set(WEBGPU_BACKEND "wgpu")
 FetchContent_Declare(
   webgpu
-  GIT_REPOSITORY https://github.com/eliemichel/WebGPU-distribution
+  GIT_REPOSITORY "https://github.com/eliemichel/WebGPU-distribution"
   GIT_TAG        main
 )
 FetchContent_MakeAvailable(webgpu)

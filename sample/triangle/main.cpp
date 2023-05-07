@@ -10,7 +10,8 @@ int main(int argc, char** argv) {
   fmt::print("Hello, world!\n");
   // Ecstasy::display();
   // Ecstasy::compute();
-  Ecstasy::dawnTest();
+  // Ecstasy::dawnTest();
+  Ecstasy::webgpu();
 }
 
 // void testa() { Ecstasy::display(); }
