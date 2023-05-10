@@ -1,10 +1,8 @@
-#include <entt/entt.hpp>
+#pragma once
 
 namespace ecstasy {
 class scene {
   private:
-    entt::registry registry_;
-
   public:
     scene();
 };

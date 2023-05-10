@@ -21,8 +21,6 @@ FetchContent_MakeAvailable(glfw3webgpu)
 
 target_include_directories(
         ${ECSTASY_LIB} PRIVATE 
-        ${webgpu_SOURCE_DIR}/include/
-        ${webgpu_SOURCE_DIR}/include/webgpu
         ${CMAKE_CURRENT_SOURCE_DIR}/../include
         ${CMAKE_CURRENT_SOURCE_DIR}
         )

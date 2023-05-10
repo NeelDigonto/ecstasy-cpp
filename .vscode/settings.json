@@ -3,6 +3,7 @@
     "iostream": "cpp",
     "dense": "cpp",
     "filesystem": "cpp",
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "memory": "cpp"
   }
 }

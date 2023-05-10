@@ -90,6 +90,8 @@ FetchContent_Declare(
   GIT_TAG        main
 )
 FetchContent_MakeAvailable(webgpu)
+include_directories(${webgpu_SOURCE_DIR}/include)
+include_directories(${webgpu_SOURCE_DIR}/include/webgpu)
 # move it deeper later, cause we dont need webgpu to eb exposed in global space, doing it now for exposing target_copy_webgpu_binaries() to samples
 
 FetchContent_Declare(

@@ -1,4 +1,3 @@
-
 #include <glfw3webgpu.h>
 #include "./common/webgpu_compat.h"
 
@@ -11,6 +10,7 @@
 #include <vector>
 
 #include <ecstasy/ecstasy.hpp>
+#include <ecstasy/scene.hpp>
 
 /**
  * Utility function to get a WebGPU adapter, so that
@@ -176,7 +176,7 @@ ecstasy::app::app() {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     // glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Learn WebGPU", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Ecstasy", NULL, NULL);
     if (!window) {
         std::cerr << "Could not open window!" << std::endl;
         return;
@@ -212,4 +212,18 @@ ecstasy::app::app() {
     glfwTerminate();
 
     return;
+}
+
+ecstasy::scene ecstasy::app::createScene() {
+    // registry_.emplace<>;
+    std::cout << "Scene Created! " << std::endl;
+}
+
+ecstasy::app::~app() {
+    // wgpuSwapChainRelease(webgpu_swapchain_);
+    // wgpuDeviceRelease(webgpu_device_);
+    // wgpuAdapterRelease(webgpu_adapter_);
+    // wgpuInstanceRelease(webgpu_instance_);
+    // glfwDestroyWindow(window_);
+    // glfwTerminate();
 }
