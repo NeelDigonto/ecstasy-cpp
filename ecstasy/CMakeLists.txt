@@ -14,11 +14,37 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw3webgpu)
 
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY "https://github.com/nothings/stb"
+    GIT_TAG 5736b15f7ea0ffb08dd38af21067c314d6a3aae9
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(stb)
+include_directories(${stb_SOURCE_DIR})
+
+set(WEBGPU_BACKEND "wgpu")
+FetchContent_Declare(
+  webgpu
+  GIT_REPOSITORY "https://github.com/eliemichel/WebGPU-distribution"
+  GIT_TAG        main
+)
+FetchContent_MakeAvailable(webgpu)
+
+FetchContent_Declare(
+    EnTT
+    GIT_REPOSITORY "https://github.com/skypjack/entt"
+    GIT_TAG v3.11.1
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(EnTT)
+
 add_subdirectory(src)
 #add_subdirectory(third_party)
 
 add_library(${ECSTASY_LIB} STATIC ${ECSTASY_SOURCES})
 
+target_include_directories( ${ECSTASY_LIB} PRIVATE ${EnTT_SOURCE_DIR}/src)
 target_include_directories(
         ${ECSTASY_LIB} PRIVATE 
         ${webgpu_SOURCE_DIR}/include

@@ -74,35 +74,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(eigen)
 
-FetchContent_Declare(
-    stb
-    GIT_REPOSITORY "https://github.com/nothings/stb"
-    GIT_TAG 5736b15f7ea0ffb08dd38af21067c314d6a3aae9
-    GIT_PROGRESS TRUE
-)
-FetchContent_MakeAvailable(stb)
-include_directories(${stb_SOURCE_DIR})
-
-set(WEBGPU_BACKEND "wgpu")
-FetchContent_Declare(
-  webgpu
-  GIT_REPOSITORY "https://github.com/eliemichel/WebGPU-distribution"
-  GIT_TAG        main
-)
-FetchContent_MakeAvailable(webgpu)
-#include_directories(${webgpu_SOURCE_DIR}/include)
-#include_directories(${webgpu_SOURCE_DIR}/include/webgpu)
-# move it deeper later, cause we dont need webgpu to eb exposed in global space, doing it now for exposing target_copy_webgpu_binaries() to samples
-
-FetchContent_Declare(
-    EnTT
-    GIT_REPOSITORY "https://github.com/skypjack/entt"
-    GIT_TAG v3.11.1
-    GIT_PROGRESS TRUE
-)
-FetchContent_MakeAvailable(EnTT)
-include_directories(${EnTT_SOURCE_DIR}/src)
-
 add_subdirectory(ecstasy)
 add_subdirectory(sample)
 
