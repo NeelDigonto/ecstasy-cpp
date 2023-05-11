@@ -11,6 +11,7 @@
 
 #include <ecstasy/ecstasy.hpp>
 #include <ecstasy/scene.hpp>
+#include <Eigen/Dense>
 
 /**
  * Utility function to get a WebGPU adapter, so that
@@ -161,8 +162,8 @@ void inspectAdapter(WGPUAdapter adapter) {
 ecstasy::app::app() {
     WGPUInstanceDescriptor desc = {};
     desc.nextInChain = nullptr;
-    WGPUInstance instance = wgpuCreateInstance(&desc);
-    if (!instance) {
+    webgpu_instance_ = wgpuCreateInstance(&desc);
+    if (!webgpu_instance_) {
         std::cerr << "Could not initialize WebGPU!" << std::endl;
         return;
     }
@@ -176,8 +177,8 @@ ecstasy::app::app() {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     // glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Ecstasy", NULL, NULL);
-    if (!window) {
+    window_ = glfwCreateWindow(1280, 720, "Ecstasy", NULL, NULL);
+    if (!window_) {
         std::cerr << "Could not open window!" << std::endl;
         return;
     }
@@ -185,7 +186,7 @@ ecstasy::app::app() {
     std::cout << "Requesting adapter..." << std::endl;
 
     // Utility function provided by glfw3webgpu.h
-    WGPUSurface surface = glfwGetWGPUSurface(instance, window);
+    WGPUSurface surface = glfwGetWGPUSurface(webgpu_instance_, window_);
 
     // Adapter options: we need the adapter to draw to the window's surface
     WGPURequestAdapterOptions adapterOpts = {};
@@ -194,22 +195,11 @@ ecstasy::app::app() {
 
     // Get the adapter, see the comments in the definition of the body of the
     // requestAdapter function above.
-    WGPUAdapter adapter = requestAdapter(instance, &adapterOpts);
+    webgpu_adapter_ = requestAdapter(webgpu_instance_, &adapterOpts);
 
-    std::cout << "Got adapter: " << adapter << std::endl;
+    std::cout << "Got adapter: " << webgpu_adapter_ << std::endl;
 
-    inspectAdapter(adapter);
-
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-    }
-
-    // Don't forget to release the adapter
-    wgpuAdapterRelease(adapter);
-    wgpuInstanceRelease(instance);
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    inspectAdapter(webgpu_adapter_);
 
     return;
 }
@@ -219,11 +209,17 @@ ecstasy::scene ecstasy::app::createScene() {
     std::cout << "Scene Created! " << std::endl;
 }
 
+void ecstasy::app::run() {
+    while (!glfwWindowShouldClose(window_)) {
+        glfwPollEvents();
+    }
+}
+
 ecstasy::app::~app() {
     // wgpuSwapChainRelease(webgpu_swapchain_);
     // wgpuDeviceRelease(webgpu_device_);
-    // wgpuAdapterRelease(webgpu_adapter_);
-    // wgpuInstanceRelease(webgpu_instance_);
-    // glfwDestroyWindow(window_);
-    // glfwTerminate();
+    wgpuAdapterRelease(webgpu_adapter_);
+    wgpuInstanceRelease(webgpu_instance_);
+    glfwDestroyWindow(window_);
+    glfwTerminate();
 }

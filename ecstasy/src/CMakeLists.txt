@@ -25,6 +25,14 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}
         )
 
+target_include_directories(
+        ${ECSTASY_LIB} PRIVATE 
+        ${webgpu_SOURCE_DIR}/include
+        ${webgpu_SOURCE_DIR}/include/webgpu
+        )
+
+        
+
 target_link_libraries(${ECSTASY_LIB} PRIVATE fmt::fmt glfw Eigen3::Eigen webgpu glfw3webgpu EnTT::EnTT)
 
 # sdl2
