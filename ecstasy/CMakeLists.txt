@@ -14,7 +14,19 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw3webgpu)
 
-
 add_subdirectory(src)
 #add_subdirectory(third_party)
 
+add_library(${ECSTASY_LIB} STATIC ${ECSTASY_SOURCES})
+
+target_include_directories(
+        ${ECSTASY_LIB} PRIVATE 
+        ${webgpu_SOURCE_DIR}/include
+        ${webgpu_SOURCE_DIR}/include/webgpu
+        )
+target_include_directories(
+        ${ECSTASY_LIB} PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        )
+
+target_link_libraries(${ECSTASY_LIB} PRIVATE fmt::fmt glfw Eigen3::Eigen webgpu glfw3webgpu EnTT::EnTT)
