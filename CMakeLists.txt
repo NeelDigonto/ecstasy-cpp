@@ -74,6 +74,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(eigen)
 
+FetchContent_Declare(
+    EnTT
+    GIT_REPOSITORY "https://github.com/skypjack/entt"
+    GIT_TAG v3.11.1
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(EnTT)
+include_directories(${EnTT_SOURCE_DIR}/src)
+
 add_subdirectory(ecstasy)
 add_subdirectory(sample)
 

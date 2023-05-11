@@ -1,18 +1,8 @@
 #pragma once
+#include <ecstasy/fd.h>
 #include <entt/entt.hpp>
 #include <ecstasy/scene.hpp>
-// #include <Eigen/Dense>
-
-class GLFWwindow;
-class WGPUInstanceImpl;
-class WGPUAdapterImpl;
-class WGPUDeviceImpl;
-class WGPUSwapChainImpl;
-
-typedef struct WGPUInstanceImpl* WGPUInstance;
-typedef struct WGPUAdapterImpl* WGPUAdapter;
-typedef struct WGPUDeviceImpl* WGPUDevice;
-typedef struct WGPUSwapChainImpl* WGPUSwapChain;
+//   #include <Eigen/Dense>
 
 namespace ecstasy {
 

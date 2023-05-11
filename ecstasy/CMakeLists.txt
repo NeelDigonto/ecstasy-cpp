@@ -31,14 +31,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(webgpu)
 
 FetchContent_Declare(
-    EnTT
-    GIT_REPOSITORY "https://github.com/skypjack/entt"
-    GIT_TAG v3.11.1
-    GIT_PROGRESS TRUE
-)
-FetchContent_MakeAvailable(EnTT)
-
-FetchContent_Declare(
     imgui
     GIT_REPOSITORY "https://github.com/ocornut/imgui"
     GIT_TAG v1.89.5
@@ -60,7 +52,7 @@ add_subdirectory(src)
 add_library(${ECSTASY_LIB} STATIC ${ECSTASY_SOURCES})
 
 target_include_directories( ${ECSTASY_LIB} PRIVATE ${stb_SOURCE_DIR})
-target_include_directories( ${ECSTASY_LIB} PRIVATE ${EnTT_SOURCE_DIR}/src)
+#target_include_directories( ${ECSTASY_LIB} PRIVATE ${EnTT_SOURCE_DIR}/src)
 target_include_directories(
         ${ECSTASY_LIB} PRIVATE 
         ${webgpu_SOURCE_DIR}/include
@@ -69,6 +61,7 @@ target_include_directories(
 target_include_directories(
         ${ECSTASY_LIB} PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
         )
 
 target_link_libraries(${ECSTASY_LIB} PRIVATE fmt::fmt glfw Eigen3::Eigen webgpu glfw3webgpu EnTT::EnTT)
