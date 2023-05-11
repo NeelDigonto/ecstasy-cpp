@@ -21,7 +21,6 @@ FetchContent_Declare(
     GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(stb)
-include_directories(${stb_SOURCE_DIR})
 
 set(WEBGPU_BACKEND "wgpu")
 FetchContent_Declare(
@@ -39,11 +38,28 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(EnTT)
 
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY "https://github.com/ocornut/imgui"
+    GIT_TAG v1.89.5
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(imgui)
+
+FetchContent_Declare(
+    implot
+    GIT_REPOSITORY "https://github.com/epezent/implot"
+    GIT_TAG v0.14
+    GIT_PROGRESS TRUE
+)
+FetchContent_Populate(implot)
+
 add_subdirectory(src)
 #add_subdirectory(third_party)
 
 add_library(${ECSTASY_LIB} STATIC ${ECSTASY_SOURCES})
 
+target_include_directories( ${ECSTASY_LIB} PRIVATE ${stb_SOURCE_DIR})
 target_include_directories( ${ECSTASY_LIB} PRIVATE ${EnTT_SOURCE_DIR}/src)
 target_include_directories(
         ${ECSTASY_LIB} PRIVATE 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 # https://github.com/nothings/stb
 # https://gitlab.com/libeigen/eigen
-# https://github.com/libsdl-org/SDL
+# https://github.com/glfw/glfw
 # https://github.com/ocornut/imgui
 # https://github.com/fmtlib/fmt
 # https://github.com/hexops/mach-gpu-dawn
