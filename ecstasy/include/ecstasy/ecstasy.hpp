@@ -6,6 +6,8 @@
 #include <ecstasy/scene.hpp>
 #include <Eigen/Dense>
 
+// auto create a default scene
+
 namespace ecstasy {
 
 class app {
@@ -13,7 +15,7 @@ class app {
     std::string app_name_;
     std::uint32_t window_width_;
     std::uint32_t window_height_;
-    Eigen::Vector4d clear_color_{0.9, 0.1, 0.2, 1.0};
+    Eigen::Vector4d clear_color_{1.0, 1.0, 1.0, 1.0};
 
     entt::registry registry_;
 
@@ -28,8 +30,8 @@ class app {
   public:
     app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 1280U,
         std::uint32_t _window_height = 720U);
-    ecstasy::scene createScene();
-    void setClearColor(const Eigen::Vector4d& _clear_color) const noexcept;
+    // ecstasy::scene createScene();
+    void setClearColor(const Eigen::Vector4d& _clear_color) noexcept;
     bool shouldClose() const noexcept;
     void animate();
     ~app();

@@ -89,14 +89,18 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     std::cout << "Swapchain: " << webgpu_swapchain_ << std::endl;
 }
 
+void ecstasy::app::setClearColor(const Eigen::Vector4d& _clear_color) noexcept {
+    clear_color_ = _clear_color;
+};
+
 bool ecstasy::app::shouldClose() const noexcept {
     return glfwWindowShouldClose(window_);
 }
 
-ecstasy::scene ecstasy::app::createScene() {
+/* ecstasy::scene ecstasy::app::createScene() {
     // registry_.emplace<>;
     std::cout << "Scene Created! " << std::endl;
-}
+} */
 
 void ecstasy::app::animate() {
     glfwPollEvents();

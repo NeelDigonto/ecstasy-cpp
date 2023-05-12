@@ -1,14 +1,8 @@
-#include <fmt/core.h>
-
 #include <ecstasy/ecstasy.hpp>
-#include <ecstasy/scene.hpp>
-#include <iostream>
 
 int main(int argc, char** argv) {
-    fmt::print("Hello, world!\n");
-    // Ecstasy::adapter();
-    ecstasy::app app{"Clear Color"};
-    // const auto scene = app.createScene();
+    ecstasy::app app("Clear Color");
+    app.setClearColor({0.9, 0.1, 0.2, 1.0});
     while (!app.shouldClose())
         app.animate();
 }
