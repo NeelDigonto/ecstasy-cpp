@@ -15,9 +15,13 @@
 #include "./webgpu_adapter.hpp"
 #include "./webgpu_device.hpp"
 
-ecstasy::app::app() {
-    WGPUInstanceDescriptor desc = {};
-    desc.nextInChain = nullptr;
+ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
+                  std::uint32_t _window_height) {
+    app_name_ = _app_name;
+    window_height_ = _window_height;
+    window_width_ = _window_width;
+
+    WGPUInstanceDescriptor desc = {.nextInChain = nullptr};
     WGPUInstance instance = wgpuCreateInstance(&desc);
     if (!instance) {
         std::cerr << "Could not initialize WebGPU!" << std::endl;
@@ -31,28 +35,28 @@ ecstasy::app::app() {
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Learn WebGPU", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(window_width_, window_height_,
+                                          app_name_.c_str(), NULL, NULL);
     if (!window) {
         std::cerr << "Could not open window!" << std::endl;
         return;
     }
 
-    std::cout << "Requesting adapter..." << std::endl;
     WGPUSurface surface = glfwGetWGPUSurface(instance, window);
-    WGPURequestAdapterOptions adapterOpts = {};
-    adapterOpts.nextInChain = nullptr;
-    adapterOpts.compatibleSurface = surface;
+
+    std::cout << "Requesting adapter..." << std::endl;
+    WGPURequestAdapterOptions adapterOpts = {.nextInChain = nullptr,
+                                             .compatibleSurface = surface};
     WGPUAdapter adapter = requestAdapter(instance, &adapterOpts);
     std::cout << "Got adapter: " << adapter << std::endl;
 
     std::cout << "Requesting device..." << std::endl;
-    WGPUDeviceDescriptor deviceDesc = {};
-    deviceDesc.nextInChain = nullptr;
-    deviceDesc.label = "My Device";
-    deviceDesc.requiredFeaturesCount = 0;
-    deviceDesc.requiredLimits = nullptr;
-    deviceDesc.defaultQueue.nextInChain = nullptr;
-    deviceDesc.defaultQueue.label = "The default queue";
+    WGPUDeviceDescriptor deviceDesc = {
+        .nextInChain = nullptr,
+        .label = "My Device",
+        .requiredFeaturesCount = 0,
+        .requiredLimits = nullptr,
+        .defaultQueue = {.nextInChain = nullptr, .label = "The default queue"}};
     WGPUDevice device = requestDevice(adapter, &deviceDesc);
     std::cout << "Got device: " << device << std::endl;
 
@@ -60,26 +64,24 @@ ecstasy::app::app() {
 
     std::cout << "Creating swapchain device..." << std::endl;
 
+    WGPUTextureFormat swapChainFormat =
+        wgpuSurfaceGetPreferredFormat(surface, adapter);
+
     // We describe the Swap Chain that is used to present rendered textures on
     // screen. Note that it is specific to a given window size so don't resize.
-    WGPUSwapChainDescriptor swapChainDesc = {};
-    swapChainDesc.width = 640;
-    swapChainDesc.height = 480;
-
     // Like buffers, textures are allocated for a specific usage. In our case,
     // we will use them as the target of a Render Pass so it needs to be created
     // with the `RenderAttachment` usage flag.
-    swapChainDesc.usage = WGPUTextureUsage_RenderAttachment;
-
     // The swap chain textures use the color format suggested by the target
     // surface.
-    WGPUTextureFormat swapChainFormat =
-        wgpuSurfaceGetPreferredFormat(surface, adapter);
-    swapChainDesc.format = swapChainFormat;
-
     // FIFO stands for "first in, first out", meaning that the presented
     // texture is always the oldest one, like a regular queue.
-    swapChainDesc.presentMode = WGPUPresentMode_Fifo;
+    WGPUSwapChainDescriptor swapChainDesc = {
+        .usage = WGPUTextureUsage_RenderAttachment,
+        .format = swapChainFormat,
+        .width = window_width_,
+        .height = window_height_,
+        .presentMode = WGPUPresentMode_Fifo};
 
     // Finally create the Swap Chain
     WGPUSwapChain swapChain =
@@ -101,9 +103,11 @@ ecstasy::app::app() {
         }
         std::cout << "nextTexture: " << nextTexture << std::endl;
 
-        WGPUCommandEncoderDescriptor commandEncoderDesc = {};
-        commandEncoderDesc.nextInChain = nullptr;
-        commandEncoderDesc.label = "Command Encoder";
+        WGPUCommandEncoderDescriptor commandEncoderDesc = {
+            .nextInChain = nullptr,
+            .label = "Command Encoder",
+        };
+
         WGPUCommandEncoder encoder =
             wgpuDeviceCreateCommandEncoder(device, &commandEncoderDesc);
 
@@ -114,7 +118,7 @@ ecstasy::app::app() {
         // The attachment is tighed to the view returned by the swap chain, so
         // that the render pass draws directly on screen.
         renderPassColorAttachment.view = nextTexture;
-        // Not relevant here because we do not use multi-sampling
+        // resolveTarget: Not relevant here because we do not use multi-sampling
         renderPassColorAttachment.resolveTarget = nullptr;
         renderPassColorAttachment.loadOp = WGPULoadOp_Clear;
         renderPassColorAttachment.storeOp = WGPUStoreOp_Store;

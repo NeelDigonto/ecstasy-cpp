@@ -7,7 +7,7 @@
 int main(int argc, char** argv) {
     fmt::print("Hello, world!\n");
     // Ecstasy::adapter();
-    ecstasy::app app;
+    ecstasy::app app{"Clear Color"};
     const auto scene = app.createScene();
 }
 
