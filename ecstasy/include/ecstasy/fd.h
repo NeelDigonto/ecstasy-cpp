@@ -2,6 +2,8 @@
 
 struct GLFWwindow;
 
+struct Color {};
+
 struct WGPUAdapterImpl;
 struct WGPUBindGroupImpl;
 struct WGPUBindGroupLayoutImpl;

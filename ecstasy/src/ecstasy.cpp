@@ -111,17 +111,28 @@ void ecstasy::app::animate() {
         // break;
         return;
     }
-    std::cout << "nextTexture: " << nextTexture << std::endl;
+    // std::cout << "nextTexture: " << nextTexture << std::endl;
 
     // The attachment is tighed to the view returned by the swap chain, so
     // that the render pass draws directly on screen.
     // resolveTarget: Not relevant here because we do not use multi-sampling
+    const WGPUColor clear_color = {clear_color_[0], clear_color_[1],
+                                   clear_color_[2], clear_color_[3]};
+
     WGPURenderPassColorAttachment renderPassColorAttachment = {
         .view = nextTexture,
         .resolveTarget = nullptr,
         .loadOp = WGPULoadOp_Clear,
         .storeOp = WGPUStoreOp_Store,
-        .clearValue = WGPUColor{0.9, 0.1, 0.2, 1.0}};
+        .clearValue = clear_color};
+
+    WGPUCommandEncoderDescriptor commandEncoderDesc = {
+        .nextInChain = nullptr,
+        .label = "Command Encoder",
+    };
+    // needs to be in render loop
+    webgpu_encoder_ =
+        wgpuDeviceCreateCommandEncoder(webgpu_device_, &commandEncoderDesc);
 
     // Describe a render pass, which targets the texture view
     // No depth buffer for now
@@ -135,18 +146,11 @@ void ecstasy::app::animate() {
         .timestampWrites = nullptr,
     };
 
-    WGPUCommandEncoderDescriptor commandEncoderDesc = {
-        .nextInChain = nullptr,
-        .label = "Command Encoder",
-    };
-    WGPUCommandEncoder encoder =
-        wgpuDeviceCreateCommandEncoder(webgpu_device_, &commandEncoderDesc);
-
     // Create a render pass. We end it immediately because we use its
     // built-in mechanism for clearing the screen when it begins (see
     // descriptor).
     WGPURenderPassEncoder renderPass =
-        wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
+        wgpuCommandEncoderBeginRenderPass(webgpu_encoder_, &renderPassDesc);
     wgpuRenderPassEncoderEnd(renderPass);
 
     wgpuTextureViewRelease(nextTexture);
@@ -154,7 +158,7 @@ void ecstasy::app::animate() {
     WGPUCommandBufferDescriptor cmdBufferDescriptor = {
         .nextInChain = nullptr, .label = "Command buffer"};
     WGPUCommandBuffer command =
-        wgpuCommandEncoderFinish(encoder, &cmdBufferDescriptor);
+        wgpuCommandEncoderFinish(webgpu_encoder_, &cmdBufferDescriptor);
     wgpuQueueSubmit(webgpu_queue_, 1, &command);
 
     // We can tell the swap chain to present the next texture.

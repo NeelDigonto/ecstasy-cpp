@@ -12,5 +12,3 @@ int main(int argc, char** argv) {
     while (!app.shouldClose())
         app.animate();
 }
-
-// void testa() { Ecstasy::display(); }

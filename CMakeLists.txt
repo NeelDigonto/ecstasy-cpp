@@ -73,6 +73,7 @@ FetchContent_Declare(
     GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(eigen)
+include_directories(${eigen_SOURCE_DIR})
 
 FetchContent_Declare(
     EnTT
