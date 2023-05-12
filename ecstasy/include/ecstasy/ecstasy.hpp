@@ -20,13 +20,15 @@ class app {
     WGPUAdapter webgpu_adapter_;
     WGPUDevice webgpu_device_;
     WGPUInstance webgpu_instance_;
+    WGPUQueue webgpu_queue_;
     WGPUSwapChain webgpu_swapchain_;
 
   public:
     app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 1280U,
         std::uint32_t _window_height = 720U);
     ecstasy::scene createScene();
-    void run();
+    bool shouldClose() const noexcept;
+    void animate();
     ~app();
 };
 } // namespace ecstasy
