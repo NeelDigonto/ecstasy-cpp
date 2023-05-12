@@ -103,37 +103,34 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
         }
         std::cout << "nextTexture: " << nextTexture << std::endl;
 
+        // The attachment is tighed to the view returned by the swap chain, so
+        // that the render pass draws directly on screen.
+        // resolveTarget: Not relevant here because we do not use multi-sampling
+        WGPURenderPassColorAttachment renderPassColorAttachment = {
+            .view = nextTexture,
+            .resolveTarget = nullptr,
+            .loadOp = WGPULoadOp_Clear,
+            .storeOp = WGPUStoreOp_Store,
+            .clearValue = WGPUColor{0.9, 0.1, 0.2, 1.0}};
+
+        // Describe a render pass, which targets the texture view
+        // No depth buffer for now
+        // We do not use timers for now neither
+        WGPURenderPassDescriptor renderPassDesc = {
+            .nextInChain = nullptr,
+            .colorAttachmentCount = 1,
+            .colorAttachments = &renderPassColorAttachment,
+            .depthStencilAttachment = nullptr,
+            .timestampWriteCount = 0,
+            .timestampWrites = nullptr,
+        };
+
         WGPUCommandEncoderDescriptor commandEncoderDesc = {
             .nextInChain = nullptr,
             .label = "Command Encoder",
         };
-
         WGPUCommandEncoder encoder =
             wgpuDeviceCreateCommandEncoder(device, &commandEncoderDesc);
-
-        // Describe a render pass, which targets the texture view
-        WGPURenderPassDescriptor renderPassDesc = {};
-
-        WGPURenderPassColorAttachment renderPassColorAttachment = {};
-        // The attachment is tighed to the view returned by the swap chain, so
-        // that the render pass draws directly on screen.
-        renderPassColorAttachment.view = nextTexture;
-        // resolveTarget: Not relevant here because we do not use multi-sampling
-        renderPassColorAttachment.resolveTarget = nullptr;
-        renderPassColorAttachment.loadOp = WGPULoadOp_Clear;
-        renderPassColorAttachment.storeOp = WGPUStoreOp_Store;
-        renderPassColorAttachment.clearValue = WGPUColor{0.9, 0.1, 0.2, 1.0};
-        renderPassDesc.colorAttachmentCount = 1;
-        renderPassDesc.colorAttachments = &renderPassColorAttachment;
-
-        // No depth buffer for now
-        renderPassDesc.depthStencilAttachment = nullptr;
-
-        // We do not use timers for now neither
-        renderPassDesc.timestampWriteCount = 0;
-        renderPassDesc.timestampWrites = nullptr;
-
-        renderPassDesc.nextInChain = nullptr;
 
         // Create a render pass. We end it immediately because we use its
         // built-in mechanism for clearing the screen when it begins (see
@@ -144,9 +141,9 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
 
         wgpuTextureViewRelease(nextTexture);
 
-        WGPUCommandBufferDescriptor cmdBufferDescriptor = {};
-        cmdBufferDescriptor.nextInChain = nullptr;
-        cmdBufferDescriptor.label = "Command buffer";
+        WGPUCommandBufferDescriptor cmdBufferDescriptor = {
+            .nextInChain = nullptr, .label = "Command buffer"};
+
         WGPUCommandBuffer command =
             wgpuCommandEncoderFinish(encoder, &cmdBufferDescriptor);
         wgpuQueueSubmit(queue, 1, &command);
