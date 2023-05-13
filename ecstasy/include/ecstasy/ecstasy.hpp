@@ -15,7 +15,7 @@ class app {
     std::string app_name_;
     std::uint32_t window_width_;
     std::uint32_t window_height_;
-    Eigen::Vector4d clear_color_{1.0, 1.0, 1.0, 1.0};
+    Eigen::Vector4d clear_color_{0.5, 0.5, 0.5, 1.0};
 
     entt::registry registry_;
 
