@@ -4,6 +4,11 @@
 #include <ecstasy/fd.h>
 #include <entt/entt.hpp>
 #include <ecstasy/scene.hpp>
+#include <ecstasy/shader.hpp>
+#include <ecstasy/texture.hpp>
+#include <ecstasy/material.hpp>
+#include <ecstasy/geometry.hpp>
+#include <ecstasy/mesh.hpp>
 #include <Eigen/Dense>
 
 // auto create a default scene
@@ -11,6 +16,8 @@
 namespace ecstasy {
 
 class app {
+    friend class shader;
+
   private:
     std::string app_name_;
     std::uint32_t window_width_;
@@ -26,6 +33,7 @@ class app {
     WGPUCommandEncoder webgpu_encoder_;
     WGPUQueue webgpu_queue_;
     WGPUSwapChain webgpu_swapchain_;
+    WGPURenderPipeline render_pipeline_;
 
   public:
     app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 1280U,

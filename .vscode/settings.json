@@ -92,6 +92,7 @@
     "xtree": "cpp",
     "xutility": "cpp",
     "eigenvalues": "cpp",
-    "core": "cpp"
+    "core": "cpp",
+    "resumable": "cpp"
   }
 }

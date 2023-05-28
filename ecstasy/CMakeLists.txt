@@ -58,6 +58,7 @@ target_include_directories(
         ${webgpu_SOURCE_DIR}/include
         ${webgpu_SOURCE_DIR}/include/webgpu
         )
+
 target_include_directories(
         ${ECSTASY_LIB} PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
