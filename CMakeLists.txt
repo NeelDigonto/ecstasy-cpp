@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.22)
 # https://github.com/nothings/stb
 # https://gitlab.com/libeigen/eigen
 # https://github.com/glfw/glfw
@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 3.21)
 # https://github.com/NVIDIA-Omniverse/PhysX  --> https://developer.nvidia.com/physx-sdk
 
 project(Ecstasy
-    DESCRIPTION "A Modern Webgpu Renderer"
+    DESCRIPTION "My Dream Project"
     LANGUAGES C CXX
     )
 
@@ -28,10 +28,19 @@ include(FetchContent)
 include(cmake/download_file.cmake)
 include(cmake/dll_utils.cmake)
 
-if(MSVC)
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
     set(BUILD_SHARED_LIBS OFF)
     set(BUILD_STATIC_LIBS ON)
+
+if(MSVC)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_link_options(-fsanitize=address)
+    add_link_options(-fsanitize=leak)
+    #add_link_options(-fsanitize=memory)
+    #add_link_options(-fsanitize=thread)
+    add_link_options(-fsanitize=undefined)
 endif()
 
 set(ECSTASY_LIB "ecstasy")
@@ -45,7 +54,7 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
 endif()
 
-#set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 #set(CMAKE_CXX_FLAGS "-std=c++23")
 
@@ -85,5 +94,5 @@ FetchContent_MakeAvailable(EnTT)
 include_directories(${EnTT_SOURCE_DIR}/src)
 
 add_subdirectory(ecstasy)
-add_subdirectory(sample)
+add_subdirectory(libs)
 

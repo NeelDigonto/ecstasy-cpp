@@ -1,6 +1,0 @@
-set(SOURCES main.cpp)
-set(SAMPLE_NAME triangle)
-add_executable(${SAMPLE_NAME} ${SOURCES})
-target_link_libraries(${SAMPLE_NAME} PRIVATE fmt::fmt ${ECSTASY_LIB})
-copy_dll(${SAMPLE_NAME} ${ECSTASY_LIB})
-target_copy_webgpu_binaries(${SAMPLE_NAME})
