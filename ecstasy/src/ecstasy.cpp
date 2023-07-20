@@ -7,12 +7,20 @@
 #include <ecstasy/ecstasy.hpp>
 #include <Eigen/Dense>
 #include <chrono>
+
+#include <filament/FilamentAPI.h>
+#include <filament/Engine.h>
+
+using namespace filament;
 // https : // github.com/BinomialLLC/basis_universal
 ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
                   std::uint32_t _window_height) {
     app_name_ = _app_name;
     window_height_ = _window_height;
     window_width_ = _window_width;
+
+    Engine* engine = Engine::create();
+    engine->destroy(&engine);
 
     // if (!glfwInit()) {
     //     std::cerr << "Could not initialize GLFW!" << std::endl;

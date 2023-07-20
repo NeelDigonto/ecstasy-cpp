@@ -46,22 +46,22 @@ FetchContent_Declare(
 )
 FetchContent_Populate(implot)
 
-set(FILAMENT_ENABLE_LTO OFF)
-set(FILAMENT_BUILD_FILAMAT OFF)
-set(FILAMENT_SUPPORTS_OPENGL OFF)
-set(FILAMENT_SUPPORTS_METAL OFF)
-set(FILAMENT_SUPPORTS_VULKAN ON)
-set(FILAMENT_INSTALL_BACKEND_TEST OFF)
-set(FILAMENT_USE_EXTERNAL_GLES3 OFF)
-set(FILAMENT_USE_SWIFTSHADER OFF)
-set(FILAMENT_SKIP_SAMPLES ON)
-FetchContent_Declare(
-    filament
-    GIT_REPOSITORY "https://github.com/google/filament.git"
-    GIT_TAG v1.40.2
-    GIT_PROGRESS TRUE
-)
-FetchContent_Populate(filament)
+#set(FILAMENT_ENABLE_LTO OFF)
+#set(FILAMENT_BUILD_FILAMAT OFF)
+#set(FILAMENT_SUPPORTS_OPENGL OFF)
+#set(FILAMENT_SUPPORTS_METAL OFF)
+#set(FILAMENT_SUPPORTS_VULKAN ON)
+#set(FILAMENT_INSTALL_BACKEND_TEST OFF)
+#set(FILAMENT_USE_EXTERNAL_GLES3 OFF)
+#set(FILAMENT_USE_SWIFTSHADER OFF)
+#set(FILAMENT_SKIP_SAMPLES ON)
+#FetchContent_Declare(
+#    filament
+#    GIT_REPOSITORY "https://github.com/google/filament.git"
+#    GIT_TAG v1.40.2
+#    GIT_PROGRESS TRUE
+#)
+#FetchContent_Populate(filament)
 
 add_subdirectory(src)
 #add_subdirectory(third_party)
@@ -82,4 +82,22 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         )
 
-target_link_libraries(${ECSTASY_LIB} PRIVATE fmt::fmt Eigen3::Eigen EnTT::EnTT filament)
+target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/release/filament/include)
+target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/release/filament/lib/x86_64)
+target_link_libraries(${ECSTASY_LIB} PRIVATE 
+    fmt::fmt Eigen3::Eigen EnTT::EnTT
+    filament
+    backend
+    bluegl
+    bluevk
+    filabridge
+    filaflat
+    utils
+    geometry
+    smol-v
+    vkshaders
+    ibl
+    pthread
+    dl
+    c++
+    )
