@@ -8,9 +8,16 @@
 
 // auto create a default scene
 class GLFWwindow;
+
 namespace filament {
 class Engine;
-}
+class SwapChain;
+class Renderer;
+class Camera;
+class View;
+class Scene;
+class Skybox;
+} // namespace filament
 
 namespace ecstasy {
 
@@ -34,7 +41,14 @@ class app {
     entt::registry registry_;
 
     GLFWwindow* window_;
+
     filament::Engine* filament_engine_;
+    filament::SwapChain* filament_swapchain_;
+    filament::Renderer* renderer_;
+    filament::Camera* camera_;
+    filament::View* view_;
+    filament::Scene* scene_;
+    filament::Skybox* skybox_;
 
     // WGPUAdapter webgpu_adapter_;
     // WGPUDevice webgpu_device_;

@@ -35,22 +35,31 @@
 #include <filament/Viewport.h>
 #include <filament/IndirectLight.h>
 
-using namespace filament;
+#include <utils/Entity.h>
+#include <utils/EntityManager.h>
+
+// GLFW_EXPOSE_NATIVE_WAYLAND GLFW_EXPOSE_NATIVE_X11
+// #define GLFW_EXPOSE_NATIVE_WAYLAND
+#define GLFW_EXPOSE_NATIVE_X11
+#define GLFW_EXPOSE_NATIVE_GLX
+// #define GLFW_NATIVE_INCLUDE_NONE
+#include <GLFW/glfw3native.h>
+
 // using utils::Entity;
-// using utils::EntityManager;
+using utils::EntityManager;
 
 struct App {
-    Engine* engine;
-    SwapChain* swapChain;
-    Renderer* renderer;
-    View* view;
-    Scene* scene;
-    Camera* cam;
+    filament::Engine* engine;
+    filament::SwapChain* swapChain;
+    filament::Renderer* renderer;
+    filament::View* view;
+    filament::Scene* scene;
+    filament::Camera* cam;
 
-    VertexBuffer* vb;
-    IndexBuffer* ib;
-    Material* mat;
-    Skybox* skybox;
+    filament::VertexBuffer* vb;
+    filament::IndexBuffer* ib;
+    filament::Material* mat;
+    filament::Skybox* skybox;
 
     // Entity camera;
     // Entity renderable;
@@ -85,12 +94,34 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     window_ = glfwCreateWindow(window_width_, window_height_, app_name_.c_str(),
                                NULL, NULL);
-
     if (!window_)
         throw std::runtime_error("Could not open window!");
 
-    filament_engine_ =
-        Engine::create(Engine::Backend::OPENGL); // Engine::Backend::VULKAN
+    glfwMakeContextCurrent(window_);
+
+    filament_engine_ = filament::Engine::create(
+        filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN
+
+    // glfwGetWaylandWindow(window_);
+    auto native_window = glfwGetX11Window(window_);
+    filament_swapchain_ =
+        filament_engine_->createSwapChain((void*)native_window);
+    renderer_ = filament_engine_->createRenderer();
+
+    auto cameraEntity = utils::EntityManager::get().create();
+    camera_ = filament_engine_->createCamera(cameraEntity);
+    view_ = filament_engine_->createView();
+    scene_ = filament_engine_->createScene();
+
+    view_->setCamera(camera_);
+    view_->setScene(scene_);
+    view_->setViewport({0, 0, window_width_, window_height_});
+
+    skybox_ = filament::Skybox::Builder()
+                  .color({0.1, 0.125, 0.25, 1.0})
+                  .build(*filament_engine_);
+    scene_->setSkybox(skybox_);
+    view_->setPostProcessingEnabled(false);
 }
 
 void ecstasy::app::setClearColor(const Eigen::Vector4d& _clear_color) noexcept {
@@ -120,6 +151,19 @@ void ecstasy::app::animate() {
     last_animation_start_timestamp_ = current_timestamp;
 
     glfwPollEvents();
+
+    constexpr double ZOOM = 1.5f;
+    const uint32_t w = view_->getViewport().width;
+    const uint32_t h = view_->getViewport().height;
+    const double aspect = (double)w / h;
+
+    camera_->setProjection(filament::Camera::Projection::ORTHO, -aspect * ZOOM,
+                           aspect * ZOOM, -ZOOM, ZOOM, 0, 1);
+
+    if (renderer_->beginFrame(filament_swapchain_)) {
+        renderer_->render(view_);
+        renderer_->endFrame();
+    }
 }
 
 ecstasy::app::~app() {
