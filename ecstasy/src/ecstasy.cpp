@@ -102,7 +102,6 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     filament_engine_ = filament::Engine::create(
         filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN
 
-    // glfwGetWaylandWindow(window_);
     auto native_window = glfwGetX11Window(window_);
     filament_swapchain_ =
         filament_engine_->createSwapChain((void*)native_window);
@@ -157,8 +156,9 @@ void ecstasy::app::animate() {
     const uint32_t h = view_->getViewport().height;
     const double aspect = (double)w / h;
 
-    camera_->setProjection(filament::Camera::Projection::ORTHO, -aspect * ZOOM,
-                           aspect * ZOOM, -ZOOM, ZOOM, 0, 1);
+    camera_->setProjection(filament::Camera::Projection::PERSPECTIVE,
+                           -aspect * ZOOM, aspect * ZOOM, -ZOOM, ZOOM, 0.01,
+                           10);
 
     if (renderer_->beginFrame(filament_swapchain_)) {
         renderer_->render(view_);
