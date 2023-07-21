@@ -93,6 +93,17 @@
     "xutility": "cpp",
     "eigenvalues": "cpp",
     "core": "cpp",
-    "resumable": "cpp"
+    "resumable": "cpp",
+    "*.tcc": "cpp",
+    "cwctype": "cpp",
+    "string_view": "cpp",
+    "numbers": "cpp",
+    "__nullptr": "cpp",
+    "__verbose_abort": "cpp",
+    "bitset": "cpp",
+    "hash_map": "cpp",
+    "__bit_reference": "cpp",
+    "__threading_support": "cpp",
+    "__tree": "cpp"
   }
 }

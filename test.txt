@@ -1,0 +1,47 @@
+backend           
+basis_transcoder  
+bluegl            
+bluevk            
+camutils          
+civetweb          
+dracodec          
+filabridge        
+filaflat          
+filamat           
+filamat_lite      
+filament              
+filament-iblprefilter 
+filameshio            
+geometry              
+gltfio                
+gltfio_core           
+ibl                   
+ibl-lite              
+image                 
+ktxreader             
+matdbg                
+meshoptimizer
+mikktspace
+shaders
+smol-v
+stb
+uberarchive
+uberzlib
+utils
+viewer
+vkshaders
+zstd
+
+
+    #filament
+    #backend
+    #bluegl
+    #bluevk
+    #filabridge
+    #filaflat
+    #utils
+    #geometry
+    #smol-v
+    #vkshaders
+    #ibl
+    #matdbg 

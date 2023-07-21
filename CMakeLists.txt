@@ -37,7 +37,7 @@ endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_link_options(-fsanitize=address)
-    add_link_options(-fsanitize=leak)
+    #add_link_options(-fsanitize=leak)
     #add_link_options(-fsanitize=memory)
     #add_link_options(-fsanitize=thread)
     add_link_options(-fsanitize=undefined)
@@ -56,7 +56,8 @@ endif()
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
-#set(CMAKE_CXX_FLAGS "-std=c++23")
+set(CMAKE_CXX_FLAGS "-std=c++23")
+set(CMAKE_CXX_FLAGS "-stdlib=libc++")
 
 set(FETCHCONTENT_QUIET FALSE)
 get_filename_component(fc_cache "../.fetchcontent_cache"

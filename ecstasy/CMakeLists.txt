@@ -1,11 +1,11 @@
-#set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "")
-#FetchContent_Declare(
-#    glfw
-#    GIT_REPOSITORY "https://github.com/glfw/glfw"
-#    GIT_TAG 3.3.8
-#    GIT_PROGRESS TRUE
-#)
-#FetchContent_MakeAvailable(glfw)
+set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "")
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY "https://github.com/glfw/glfw"
+    GIT_TAG 3.3.8
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(glfw)
 #
 #FetchContent_Declare(
 #  glfw3webgpu
@@ -30,21 +30,21 @@
 #)
 #FetchContent_MakeAvailable(webgpu)
 
-FetchContent_Declare(
-    imgui
-    GIT_REPOSITORY "https://github.com/ocornut/imgui"
-    GIT_TAG v1.89.5
-    GIT_PROGRESS TRUE
-)
-FetchContent_MakeAvailable(imgui)
-
-FetchContent_Declare(
-    implot
-    GIT_REPOSITORY "https://github.com/epezent/implot"
-    GIT_TAG v0.14
-    GIT_PROGRESS TRUE
-)
-FetchContent_Populate(implot)
+#FetchContent_Declare(
+#    imgui
+#    GIT_REPOSITORY "https://github.com/ocornut/imgui"
+#    GIT_TAG v1.89.5
+#    GIT_PROGRESS TRUE
+#)
+#FetchContent_MakeAvailable(imgui)
+#
+#FetchContent_Declare(
+#    implot
+#    GIT_REPOSITORY "https://github.com/epezent/implot"
+#    GIT_TAG v0.14
+#    GIT_PROGRESS TRUE
+#)
+#FetchContent_Populate(implot)
 
 #set(FILAMENT_ENABLE_LTO OFF)
 #set(FILAMENT_BUILD_FILAMAT OFF)
@@ -82,10 +82,16 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         )
 
-target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/release/filament/include)
-target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/release/filament/lib/x86_64)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/debug/filament/include)
+    target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/debug/filament/lib/x86_64)
+else()
+    target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/release/filament/include)
+    target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/release/filament/lib/x86_64)
+endif()
+
 target_link_libraries(${ECSTASY_LIB} PRIVATE 
-    fmt::fmt Eigen3::Eigen EnTT::EnTT
+    fmt::fmt Eigen3::Eigen EnTT::EnTT glfw          
     filament
     backend
     bluegl
@@ -97,7 +103,6 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     smol-v
     vkshaders
     ibl
-    pthread
-    dl
-    c++
+    matdbg 
+    filamat
     )
