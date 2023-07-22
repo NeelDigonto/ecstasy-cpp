@@ -1,0 +1,12 @@
+material {
+    name : Lit,
+    shadingModel : lit,
+    parameters : [],
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+      prepareMaterial(material);
+      material.baseColor = getColor();
+    }
+}

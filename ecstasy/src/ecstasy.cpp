@@ -37,6 +37,7 @@
 
 #include <utils/Entity.h>
 #include <utils/EntityManager.h>
+#include <math/norm.h>
 
 // GLFW_EXPOSE_NATIVE_WAYLAND GLFW_EXPOSE_NATIVE_X11
 // #define GLFW_EXPOSE_NATIVE_WAYLAND
@@ -45,40 +46,23 @@
 // #define GLFW_NATIVE_INCLUDE_NONE
 #include <GLFW/glfw3native.h>
 
-// using utils::Entity;
-using utils::EntityManager;
+const static uint32_t indices[] = {0, 1, 2, 2, 3, 0};
 
-struct App {
-    filament::Engine* engine;
-    filament::SwapChain* swapChain;
-    filament::Renderer* renderer;
-    filament::View* view;
-    filament::Scene* scene;
-    filament::Camera* cam;
-
-    filament::VertexBuffer* vb;
-    filament::IndexBuffer* ib;
-    filament::Material* mat;
-    filament::Skybox* skybox;
-
-    // Entity camera;
-    // Entity renderable;
+const static filament::math::float3 vertices[] = {
+    {-10, 0, -10},
+    {-10, 0, 10},
+    {10, 0, 10},
+    {10, 0, -10},
 };
 
-App app;
+filament::math::short4 tbn = filament::math::packSnorm16(
+    filament::math::mat3f::packTangentFrame(
+        filament::math::mat3f{filament::math::float3{1.0f, 0.0f, 0.0f},
+                              filament::math::float3{0.0f, 0.0f, 1.0f},
+                              filament::math::float3{0.0f, 1.0f, 0.0f}})
+        .xyzw);
 
-struct Vertex {
-    filament::math::float2 position;
-    uint32_t color;
-};
-
-static const Vertex TRIANGLE_VERTICES[3] = {
-    {{1, 0}, 0xffff0000u},
-    {{cos(M_PI * 2 / 3), sin(M_PI * 2 / 3)}, 0xff00ff00u},
-    {{cos(M_PI * 4 / 3), sin(M_PI * 4 / 3)}, 0xff0000ffu},
-};
-
-static constexpr uint16_t TRIANGLE_INDICES[3] = {0, 1, 2};
+const static filament::math::short4 normals[]{tbn, tbn, tbn, tbn};
 
 // https : // github.com/BinomialLLC/basis_universal
 ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
@@ -121,6 +105,91 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
                   .build(*filament_engine_);
     scene_->setSkybox(skybox_);
     view_->setPostProcessingEnabled(false);
+
+    filament::VertexBuffer* vertexBuffer =
+        filament::VertexBuffer::Builder()
+            .vertexCount(4)
+            .bufferCount(2)
+            .attribute(filament::VertexAttribute::POSITION, 0,
+                       filament::VertexBuffer::AttributeType::FLOAT3)
+            .attribute(filament::VertexAttribute::TANGENTS, 1,
+                       filament::VertexBuffer::AttributeType::SHORT4)
+            .normalized(filament::VertexAttribute::TANGENTS)
+            .build(*filament_engine_);
+
+    vertexBuffer->setBufferAt(
+        *filament_engine_, 0,
+        filament::VertexBuffer::BufferDescriptor(
+            vertices, vertexBuffer->getVertexCount() * sizeof(vertices[0])));
+    vertexBuffer->setBufferAt(
+        *filament_engine_, 1,
+        filament::VertexBuffer::BufferDescriptor(
+            normals, vertexBuffer->getVertexCount() * sizeof(normals[0])));
+
+    filament::IndexBuffer* indexBuffer =
+        filament::IndexBuffer::Builder().indexCount(6).build(*filament_engine_);
+
+    indexBuffer->setBuffer(
+        *filament_engine_,
+        filament::IndexBuffer::BufferDescriptor(
+            indices, indexBuffer->getIndexCount() * sizeof(uint32_t)));
+
+    filamat::MaterialBuilder::init();
+    filamat::MaterialBuilder builder;
+    builder.name("Some material")
+        .material("    void material(inout MaterialInputs material) {\n"
+                  "        prepareMaterial(material);\n"
+                  "        material.baseColor.rgb = materialParams.baseColor;\n"
+                  "        material.metallic = materialParams.metallic;\n"
+                  "        material.roughness = materialParams.roughness;\n"
+                  "        material.reflectance = materialParams.reflectance;\n"
+                  "    }")
+        .parameter("baseColor", filament::backend::UniformType::FLOAT3)
+        .parameter("metallic", filament::backend::UniformType::FLOAT)
+        .parameter("roughness", filament::backend::UniformType::FLOAT)
+        .parameter("reflectance", filament::backend::UniformType::FLOAT)
+        .shading(filamat::MaterialBuilder::Shading::LIT)
+        .targetApi(filamat::MaterialBuilder::TargetApi::ALL)
+        .platform(filamat::MaterialBuilder::Platform::ALL);
+
+    filamat::Package package = builder.build(filament_engine_->getJobSystem());
+
+    filament::Material* material =
+        filament::Material::Builder()
+            .package(package.getData(), package.getSize())
+            .build(*filament_engine_);
+    material->setDefaultParameter("baseColor", filament::RgbType::LINEAR,
+                                  filament::math::float3{0, 1, 0});
+    material->setDefaultParameter("metallic", 0.0f);
+    material->setDefaultParameter("roughness", 0.4f);
+    material->setDefaultParameter("reflectance", 0.5f);
+
+    filament::MaterialInstance* materialInstance = material->createInstance();
+
+    utils::Entity renderable = utils::EntityManager::get().create();
+
+    utils::Entity light = utils::EntityManager::get().create();
+
+    filament::LightManager::Builder(filament::LightManager::Type::SUN)
+        .color(filament::Color::toLinear<filament::ACCURATE>(
+            filament::sRGBColor(0.98f, 0.92f, 0.89f)))
+        .intensity(500'000)
+        .direction({0.7, -1, -0.8})
+        .sunAngularRadius(1.9f)
+        .castShadows(true)
+        .build(*filament_engine_, light);
+
+    scene_->addEntity(light);
+
+    // build a quad
+    filament::RenderableManager::Builder(1)
+        .boundingBox({{-1, -1, -1}, {1, 1, 1}})
+        .material(0, materialInstance)
+        .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES,
+                  vertexBuffer, indexBuffer, 0, 6)
+        .culling(false)
+        .build(*filament_engine_, renderable);
+    scene_->addEntity(renderable);
 }
 
 void ecstasy::app::setClearColor(const Eigen::Vector4d& _clear_color) noexcept {
@@ -144,6 +213,8 @@ ecstasy::app::getLastAnimationTime<std::chrono::milliseconds>() const noexcept;
 template std::chrono::seconds::rep
 ecstasy::app::getLastAnimationTime<std::chrono::seconds>() const noexcept;
 
+void printUsage(std::chrono::steady_clock::duration _duration) {}
+
 void ecstasy::app::animate() {
     const auto current_timestamp = std::chrono::steady_clock::now();
     last_animation_time_ = current_timestamp - last_animation_start_timestamp_;
@@ -151,14 +222,21 @@ void ecstasy::app::animate() {
 
     glfwPollEvents();
 
-    constexpr double ZOOM = 1.5f;
-    const uint32_t w = view_->getViewport().width;
-    const uint32_t h = view_->getViewport().height;
-    const double aspect = (double)w / h;
+    /*    constexpr double ZOOM = 1.5f;
+       const uint32_t w = view_->getViewport().width;
+       const uint32_t h = view_->getViewport().height;
+       const double aspect = (double)w / h;
 
-    camera_->setProjection(filament::Camera::Projection::PERSPECTIVE,
-                           -aspect * ZOOM, aspect * ZOOM, -ZOOM, ZOOM, 0.01,
-                           10);
+       camera_->setProjection(filament::Camera::Projection::PERSPECTIVE,
+                              -aspect * ZOOM, aspect * ZOOM, -ZOOM, ZOOM, 0.01,
+                              10); */
+
+    camera_->lookAt(filament::math::float3(0, 50.5f, 0),
+                    filament::math::float3(0, 0, 0),
+                    filament::math::float3(1.f, 0, 0));
+    camera_->setProjection(45.0,
+                           double(this->window_width_) / this->window_height_,
+                           0.1, 50, filament::Camera::Fov::VERTICAL);
 
     if (renderer_->beginFrame(filament_swapchain_)) {
         renderer_->render(view_);

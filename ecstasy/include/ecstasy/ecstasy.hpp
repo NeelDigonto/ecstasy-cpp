@@ -68,6 +68,7 @@ class app {
     bool shouldClose() const noexcept;
     template <ecstasy::AnimationTime T = std::chrono::microseconds>
     typename T::rep getLastAnimationTime() const noexcept;
+    void printUsage(std::chrono::steady_clock::duration _duration);
     void animate();
     ~app();
 };

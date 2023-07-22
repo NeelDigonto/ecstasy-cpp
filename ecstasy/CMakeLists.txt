@@ -105,4 +105,7 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     ibl
     matdbg 
     filamat
+    utils
+    shaders
+    vkshaders
     )
