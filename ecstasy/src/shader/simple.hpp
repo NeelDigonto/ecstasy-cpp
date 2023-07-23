@@ -1,30 +1,28 @@
 #include <string>
+#include <filamat/MaterialBuilder.h>
 
 namespace ecstasy {
 namespace shader {
 
-std::string simple = R"MS_START(
-material {
-    name : Lit,
-    shadingModel : lit,
-    parameters : [
-        { type : float3, name : baseColor },
-        { type : float,  name : roughness },
-        { type : float,  name : clearCoat },
-        { type : float,  name : clearCoatRoughness }
-    ],
+void simple(filamat::MaterialBuilder& _builder) {
+    _builder.name("Simple Lit Shader")
+        .material(R"MS_START(    
+            void material(inout MaterialInputs material) {
+                prepareMaterial(material);
+                material.baseColor.rgb = materialParams.baseColor;
+                material.metallic = materialParams.metallic;
+                material.roughness = materialParams.roughness;
+                material.reflectance = materialParams.reflectance;
+            }
+        )MS_START")
+        .parameter("baseColor", filament::backend::UniformType::FLOAT3)
+        .parameter("metallic", filament::backend::UniformType::FLOAT)
+        .parameter("roughness", filament::backend::UniformType::FLOAT)
+        .parameter("reflectance", filament::backend::UniformType::FLOAT)
+        .shading(filamat::MaterialBuilder::Shading::LIT)
+        .doubleSided(true)
+        .targetApi(filamat::MaterialBuilder::TargetApi::OPENGL)
+        .platform(filamat::MaterialBuilder::Platform::DESKTOP);
 }
-
-fragment {
-    void material(inout MaterialInputs material) {
-        prepareMaterial(material);
-        material.baseColor.rgb = materialParams.baseColor;
-        material.roughness = materialParams.roughness;
-        material.clearCoat = materialParams.clearCoat;
-        material.clearCoatRoughness = materialParams.clearCoatRoughness;
-    }
-}
-)MS_START";
-
-}
+} // namespace shader
 } // namespace ecstasy

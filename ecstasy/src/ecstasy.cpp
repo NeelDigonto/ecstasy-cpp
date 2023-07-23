@@ -38,6 +38,7 @@
 #include <utils/Entity.h>
 #include <utils/EntityManager.h>
 #include <math/norm.h>
+#include <shader/simple.hpp>
 
 // GLFW_EXPOSE_NATIVE_WAYLAND GLFW_EXPOSE_NATIVE_X11
 // #define GLFW_EXPOSE_NATIVE_WAYLAND
@@ -136,22 +137,7 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
 
     filamat::MaterialBuilder::init();
     filamat::MaterialBuilder builder;
-    builder.name("Some material")
-        .material("    void material(inout MaterialInputs material) {\n"
-                  "        prepareMaterial(material);\n"
-                  "        material.baseColor.rgb = materialParams.baseColor;\n"
-                  "        material.metallic = materialParams.metallic;\n"
-                  "        material.roughness = materialParams.roughness;\n"
-                  "        material.reflectance = materialParams.reflectance;\n"
-                  "    }")
-        .parameter("baseColor", filament::backend::UniformType::FLOAT3)
-        .parameter("metallic", filament::backend::UniformType::FLOAT)
-        .parameter("roughness", filament::backend::UniformType::FLOAT)
-        .parameter("reflectance", filament::backend::UniformType::FLOAT)
-        .shading(filamat::MaterialBuilder::Shading::LIT)
-        .targetApi(filamat::MaterialBuilder::TargetApi::ALL)
-        .platform(filamat::MaterialBuilder::Platform::ALL);
-
+    ecstasy::shader::simple(builder);
     filamat::Package package = builder.build(filament_engine_->getJobSystem());
 
     filament::Material* material =
@@ -234,9 +220,11 @@ void ecstasy::app::animate() {
     camera_->lookAt(filament::math::float3(0, 50.5f, 0),
                     filament::math::float3(0, 0, 0),
                     filament::math::float3(1.f, 0, 0));
-    camera_->setProjection(45.0,
+    camera_->setProjection(90.0,
                            double(this->window_width_) / this->window_height_,
                            0.1, 50, filament::Camera::Fov::VERTICAL);
+
+    camera_->setModelMatrix(filament::math::mat4f());
 
     if (renderer_->beginFrame(filament_swapchain_)) {
         renderer_->render(view_);
