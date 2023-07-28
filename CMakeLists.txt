@@ -56,7 +56,6 @@ endif()
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS "-std=c++23")
 set(CMAKE_CXX_FLAGS "-stdlib=libc++")
 
 set(FETCHCONTENT_QUIET FALSE)

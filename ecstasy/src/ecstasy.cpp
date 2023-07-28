@@ -159,7 +159,7 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     filament::LightManager::Builder(filament::LightManager::Type::SUN)
         .color(filament::Color::toLinear<filament::ACCURATE>(
             filament::sRGBColor(0.98f, 0.92f, 0.89f)))
-        .intensity(500'000)
+        .intensity(100'000)
         .direction({0.7, -1, -0.8})
         .sunAngularRadius(1.9f)
         .castShadows(true)
@@ -224,7 +224,7 @@ void ecstasy::app::animate() {
                            double(this->window_width_) / this->window_height_,
                            0.1, 50, filament::Camera::Fov::VERTICAL);
 
-    camera_->setModelMatrix(filament::math::mat4f());
+    // camera_->setModelMatrix(filament::math::mat4f());
 
     if (renderer_->beginFrame(filament_swapchain_)) {
         renderer_->render(view_);
