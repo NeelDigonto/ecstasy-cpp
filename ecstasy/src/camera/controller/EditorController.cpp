@@ -14,13 +14,14 @@ ecstasy::EditorController::EditorController(InputController* _input_controller,
 void ecstasy::EditorController::animate() {
     auto cursor_pos_info =
         input_controller_->getCursorPosChange(cursor_pos_change_sid_);
-    const auto cursor_pos_diff = cursor_pos_info.current_cursor_pos_ -
-                                 cursor_pos_info.last_animate_cursor_pos;
 
-    if (cursor_pos_diff.x() != 0 || cursor_pos_diff.y() != 0)
-        fmt::print("{}, {}\n", cursor_pos_diff.x(), cursor_pos_diff.y());
-    input_controller_->setCursorPosChange(
-        cursor_pos_change_sid_, std::move(cursor_pos_info.current_cursor_pos_));
+    if (cursor_pos_info.cursor_pos_diff_.x() != 0 ||
+        cursor_pos_info.cursor_pos_diff_.y() != 0)
+        fmt::print("{}, {}\n", cursor_pos_info.cursor_pos_diff_.x(),
+                   cursor_pos_info.cursor_pos_diff_.y());
+    // input_controller_->setCursorPosChange(
+    //     cursor_pos_change_sid_,
+    //     std::move(cursor_pos_info.current_cursor_pos_));
 
     /* const auto mouseMove =
         input_controller_->getScrollChange(scroll_change_sid_);

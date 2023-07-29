@@ -87,12 +87,14 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     glfwMakeContextCurrent(window_);
     glfwSetWindowUserPointer(window_, this);
 
+    input_controller_ =
+        new InputController(window_, {window_width_, window_height_});
+
     glfwSetFramebufferSizeCallback(window_, [](GLFWwindow* window, int width,
                                                int height) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
+        app->getInputController()->updateViewportDimension({width, height});
     });
-
-    input_controller_ = new InputController(window_);
 
     filament_engine_ = filament::Engine::create(
         filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN

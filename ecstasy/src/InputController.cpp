@@ -3,7 +3,12 @@
 #include <GLFW/glfw3.h>
 #include <ecstasy/ecstasy.hpp>
 
-ecstasy::InputController::InputController(GLFWwindow* _window) {
+ecstasy::InputController::InputController(GLFWwindow* _window,
+                                          Eigen::Vector2i _window_dimension) {
+    int width, height;
+    glfwGetWindowSize(_window, &width, &height);
+    viewport_dimension_ = {width, height};
+
     glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode,
                                    int action, int mods) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
@@ -31,8 +36,12 @@ ecstasy::InputController::InputController(GLFWwindow* _window) {
     glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xposIn,
                                          double yposIn) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-        app->getInputController()->current_cursor_pos_ = {xposIn, yposIn};
-        app->getInputController()->updateCursorPos({xposIn, yposIn});
+        app->getInputController()->current_cursor_pos_ = {
+            xposIn,
+            app->getInputController()->viewport_dimension_.y() - yposIn};
+
+        app->getInputController()->updateCursorPos(
+            app->getInputController()->current_cursor_pos_);
     });
 
     glfwSetScrollCallback(_window, [](GLFWwindow* window, double xoffset,
@@ -40,6 +49,11 @@ ecstasy::InputController::InputController(GLFWwindow* _window) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         app->getInputController()->accumulateScrollChange({xoffset, yoffset});
     });
+}
+
+void ecstasy::InputController::updateViewportDimension(
+    const Eigen::Vector2i& _viewport_dimension) {
+    viewport_dimension_ = _viewport_dimension;
 }
 
 decltype(ecstasy::InputController::mbutton_state_)&
@@ -52,13 +66,27 @@ ecstasy::InputController::getKButtonState() {
     return kbutton_state_;
 }
 
-void ecstasy::InputController::updateCursorPos(Eigen::Vector2i&& _new_pos) {
-    for (auto& [_, cursor_pos_change] : cursor_pos_changes_)
+void ecstasy::InputController::updateCursorPos(
+    const Eigen::Vector2i& _new_pos) {
+    for (auto& [_, cursor_pos_change] : cursor_pos_changes_) {
         cursor_pos_change.current_cursor_pos_ = _new_pos;
+
+        const auto diffx =
+            static_cast<float>(cursor_pos_change.current_cursor_pos_.x() -
+                               cursor_pos_change.last_animate_cursor_pos.x()) /
+            viewport_dimension_.x();
+
+        const auto diffy =
+            static_cast<float>(cursor_pos_change.current_cursor_pos_.y() -
+                               cursor_pos_change.last_animate_cursor_pos.y()) /
+            viewport_dimension_.y();
+
+        cursor_pos_change.cursor_pos_diff_ = {diffx, diffy};
+    }
 }
 
 void ecstasy::InputController::accumulateScrollChange(
-    Eigen::Vector2i&& _change) {
+    const Eigen::Vector2i& _change) {
     for (auto& [_, scroll_change] : scroll_changes_)
         scroll_change += _change;
 }
@@ -93,13 +121,13 @@ void ecstasy::InputController::deregisterScrollChangeAccumulator(
 ecstasy::CursorPosInfo&
 ecstasy::InputController::getCursorPosChange(SubscriberID _subscriber_id) {
     const auto it = cursor_pos_changes_.find(_subscriber_id);
-    assert(it == end(cursor_pos_changes_) && "Unkown Subscriber");
+    assert(it != end(cursor_pos_changes_) && "Unkown Subscriber");
 
     return it->second;
 }
 
 void ecstasy::InputController::setCursorPosChange(SubscriberID _subscriber_id,
-                                                  Eigen::Vector2i&& _pos) {
+                                                  const Eigen::Vector2i& _pos) {
     const auto it = cursor_pos_changes_.find(_subscriber_id);
     assert(it != end(cursor_pos_changes_) && "Unkown Subscriber");
 
@@ -115,9 +143,9 @@ ecstasy::InputController::getScrollChange(SubscriberID _subscriber_id) {
 }
 
 void ecstasy::InputController::setScrollChange(SubscriberID _subscriber_id,
-                                               Eigen::Vector2i&& _change) {
+                                               const Eigen::Vector2i& _change) {
     const auto it = scroll_changes_.find(_subscriber_id);
-    assert(it == end(scroll_changes_) && "Unkown Subscriber");
+    assert(it != end(scroll_changes_) && "Unkown Subscriber");
 
     it->second = _change;
 }

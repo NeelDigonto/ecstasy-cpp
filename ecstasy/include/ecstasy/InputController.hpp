@@ -155,11 +155,13 @@ enum KButton {
 struct CursorPosInfo {
     Eigen::Vector2i last_animate_cursor_pos;
     Eigen::Vector2i current_cursor_pos_;
+    Eigen::Vector2f cursor_pos_diff_;
 };
 
 class InputController {
   public:
     using SubscriberID = size_t;
+    Eigen::Vector2i viewport_dimension_;
 
   private:
     std::array<bool, 16> mbutton_state_;
@@ -172,13 +174,15 @@ class InputController {
     InputController() = delete;
     InputController(const InputController&) = delete;
     InputController(InputController&&) = delete;
-    InputController(GLFWwindow* _window);
+    InputController(GLFWwindow* _window, Eigen::Vector2i _window_dimension);
+
+    void updateViewportDimension(const Eigen::Vector2i& _viewport_dimension);
 
     decltype(mbutton_state_)& getMButtonState();
     decltype(kbutton_state_)& getKButtonState();
 
-    void updateCursorPos(Eigen::Vector2i&& _new_pos);
-    void accumulateScrollChange(Eigen::Vector2i&& _change);
+    void updateCursorPos(const Eigen::Vector2i& _new_pos);
+    void accumulateScrollChange(const Eigen::Vector2i& _change);
 
     SubscriberID registerCursorPosChangeUpdater();
     void deregisterCursorPosChangeUpdater(SubscriberID _subscriber_id);
@@ -188,10 +192,10 @@ class InputController {
 
     CursorPosInfo& getCursorPosChange(SubscriberID _subscriber_id);
     void setScrollChange(SubscriberID _subscriber_id,
-                         Eigen::Vector2i&& _change);
+                         const Eigen::Vector2i& _change);
 
     Eigen::Vector2i& getScrollChange(SubscriberID _subscriber_id);
     void setCursorPosChange(SubscriberID _subscriber_id,
-                            Eigen::Vector2i&& _change);
+                            const Eigen::Vector2i& _change);
 };
 } // namespace ecstasy
