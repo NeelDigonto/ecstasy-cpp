@@ -24,6 +24,11 @@ class Skybox;
 
 namespace ecstasy {
 
+extern Eigen::IOFormat CommaInitFmt;
+extern Eigen::IOFormat CleanFmt;
+extern Eigen::IOFormat OctaveFmt;
+extern Eigen::IOFormat HeavyFmt;
+
 template <class T>
 concept AnimationTime = std::same_as<T, std::chrono::nanoseconds> ||
                         std::same_as<T, std::chrono::microseconds> ||

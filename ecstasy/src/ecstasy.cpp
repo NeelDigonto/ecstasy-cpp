@@ -49,13 +49,22 @@
 // #define GLFW_NATIVE_INCLUDE_NONE
 #include <GLFW/glfw3native.h>
 
+Eigen::IOFormat ecstasy::CommaInitFmt(Eigen::StreamPrecision,
+                                      Eigen::DontAlignCols, ", ", ", ", "", "",
+                                      " << ", ";");
+Eigen::IOFormat ecstasy::CleanFmt(4, 0, ", ", "\n", "[", "]");
+Eigen::IOFormat ecstasy::OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "",
+                                   "", "[", "]");
+Eigen::IOFormat ecstasy::HeavyFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[",
+                                  "]", "[", "]");
+
 const static uint32_t indices[] = {0, 1, 2, 2, 3, 0};
 
 const static filament::math::float3 vertices[] = {
-    {-10, 0, -10},
-    {-10, 0, 10},
-    {10, 0, 10},
-    {10, 0, -10},
+    {-10, -10, 0},
+    {-10, 10, 0},
+    {10, 10, 0},
+    {10, -10, 0},
 };
 
 /* filament::math::short4 tbn = filament::math::packSnorm16(
@@ -113,9 +122,9 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     view_->setScene(scene_);
     view_->setViewport({0, 0, window_width_, window_height_});
 
-    camera_->lookAt(filament::math::float3(0, 50.5f, 0),
+    camera_->lookAt(filament::math::float3(0, 0, 50.f),
                     filament::math::float3(0, 0, 0),
-                    filament::math::float3(1.f, 0, 0));
+                    filament::math::float3(0, 1.f, 0));
     camera_->setProjection(90.0,
                            double(this->window_width_) / this->window_height_,
                            0.1, 50, filament::Camera::Fov::VERTICAL);
@@ -182,7 +191,8 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
         .color(filament::Color::toLinear<filament::ACCURATE>(
             filament::sRGBColor(0.98f, 0.92f, 0.89f)))
         .intensity(150'000)
-        .direction({0.7, -1, -0.8})
+        //.direction({0.7, -1, -0.8})
+        .direction({0, 0, 5})
         .sunAngularRadius(1.9f)
         .castShadows(true)
         .build(*filament_engine_, light);
