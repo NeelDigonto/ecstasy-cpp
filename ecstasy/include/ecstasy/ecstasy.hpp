@@ -4,7 +4,10 @@
 #include <chrono>
 #include <concepts>
 #include <entt/entt.hpp>
+#include <fmt/core.h>
 #include <Eigen/Dense>
+#include <ecstasy/InputController.hpp>
+#include <ecstasy/EditorController.hpp>
 
 // auto create a default scene
 class GLFWwindow;
@@ -50,6 +53,9 @@ class app {
     filament::Scene* scene_;
     filament::Skybox* skybox_;
 
+    InputController* input_controller_;
+    EditorController* editor_controller_;
+
     // WGPUAdapter webgpu_adapter_;
     // WGPUDevice webgpu_device_;
     // WGPUInstance webgpu_instance_;
@@ -66,6 +72,8 @@ class app {
     // ecstasy::scene createScene();
     void setClearColor(const Eigen::Vector4d& _clear_color) noexcept;
     bool shouldClose() const noexcept;
+    InputController* getInputController() noexcept;
+    EditorController* getEditorController() noexcept;
     template <ecstasy::AnimationTime T = std::chrono::microseconds>
     typename T::rep getLastAnimationTime() const noexcept;
     void printUsage(std::chrono::steady_clock::duration _duration);

@@ -40,6 +40,8 @@
 #include <math/norm.h>
 #include <shader/simple.hpp>
 
+#include <fmt/core.h>
+
 // GLFW_EXPOSE_NATIVE_WAYLAND GLFW_EXPOSE_NATIVE_X11
 // #define GLFW_EXPOSE_NATIVE_WAYLAND
 #define GLFW_EXPOSE_NATIVE_X11
@@ -56,14 +58,14 @@ const static filament::math::float3 vertices[] = {
     {10, 0, -10},
 };
 
-filament::math::short4 tbn = filament::math::packSnorm16(
+/* filament::math::short4 tbn = filament::math::packSnorm16(
     filament::math::mat3f::packTangentFrame(
         filament::math::mat3f{filament::math::float3{1.0f, 0.0f, 0.0f},
                               filament::math::float3{0.0f, 0.0f, 1.0f},
                               filament::math::float3{0.0f, 1.0f, 0.0f}})
         .xyzw);
 
-const static filament::math::short4 normals[]{tbn, tbn, tbn, tbn};
+const static filament::math::short4 normals[]{tbn, tbn, tbn, tbn}; */
 
 // https : // github.com/BinomialLLC/basis_universal
 ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
@@ -83,6 +85,14 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
         throw std::runtime_error("Could not open window!");
 
     glfwMakeContextCurrent(window_);
+    glfwSetWindowUserPointer(window_, this);
+
+    glfwSetFramebufferSizeCallback(window_, [](GLFWwindow* window, int width,
+                                               int height) {
+        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
+    });
+
+    input_controller_ = new InputController(window_);
 
     filament_engine_ = filament::Engine::create(
         filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN
@@ -101,6 +111,15 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     view_->setScene(scene_);
     view_->setViewport({0, 0, window_width_, window_height_});
 
+    camera_->lookAt(filament::math::float3(0, 50.5f, 0),
+                    filament::math::float3(0, 0, 0),
+                    filament::math::float3(1.f, 0, 0));
+    camera_->setProjection(90.0,
+                           double(this->window_width_) / this->window_height_,
+                           0.1, 50, filament::Camera::Fov::VERTICAL);
+
+    editor_controller_ = new EditorController(input_controller_, camera_);
+
     skybox_ = filament::Skybox::Builder()
                   .color({0.1, 0.125, 0.25, 1.0})
                   .build(*filament_engine_);
@@ -110,22 +129,23 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     filament::VertexBuffer* vertexBuffer =
         filament::VertexBuffer::Builder()
             .vertexCount(4)
-            .bufferCount(2)
+            .bufferCount(1)
             .attribute(filament::VertexAttribute::POSITION, 0,
                        filament::VertexBuffer::AttributeType::FLOAT3)
-            .attribute(filament::VertexAttribute::TANGENTS, 1,
-                       filament::VertexBuffer::AttributeType::SHORT4)
-            .normalized(filament::VertexAttribute::TANGENTS)
+            /*             .attribute(filament::VertexAttribute::TANGENTS,
+               1, filament::VertexBuffer::AttributeType::SHORT4)
+                        .normalized(filament::VertexAttribute::TANGENTS) */
             .build(*filament_engine_);
 
     vertexBuffer->setBufferAt(
         *filament_engine_, 0,
         filament::VertexBuffer::BufferDescriptor(
             vertices, vertexBuffer->getVertexCount() * sizeof(vertices[0])));
-    vertexBuffer->setBufferAt(
-        *filament_engine_, 1,
-        filament::VertexBuffer::BufferDescriptor(
-            normals, vertexBuffer->getVertexCount() * sizeof(normals[0])));
+    /*     vertexBuffer->setBufferAt(
+            *filament_engine_, 1,
+            filament::VertexBuffer::BufferDescriptor(
+                normals, vertexBuffer->getVertexCount() * sizeof(normals[0])));
+     */
 
     filament::IndexBuffer* indexBuffer =
         filament::IndexBuffer::Builder().indexCount(6).build(*filament_engine_);
@@ -159,7 +179,7 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     filament::LightManager::Builder(filament::LightManager::Type::SUN)
         .color(filament::Color::toLinear<filament::ACCURATE>(
             filament::sRGBColor(0.98f, 0.92f, 0.89f)))
-        .intensity(100'000)
+        .intensity(150'000)
         .direction({0.7, -1, -0.8})
         .sunAngularRadius(1.9f)
         .castShadows(true)
@@ -186,6 +206,14 @@ bool ecstasy::app::shouldClose() const noexcept {
     return glfwWindowShouldClose(window_);
 }
 
+ecstasy::InputController* ecstasy::app::getInputController() noexcept {
+    return input_controller_;
+}
+
+ecstasy::EditorController* ecstasy::app::getEditorController() noexcept {
+    return editor_controller_;
+}
+
 template <ecstasy::AnimationTime T>
 typename T::rep ecstasy::app::getLastAnimationTime() const noexcept {
     return std::chrono::duration_cast<T>(last_animation_time_).count();
@@ -207,6 +235,7 @@ void ecstasy::app::animate() {
     last_animation_start_timestamp_ = current_timestamp;
 
     glfwPollEvents();
+    editor_controller_->animate();
 
     /*    constexpr double ZOOM = 1.5f;
        const uint32_t w = view_->getViewport().width;
@@ -214,15 +243,8 @@ void ecstasy::app::animate() {
        const double aspect = (double)w / h;
 
        camera_->setProjection(filament::Camera::Projection::PERSPECTIVE,
-                              -aspect * ZOOM, aspect * ZOOM, -ZOOM, ZOOM, 0.01,
-                              10); */
-
-    camera_->lookAt(filament::math::float3(0, 50.5f, 0),
-                    filament::math::float3(0, 0, 0),
-                    filament::math::float3(1.f, 0, 0));
-    camera_->setProjection(90.0,
-                           double(this->window_width_) / this->window_height_,
-                           0.1, 50, filament::Camera::Fov::VERTICAL);
+                              -aspect * ZOOM, aspect * ZOOM, -ZOOM, ZOOM,
+       0.01, 10); */
 
     // camera_->setModelMatrix(filament::math::mat4f());
 
@@ -242,6 +264,6 @@ ecstasy::app::~app() {
 /*
   ecstasy::scene ecstasy::app::createScene() {
     // registry_.emplace<>;
-    std::cout << "Scene Created! " << std::endl;
+    std::cout << "Scene Created! " << std::endremovel;
 }
 */

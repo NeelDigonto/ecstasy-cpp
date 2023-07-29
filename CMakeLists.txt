@@ -56,7 +56,7 @@ endif()
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS "-stdlib=libc++")
+set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type")
 
 set(FETCHCONTENT_QUIET FALSE)
 get_filename_component(fc_cache "../.fetchcontent_cache"

@@ -1,6 +1,8 @@
 set(SOURCES 
         ${CMAKE_CURRENT_SOURCE_DIR}/ecstasy.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/scene/scene.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/camera/controller/EditorController.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/InputController.cpp
         )
 add_subdirectory(audio)
 add_subdirectory(renderer)
