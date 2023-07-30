@@ -14,6 +14,7 @@ ecstasy::InputController::InputController(GLFWwindow* _window,
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         auto input_controller = app->getInputController();
         input_controller->kbutton_state_[key] = action;
+        // fmt::print("{}\n", action);
     });
 
     glfwSetCharCallback(_window, [](GLFWwindow* window,
@@ -31,6 +32,7 @@ ecstasy::InputController::InputController(GLFWwindow* _window,
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         auto input_controller = app->getInputController();
         input_controller->mbutton_state_[button] = action;
+        // fmt::print("{}\n", action);
     });
 
     glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xposIn,

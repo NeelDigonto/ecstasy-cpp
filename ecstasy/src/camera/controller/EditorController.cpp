@@ -29,8 +29,8 @@ void ecstasy::EditorController::animate(
     auto camera_target = camera_position - camera_target_direction;
 
     // Update
-    auto delta =
-        std::chrono::duration_cast<std::chrono::milliseconds>(_delta).count();
+    double delta =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(_delta).count();
     filament::math::double3 translation{0., 0., 0.};
 
     const auto scroll_change =
@@ -43,20 +43,28 @@ void ecstasy::EditorController::animate(
                    translation.z); */
     }
 
-    /*     if (input_controller_->getKButtonState().at(KButton::W))
-        fmt::print("Yo");
-
     if (input_controller_->getKButtonState().at(KButton::W))
-        translation.z = -delta;
+        translation.z = -delta * z_movement_speed_;
+
     if (input_controller_->getKButtonState().at(KButton::S))
-        translation.z = delta;
+        translation.z = +delta * z_movement_speed_;
 
     if (input_controller_->getKButtonState().at(KButton::A))
-        translation.x = -delta;
-    if (input_controller_->getKButtonState().at(KButton::D))
-        translation.x = delta; */
+        translation.x = -delta * x_movement_speed_;
 
-    /*  Eigen::Vector3f up_vector{0.0f, 1.0f, 0.0f};
+    if (input_controller_->getKButtonState().at(KButton::D))
+        translation.x = delta * x_movement_speed_;
+
+    if (input_controller_->getKButtonState().at(KButton::SPACE))
+        translation.y = delta * y_movement_speed_;
+
+    if (input_controller_->getKButtonState().at(KButton::LEFT_CONTROL))
+        translation.y = -delta * y_movement_speed_;
+
+    /*  fmt::print("translation: {} {} {}\n", translation.x, translation.y,
+                translation.z); */
+
+     /*  Eigen::Vector3f up_vector{0.0f, 1.0f, 0.0f};
      Eigen::Vector3f camera_position{0.0f, 50.0f, 0.0f};
      Eigen::Vector3f camera_target{0.0f, 0.0f, 0.0f};
      Eigen::Vector3f camera_direction =

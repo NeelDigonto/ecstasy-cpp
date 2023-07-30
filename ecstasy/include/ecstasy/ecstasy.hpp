@@ -6,6 +6,7 @@
 #include <entt/entt.hpp>
 #include <fmt/core.h>
 #include <iostream>
+#include <thread>
 #include <Eigen/Dense>
 #include <ecstasy/InputController.hpp>
 #include <ecstasy/EditorController.hpp>
