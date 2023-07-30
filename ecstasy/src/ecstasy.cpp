@@ -247,7 +247,7 @@ void ecstasy::app::animate() {
     last_animation_start_timestamp_ = current_timestamp;
 
     glfwPollEvents();
-    editor_controller_->animate();
+    editor_controller_->animate(last_animation_time_);
 
     /*    constexpr double ZOOM = 1.5f;
        const uint32_t w = view_->getViewport().width;

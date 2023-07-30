@@ -17,10 +17,44 @@ ecstasy::EditorController::EditorController(InputController* _input_controller,
     scroll_change_sid_ = input_controller_->registerScrollChangeAccumulator();
 }
 
-void ecstasy::EditorController::animate() {
+void ecstasy::EditorController::animate(
+    const std::chrono::steady_clock::duration& _delta) {
 
-    // if (input_controller_->getKButtonState().at(KButton::W))
-    // camera_->setModelMatrix();
+    filament::math::double3 up_vector{0.0, 1.0, 0.0};
+    filament::math::mat4 model_mat = camera_->getModelMatrix();
+    filament::math::double3 camera_position{model_mat[3][0], model_mat[3][1],
+                                            model_mat[3][2]};
+    auto camera_target_direction =
+        normalize(cross(camera_->getLeftVector(), camera_->getUpVector()));
+    auto camera_target = camera_position - camera_target_direction;
+
+    // Update
+    auto delta =
+        std::chrono::duration_cast<std::chrono::milliseconds>(_delta).count();
+    filament::math::double3 translation{0., 0., 0.};
+
+    const auto scroll_change =
+        input_controller_->getScrollChange(scroll_change_sid_);
+
+    if (scroll_change.y() != 0) {
+        translation.z = -scroll_change.y() * mouse_wheel_zoom_speed_;
+        input_controller_->setScrollChange(scroll_change_sid_, {0, 0});
+        /* fmt::print("translation: {} {} {}\n", translation.x, translation.y,
+                   translation.z); */
+    }
+
+    /*     if (input_controller_->getKButtonState().at(KButton::W))
+        fmt::print("Yo");
+
+    if (input_controller_->getKButtonState().at(KButton::W))
+        translation.z = -delta;
+    if (input_controller_->getKButtonState().at(KButton::S))
+        translation.z = delta;
+
+    if (input_controller_->getKButtonState().at(KButton::A))
+        translation.x = -delta;
+    if (input_controller_->getKButtonState().at(KButton::D))
+        translation.x = delta; */
 
     /*  Eigen::Vector3f up_vector{0.0f, 1.0f, 0.0f};
      Eigen::Vector3f camera_position{0.0f, 50.0f, 0.0f};
@@ -31,24 +65,16 @@ void ecstasy::EditorController::animate() {
      right_axis.normalize();
      Eigen::Matrix4f view; */
 
-    /*     filament::math::mat4 model_mat = camera_->getModelMatrix();
+    /*     fmt::print("camera_position: {} {} {}\n", camera_position.x,
+                camera_position.y, camera_position.z);
+     fmt::print("camera_target_direction: {} {} {}\n",
+    camera_target_direction.x, camera_target_direction.y,
+    camera_target_direction.z); */
 
-        Eigen::Vector3d camera_position{model_mat[3][0], model_mat[3][1],
-                                        model_mat[3][2]};
-        Eigen::Vector3f camera_target{0.0f, 0.0f, 0.0f};
-        Eigen::Vector3d up_vector{0.0, 1.0, 0.0};
+    camera_position += translation;
+    camera_target += translation;
 
-        std::cout << camera_position.format(ecstasy::OctaveFmt) << "\n\n"
-                  << std::endl;
-
-        camera_->lookAt(filament::math::float3(0, 50, 0),
-                        *reinterpret_cast<filament::math::float3*>(&camera_target),
-                        *reinterpret_cast<filament::math::float3*>(&up_vector));
-     */
-
-    /*     camera_->lookAt(filament::math::float3(0, 50.5f, 0),
-                        filament::math::float3(0, 0, 0),
-                        filament::math::float3(1.f, 0, 0)); */
+    camera_->lookAt(camera_position, camera_target, up_vector);
 
     /*  auto cursor_pos_info =
         input_controller_->getCursorPosChange(cursor_pos_change_sid_);

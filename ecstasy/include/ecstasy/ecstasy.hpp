@@ -5,6 +5,7 @@
 #include <concepts>
 #include <entt/entt.hpp>
 #include <fmt/core.h>
+#include <iostream>
 #include <Eigen/Dense>
 #include <ecstasy/InputController.hpp>
 #include <ecstasy/EditorController.hpp>
@@ -23,6 +24,14 @@ class Skybox;
 } // namespace filament
 
 namespace ecstasy {
+
+template <typename T, typename U> inline T cast(U& _data) noexcept {
+    return *reinterpret_cast<T*>(&_data);
+}
+
+/* template <typename T, typename U> inline T cast(U&& _data) noexcept {
+    return *reinterpret_cast<T*>(&_data);
+} */
 
 extern Eigen::IOFormat CommaInitFmt;
 extern Eigen::IOFormat CleanFmt;

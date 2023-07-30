@@ -113,6 +113,8 @@
     "__mutex_base": "cpp",
     "__split_buffer": "cpp",
     "eigen": "cpp",
-    "__functional_base": "cpp"
+    "__functional_base": "cpp",
+    "alignedvector3": "cpp",
+    "geometry": "cpp"
   }
 }

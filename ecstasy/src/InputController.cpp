@@ -87,6 +87,7 @@ void ecstasy::InputController::updateCursorPos(
 
 void ecstasy::InputController::accumulateScrollChange(
     const Eigen::Vector2i& _change) {
+
     for (auto& [_, scroll_change] : scroll_changes_)
         scroll_change += _change;
 }
