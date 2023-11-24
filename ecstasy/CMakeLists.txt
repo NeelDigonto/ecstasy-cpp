@@ -82,13 +82,22 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/debug/filament/include)
-    target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/debug/filament/lib/x86_64)
-else()
-    target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/release/filament/include)
-    target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/release/filament/lib/x86_64)
-endif()
+# if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#     target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/debug/filament/include)
+#     target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/debug/filament/lib/x86_64)
+# else()
+#     target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/release/filament/include)
+#     target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/release/filament/lib/x86_64)
+# endif()
+
+
+ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+     target_include_directories(${ECSTASY_LIB} PRIVATE "C:\\Users\\fathomless\\lib\\filament-v1.46.0-windows\\include")
+     target_link_directories(${ECSTASY_LIB} INTERFACE "C:\\Users\\fathomless\\lib\\filament-v1.46.0-windows\\lib\\x86_64\\mdd")
+ else()
+     target_include_directories(${ECSTASY_LIB} PRIVATE "C:\\Users\\fathomless\\lib\\filament-v1.46.0-windows\\include")
+     target_link_directories(${ECSTASY_LIB} INTERFACE "C:\\Users\\fathomless\\lib\\filament-v1.46.0-windows\\lib\\x86_64\\md")
+ endif()
 
 target_link_libraries(${ECSTASY_LIB} PRIVATE 
     fmt::fmt Eigen3::Eigen EnTT::EnTT glfw          
@@ -108,4 +117,6 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     utils
     shaders
     vkshaders
+    opengl32 # only windows
     )
+

@@ -44,8 +44,13 @@
 
 // GLFW_EXPOSE_NATIVE_WAYLAND GLFW_EXPOSE_NATIVE_X11
 // #define GLFW_EXPOSE_NATIVE_WAYLAND
-#define GLFW_EXPOSE_NATIVE_X11
-#define GLFW_EXPOSE_NATIVE_GLX
+
+/* #define GLFW_EXPOSE_NATIVE_X11
+#define GLFW_EXPOSE_NATIVE_GLX */
+
+#define GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_EXPOSE_NATIVE_WGL
+
 // #define GLFW_NATIVE_INCLUDE_NONE
 #include <GLFW/glfw3native.h>
 
@@ -108,7 +113,7 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width,
     filament_engine_ = filament::Engine::create(
         filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN
 
-    auto native_window = glfwGetX11Window(window_);
+    auto native_window = glfwGetWin32Window(window_);
     filament_swapchain_ =
         filament_engine_->createSwapChain((void*)native_window);
     renderer_ = filament_engine_->createRenderer();

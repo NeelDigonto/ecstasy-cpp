@@ -56,7 +56,7 @@ endif()
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type")
+#set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type") #warning disabled for msvc
 
 set(FETCHCONTENT_QUIET FALSE)
 get_filename_component(fc_cache "../.fetchcontent_cache"
@@ -68,7 +68,7 @@ include_directories(ecstasy/include)
 FetchContent_Declare(
     fmtlib
     GIT_REPOSITORY "https://github.com/fmtlib/fmt"
-    GIT_TAG 9.1.0
+    GIT_TAG 10.1.1
     GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(fmtlib)
@@ -87,7 +87,7 @@ include_directories(${eigen_SOURCE_DIR})
 FetchContent_Declare(
     EnTT
     GIT_REPOSITORY "https://github.com/skypjack/entt"
-    GIT_TAG v3.11.1
+    GIT_TAG v3.12.2
     GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(EnTT)
