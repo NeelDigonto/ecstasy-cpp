@@ -27,9 +27,15 @@ project(Ecstasy
 include(FetchContent)
 include(cmake/download_file.cmake)
 include(cmake/dll_utils.cmake)
+include(cmake/CPM.cmake)
+include(CheckLanguage)
 
-    set(BUILD_SHARED_LIBS OFF)
-    set(BUILD_STATIC_LIBS ON)
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_CXX_STANDARD 23)
+#set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type") #warning disabled for msvc
+
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+set(BUILD_STATIC_LIBS ON CACHE INTERNAL "")
 
 if(MSVC)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
@@ -44,7 +50,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 set(ECSTASY_LIB "ecstasy")
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_program(CCACHE_PROGRAM ccache)
 
@@ -53,10 +59,6 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
 endif()
-
-set(CMAKE_C_STANDARD 23)
-set(CMAKE_CXX_STANDARD 23)
-#set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type") #warning disabled for msvc
 
 set(FETCHCONTENT_QUIET FALSE)
 get_filename_component(fc_cache "../.fetchcontent_cache"
@@ -92,6 +94,39 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(EnTT)
 include_directories(${EnTT_SOURCE_DIR}/src)
+
+set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "")
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY "https://github.com/glfw/glfw"
+    GIT_TAG 3.3.8
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(glfw)
+
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY "https://github.com/nothings/stb"
+    GIT_TAG master
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(stb)
+
+#FetchContent_Declare(
+#    imgui
+#    GIT_REPOSITORY "https://github.com/ocornut/imgui"
+#    GIT_TAG v1.90
+#    GIT_PROGRESS TRUE
+#)
+#FetchContent_MakeAvailable(imgui)
+#
+#FetchContent_Declare(
+#    implot
+#    GIT_REPOSITORY "https://github.com/epezent/implot"
+#    GIT_TAG v0.16
+#    GIT_PROGRESS TRUE
+#)
+#FetchContent_Populate(implot)
 
 add_subdirectory(ecstasy)
 add_subdirectory(libs)
