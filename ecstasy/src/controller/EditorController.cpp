@@ -5,7 +5,6 @@
 #include <math/mat4.h>
 #include <math/vec3.h>
 #include <Eigen/Eigen>
-#include <iostream>
 
 ecstasy::EditorController::EditorController(InputController* _input_controller, filament::Camera* _camera) {
     input_controller_ = _input_controller;

@@ -2,9 +2,7 @@
 #include <string>
 #include <chrono>
 #include <concepts>
-#include <entt/entt.hpp>
 #include <fmt/core.h>
-#include <iostream>
 #include <thread>
 #include <Eigen/Dense>
 
@@ -37,6 +35,12 @@ extern Eigen::IOFormat CleanFmt;
 extern Eigen::IOFormat OctaveFmt;
 extern Eigen::IOFormat HeavyFmt;
 
+static inline Eigen::IOFormat ecstasy::CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ",
+                                                    "", "", " << ", ";");
+static inline Eigen::IOFormat ecstasy::CleanFmt(4, 0, ", ", "\n", "[", "]");
+static inline Eigen::IOFormat ecstasy::OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");
+static inline Eigen::IOFormat ecstasy::HeavyFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
+
 template <class T>
 concept AnimationTime =
     std::same_as<T, std::chrono::nanoseconds> || std::same_as<T, std::chrono::microseconds> ||
@@ -53,8 +57,6 @@ class app {
     std::chrono::steady_clock::time_point last_animation_start_timestamp_{};
     std::chrono::steady_clock::duration last_animation_time_{};
 
-    entt::registry registry_;
-
     GLFWwindow* window_;
 
     filament::Engine* filament_engine_;
@@ -68,17 +70,9 @@ class app {
     InputController* input_controller_;
     EditorController* editor_controller_;
 
-    // WGPUAdapter webgpu_adapter_;
-    // WGPUDevice webgpu_device_;
-    // WGPUInstance webgpu_instance_;
-    // WGPUCommandEncoder webgpu_encoder_;
-    // WGPUQueue webgpu_queue_;
-    // WGPUSwapChain webgpu_swapchain_;
-    // WGPURenderPipeline render_pipeline_;
-
   public:
-    app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 1280U,
-        std::uint32_t _window_height = 720U);
+    app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 1920U,
+        std::uint32_t _window_height = 1080U);
     app(const app& _app) = delete;
     app(app&& _app) = delete;
     // ecstasy::scene createScene();

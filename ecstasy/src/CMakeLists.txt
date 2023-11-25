@@ -4,6 +4,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/controller/InputController.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/controller/EditorController.cpp
         )
+
 add_subdirectory(audio)
 add_subdirectory(renderer)
 set(ECSTASY_SOURCES ${SOURCES} ${AUDIO_SOURCES} ${RENDERER_SOURCES} PARENT_SCOPE)

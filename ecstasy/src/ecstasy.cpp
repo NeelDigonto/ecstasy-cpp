@@ -1,15 +1,16 @@
-
-#include <cassert>
-#include <iostream>
-#include <vector>
+#include <common/common.hpp>
 
 #include <ecstasy/ecstasy.hpp>
 #include <controller/InputController.hpp>
 #include <controller/EditorController.hpp>
+#include <shader/simple.hpp>
 
 #include <Eigen/Dense>
+#include <fmt/core.h>
+
+#include <vector>
 #include <chrono>
-#include <thread>
+#include <numbers>
 
 #include <filament/FilamentAPI.h>
 #include <filament/Engine.h>
@@ -40,26 +41,17 @@
 #include <utils/Entity.h>
 #include <utils/EntityManager.h>
 #include <math/norm.h>
-#include <shader/simple.hpp>
-
-#include <fmt/core.h>
 
 #include <common/glfw.hpp>
 
-Eigen::IOFormat ecstasy::CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "",
-                                      " << ", ";");
-Eigen::IOFormat ecstasy::CleanFmt(4, 0, ", ", "\n", "[", "]");
-Eigen::IOFormat ecstasy::OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");
-Eigen::IOFormat ecstasy::HeavyFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
-
-const static uint32_t indices[] = {0, 1, 2, 2, 3, 0};
+/* const static uint32_t indices[] = {0, 1, 2, 2, 3, 0};
 
 const static filament::math::float3 vertices[] = {
     {-10, -10, 0},
     {-10, 10, 0},
     {10, 10, 0},
     {10, -10, 0},
-};
+}; */
 
 /* filament::math::short4 tbn = filament::math::packSnorm16(
     filament::math::mat3f::packTangentFrame(
@@ -69,6 +61,19 @@ const static filament::math::float3 vertices[] = {
         .xyzw);
 
 const static filament::math::short4 normals[]{tbn, tbn, tbn, tbn}; */
+
+struct Vertex {
+    filament::math::float2 position;
+    uint32_t color;
+};
+
+static const Vertex TRIANGLE_VERTICES[3] = {
+    {{1, 0}, 0xffff0000u},
+    {{cos(std::numbers::pi * 2 / 3), sin(std::numbers::pi * 2 / 3)}, 0xff00ff00u},
+    {{cos(std::numbers::pi * 4 / 3), sin(std::numbers::pi * 4 / 3)}, 0xff0000ffu},
+};
+
+static constexpr uint16_t TRIANGLE_INDICES[3] = {0, 1, 2};
 
 // https : // github.com/BinomialLLC/basis_universal
 
@@ -122,30 +127,50 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint3
     scene_->setSkybox(skybox_);
     view_->setPostProcessingEnabled(false);
 
-    filament::VertexBuffer* vertexBuffer =
-        filament::VertexBuffer::Builder()
-            .vertexCount(4)
-            .bufferCount(1)
-            .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3)
-            /*             .attribute(filament::VertexAttribute::TANGENTS,
-               1, filament::VertexBuffer::AttributeType::SHORT4)
-                        .normalized(filament::VertexAttribute::TANGENTS) */
-            .build(*filament_engine_);
+    /*    filament::VertexBuffer* vertexBuffer =
+           filament::VertexBuffer::Builder()
+               .vertexCount(4)
+               .bufferCount(1)
+               .attribute(filament::VertexAttribute::POSITION, 0,
+       filament::VertexBuffer::AttributeType::FLOAT3)
+               //            .attribute(filament::VertexAttribute::TANGENTS,
+               //   1, filament::VertexBuffer::AttributeType::SHORT4)
+               //            .normalized(filament::VertexAttribute::TANGENTS)
+               .build(*filament_engine_); */
 
-    vertexBuffer->setBufferAt(*filament_engine_, 0,
-                              filament::VertexBuffer::BufferDescriptor(
-                                  vertices, vertexBuffer->getVertexCount() * sizeof(vertices[0])));
+    /*  vertexBuffer->setBufferAt(*filament_engine_, 0,
+                               filament::VertexBuffer::BufferDescriptor(
+                                   vertices, vertexBuffer->getVertexCount() * sizeof(vertices[0]))); */
     /*     vertexBuffer->setBufferAt(
             *filament_engine_, 1,
             filament::VertexBuffer::BufferDescriptor(
                 normals, vertexBuffer->getVertexCount() * sizeof(normals[0])));
      */
 
-    filament::IndexBuffer* indexBuffer =
+    /* filament::IndexBuffer* indexBuffer =
         filament::IndexBuffer::Builder().indexCount(6).build(*filament_engine_);
 
     indexBuffer->setBuffer(*filament_engine_, filament::IndexBuffer::BufferDescriptor(
                                                   indices, indexBuffer->getIndexCount() * sizeof(uint32_t)));
+  */
+
+    static_assert(sizeof(Vertex) == 12, "Strange vertex size.");
+    auto vb = filament::VertexBuffer::Builder()
+                  .vertexCount(3)
+                  .bufferCount(1)
+                  .attribute(filament::VertexAttribute::POSITION, 0,
+                             filament::VertexBuffer::AttributeType::FLOAT2, 0, 12)
+                  .attribute(filament::VertexAttribute::COLOR, 0,
+                             filament::VertexBuffer::AttributeType::UBYTE4, 8, 12)
+                  .normalized(filament::VertexAttribute::COLOR)
+                  .build(*filament_engine_);
+    vb->setBufferAt(*filament_engine_, 0,
+                    filament::VertexBuffer::BufferDescriptor(TRIANGLE_VERTICES, 36, nullptr));
+    auto ib = filament::IndexBuffer::Builder()
+                  .indexCount(3)
+                  .bufferType(filament::IndexBuffer::IndexType::USHORT)
+                  .build(*filament_engine_);
+    ib->setBuffer(*filament_engine_, filament::IndexBuffer::BufferDescriptor(TRIANGLE_INDICES, 6, nullptr));
 
     filamat::MaterialBuilder::init();
     filamat::MaterialBuilder builder;
@@ -180,7 +205,8 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint3
     filament::RenderableManager::Builder(1)
         .boundingBox({{-1, -1, -1}, {1, 1, 1}})
         .material(0, materialInstance)
-        .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertexBuffer, indexBuffer, 0, 6)
+        //.geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertexBuffer, indexBuffer, 0, 6)
+        .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vb, ib, 0, 3)
         .culling(false)
         .build(*filament_engine_, renderable);
     scene_->addEntity(renderable);

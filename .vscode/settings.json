@@ -115,6 +115,21 @@
     "eigen": "cpp",
     "__functional_base": "cpp",
     "alignedvector3": "cpp",
-    "geometry": "cpp"
+    "geometry": "cpp",
+    "superlusupport": "cpp",
+    "*.evaluator": "cpp",
+    "*.traits": "cpp",
+    "adolcforward": "cpp",
+    "autodiff": "cpp",
+    "bvh": "cpp",
+    "eulerangles": "cpp",
+    "fft": "cpp",
+    "kroneckerproduct": "cpp",
+    "mprealsupport": "cpp",
+    "numericaldiff": "cpp",
+    "openglsupport": "cpp",
+    "specialfunctions": "cpp",
+    "splines": "cpp",
+    "stack": "cpp"
   }
 }
