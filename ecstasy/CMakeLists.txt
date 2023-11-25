@@ -18,8 +18,6 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         )
 
-
-
 if(MSVC)
 
     target_link_libraries(${ECSTASY_LIB} PRIVATE opengl32)

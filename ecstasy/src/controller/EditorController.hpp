@@ -1,5 +1,5 @@
 #pragma once
-#include <ecstasy/InputController.hpp>
+#include <controller/InputController.hpp>
 #include <chrono>
 
 namespace filament {
@@ -24,8 +24,7 @@ class EditorController {
     EditorController() = delete;
     EditorController(const EditorController&) = delete;
     EditorController(EditorController&&) = delete;
-    EditorController(InputController* _input_controller,
-                     filament::Camera* _camera);
+    EditorController(InputController* _input_controller, filament::Camera* _camera);
     ~EditorController();
 
     void animate(const std::chrono::steady_clock::duration& _delta);

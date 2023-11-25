@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <string>
 #include <chrono>
 #include <concepts>
@@ -8,8 +7,6 @@
 #include <iostream>
 #include <thread>
 #include <Eigen/Dense>
-#include <ecstasy/InputController.hpp>
-#include <ecstasy/EditorController.hpp>
 
 // auto create a default scene
 class GLFWwindow;
@@ -26,9 +23,10 @@ class Skybox;
 
 namespace ecstasy {
 
-template <typename T, typename U> inline T cast(U& _data) noexcept {
-    return *reinterpret_cast<T*>(&_data);
-}
+class InputController;
+class EditorController;
+
+template <typename T, typename U> inline T cast(U& _data) noexcept { return *reinterpret_cast<T*>(&_data); }
 
 /* template <typename T, typename U> inline T cast(U&& _data) noexcept {
     return *reinterpret_cast<T*>(&_data);
@@ -40,10 +38,9 @@ extern Eigen::IOFormat OctaveFmt;
 extern Eigen::IOFormat HeavyFmt;
 
 template <class T>
-concept AnimationTime = std::same_as<T, std::chrono::nanoseconds> ||
-                        std::same_as<T, std::chrono::microseconds> ||
-                        std::same_as<T, std::chrono::milliseconds> ||
-                        std::same_as<T, std::chrono::seconds>;
+concept AnimationTime =
+    std::same_as<T, std::chrono::nanoseconds> || std::same_as<T, std::chrono::microseconds> ||
+    std::same_as<T, std::chrono::milliseconds> || std::same_as<T, std::chrono::seconds>;
 
 class app {
 

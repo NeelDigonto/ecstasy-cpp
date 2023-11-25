@@ -1,10 +1,12 @@
-#include <GLFW/glfw3.h>
 
 #include <cassert>
 #include <iostream>
 #include <vector>
 
 #include <ecstasy/ecstasy.hpp>
+#include <controller/InputController.hpp>
+#include <controller/EditorController.hpp>
+
 #include <Eigen/Dense>
 #include <chrono>
 #include <thread>
@@ -42,17 +44,7 @@
 
 #include <fmt/core.h>
 
-// GLFW_EXPOSE_NATIVE_WAYLAND GLFW_EXPOSE_NATIVE_X11
-// #define GLFW_EXPOSE_NATIVE_WAYLAND
-
-/* #define GLFW_EXPOSE_NATIVE_X11
-#define GLFW_EXPOSE_NATIVE_GLX */
-
-#define GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_EXPOSE_NATIVE_WGL
-
-// #define GLFW_NATIVE_INCLUDE_NONE
-#include <GLFW/glfw3native.h>
+#include <common/glfw.hpp>
 
 Eigen::IOFormat ecstasy::CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "",
                                       " << ", ";");
@@ -79,47 +71,6 @@ const static filament::math::float3 vertices[] = {
 const static filament::math::short4 normals[]{tbn, tbn, tbn, tbn}; */
 
 // https : // github.com/BinomialLLC/basis_universal
-
-ecstasy::InputController::InputController(GLFWwindow* _window, Eigen::Vector2i _window_dimension) {
-    int width, height;
-    glfwGetWindowSize(_window, &width, &height);
-    viewport_dimension_ = {width, height};
-
-    glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-        auto input_controller = app->getInputController();
-        input_controller->kbutton_state_[key] = action;
-        // fmt::print("{}\n", action);
-    });
-
-    glfwSetCharCallback(_window, [](GLFWwindow* window, unsigned int codepoint) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-    });
-
-    glfwSetCharModsCallback(_window, [](GLFWwindow* window, unsigned int codepoint, int mods) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-    });
-
-    glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, int button, int action, int mods) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-        auto input_controller = app->getInputController();
-        input_controller->mbutton_state_[button] = action;
-        // fmt::print("{}\n", action);
-    });
-
-    glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xposIn, double yposIn) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-        app->getInputController()->current_cursor_pos_ = {
-            xposIn, app->getInputController()->viewport_dimension_.y() - yposIn};
-
-        app->getInputController()->updateCursorPos(app->getInputController()->current_cursor_pos_);
-    });
-
-    glfwSetScrollCallback(_window, [](GLFWwindow* window, double xoffset, double yoffset) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-        app->getInputController()->accumulateScrollChange({xoffset, yoffset});
-    });
-}
 
 ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint32_t _window_height) {
     app_name_ = _app_name;

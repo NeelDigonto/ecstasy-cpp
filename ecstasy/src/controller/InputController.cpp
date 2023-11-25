@@ -1,57 +1,48 @@
-#include <ecstasy/InputController.hpp>
+#include <controller/InputController.hpp>
 #include <cassert>
 #include <GLFW/glfw3.h>
 #include <ecstasy/ecstasy.hpp>
 
-/* ecstasy::InputController::InputController(GLFWwindow* _window,
-                                          Eigen::Vector2i _window_dimension) {
+ecstasy::InputController::InputController(GLFWwindow* _window, Eigen::Vector2i _window_dimension) {
     int width, height;
     glfwGetWindowSize(_window, &width, &height);
     viewport_dimension_ = {width, height};
 
-    glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode,
-                                   int action, int mods) {
+    glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         auto input_controller = app->getInputController();
         input_controller->kbutton_state_[key] = action;
         // fmt::print("{}\n", action);
     });
 
-    glfwSetCharCallback(_window, [](GLFWwindow* window,
-                                    unsigned int codepoint) {
+    glfwSetCharCallback(_window, [](GLFWwindow* window, unsigned int codepoint) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
     });
 
-    glfwSetCharModsCallback(_window, [](GLFWwindow* window,
-                                        unsigned int codepoint, int mods) {
+    glfwSetCharModsCallback(_window, [](GLFWwindow* window, unsigned int codepoint, int mods) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
     });
 
-    glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, int button,
-                                           int action, int mods) {
+    glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, int button, int action, int mods) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         auto input_controller = app->getInputController();
         input_controller->mbutton_state_[button] = action;
         // fmt::print("{}\n", action);
     });
 
-    glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xposIn,
-                                         double yposIn) {
+    glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xposIn, double yposIn) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         app->getInputController()->current_cursor_pos_ = {
-            xposIn,
-            app->getInputController()->viewport_dimension_.y() - yposIn};
+            xposIn, app->getInputController()->viewport_dimension_.y() - yposIn};
 
-        app->getInputController()->updateCursorPos(
-            app->getInputController()->current_cursor_pos_);
+        app->getInputController()->updateCursorPos(app->getInputController()->current_cursor_pos_);
     });
 
-    glfwSetScrollCallback(_window, [](GLFWwindow* window, double xoffset,
-                                      double yoffset) {
+    glfwSetScrollCallback(_window, [](GLFWwindow* window, double xoffset, double yoffset) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         app->getInputController()->accumulateScrollChange({xoffset, yoffset});
     });
-} */
+}
 
 void ecstasy::InputController::updateViewportDimension(const Eigen::Vector2i& _viewport_dimension) {
     viewport_dimension_ = _viewport_dimension;

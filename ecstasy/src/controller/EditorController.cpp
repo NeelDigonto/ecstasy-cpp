@@ -1,4 +1,4 @@
-#include <ecstasy/EditorController.hpp>
+#include <controller/EditorController.hpp>
 #include <ecstasy/ecstasy.hpp>
 #include <fmt/core.h>
 #include <filament/Camera.h>
@@ -7,34 +7,27 @@
 #include <Eigen/Eigen>
 #include <iostream>
 
-ecstasy::EditorController::EditorController(InputController* _input_controller,
-                                            filament::Camera* _camera) {
+ecstasy::EditorController::EditorController(InputController* _input_controller, filament::Camera* _camera) {
     input_controller_ = _input_controller;
     camera_ = _camera;
 
-    cursor_pos_change_sid_ =
-        input_controller_->registerCursorPosChangeUpdater();
+    cursor_pos_change_sid_ = input_controller_->registerCursorPosChangeUpdater();
     scroll_change_sid_ = input_controller_->registerScrollChangeAccumulator();
 }
 
-void ecstasy::EditorController::animate(
-    const std::chrono::steady_clock::duration& _delta) {
+void ecstasy::EditorController::animate(const std::chrono::steady_clock::duration& _delta) {
 
     filament::math::double3 up_vector{0.0, 1.0, 0.0};
     filament::math::mat4 model_mat = camera_->getModelMatrix();
-    filament::math::double3 camera_position{model_mat[3][0], model_mat[3][1],
-                                            model_mat[3][2]};
-    auto camera_target_direction =
-        normalize(cross(camera_->getLeftVector(), camera_->getUpVector()));
+    filament::math::double3 camera_position{model_mat[3][0], model_mat[3][1], model_mat[3][2]};
+    auto camera_target_direction = normalize(cross(camera_->getLeftVector(), camera_->getUpVector()));
     auto camera_target = camera_position - camera_target_direction;
 
     // Update
-    double delta =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(_delta).count();
+    double delta = std::chrono::duration_cast<std::chrono::nanoseconds>(_delta).count();
     filament::math::double3 translation{0., 0., 0.};
 
-    const auto scroll_change =
-        input_controller_->getScrollChange(scroll_change_sid_);
+    const auto scroll_change = input_controller_->getScrollChange(scroll_change_sid_);
 
     if (scroll_change.y() != 0) {
         translation.z = -scroll_change.y() * mouse_wheel_zoom_speed_;
@@ -64,14 +57,14 @@ void ecstasy::EditorController::animate(
     /*  fmt::print("translation: {} {} {}\n", translation.x, translation.y,
                 translation.z); */
 
-     /*  Eigen::Vector3f up_vector{0.0f, 1.0f, 0.0f};
-     Eigen::Vector3f camera_position{0.0f, 50.0f, 0.0f};
-     Eigen::Vector3f camera_target{0.0f, 0.0f, 0.0f};
-     Eigen::Vector3f camera_direction =
-         (camera_position - camera_target).normalized();
-     Eigen::Vector3f right_axis = up_vector.cross(camera_direction);
-     right_axis.normalize();
-     Eigen::Matrix4f view; */
+    /*  Eigen::Vector3f up_vector{0.0f, 1.0f, 0.0f};
+    Eigen::Vector3f camera_position{0.0f, 50.0f, 0.0f};
+    Eigen::Vector3f camera_target{0.0f, 0.0f, 0.0f};
+    Eigen::Vector3f camera_direction =
+        (camera_position - camera_target).normalized();
+    Eigen::Vector3f right_axis = up_vector.cross(camera_direction);
+    right_axis.normalize();
+    Eigen::Matrix4f view; */
 
     /*     fmt::print("camera_position: {} {} {}\n", camera_position.x,
                 camera_position.y, camera_position.z);
