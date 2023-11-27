@@ -85,11 +85,11 @@ void ecstasy::app::animate() {
     // fmt::print("{}us\n", getLastAnimationTime<std::chrono::microseconds>());
     glfwPollEvents();
 
-    if (renderer_->beginFrame(filament_swapchain_)) {
-        log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
-        scene_->animate(last_animation_time_);
-        renderer_->endFrame();
-    }
+    renderer_->beginFrame(filament_swapchain_);
+    // log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
+    scene_->animate(last_animation_time_);
+    renderer_->endFrame();
+    std::this_thread::sleep_for(500ms);
 }
 
 ecstasy::app::~app() {

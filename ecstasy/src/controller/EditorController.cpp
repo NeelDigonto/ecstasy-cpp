@@ -33,8 +33,6 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
     if (scroll_change.y() != 0) {
         translation.z = -scroll_change.y() * mouse_wheel_zoom_speed_;
         input_controller_->setScrollChange(scroll_change_sid_, {0, 0});
-        /* fmt::print("translation: {} {} {}\n", translation.x, translation.y,
-                   translation.z); */
     }
 
     if (input_controller_->getKButtonState().at(KButton::W))
@@ -55,7 +53,12 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
     if (input_controller_->getKButtonState().at(KButton::LEFT_CONTROL))
         translation.y = -delta * y_movement_speed_;
 
-    log::info("{} {} {}", translation.x, translation.y, translation.z);
+    camera_position += translation;
+    camera_target += translation;
+
+    camera_->lookAt(camera_position, camera_target, up_vector);
+
+    // log::info("{} {} {}", translation.x, translation.y, translation.z);
 
     /*  fmt::print("translation: {} {} {}\n", translation.x, translation.y,
                 translation.z); */
@@ -75,12 +78,7 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
     camera_target_direction.x, camera_target_direction.y,
     camera_target_direction.z); */
 
-    camera_position += translation;
-    camera_target += translation;
-
-    camera_->lookAt(camera_position, camera_target, up_vector);
-
-    /*  auto cursor_pos_info =
+        /*  auto cursor_pos_info =
         input_controller_->getCursorPosChange(cursor_pos_change_sid_);
     if (cursor_pos_info.cursor_pos_diff_.x() != 0 ||
             cursor_pos_info.cursor_pos_diff_.y() != 0)

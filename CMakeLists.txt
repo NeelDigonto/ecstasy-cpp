@@ -32,7 +32,12 @@ include(CheckLanguage)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
-#set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type") #warning disabled for msvc
+
+if(NOT MSVC)
+    set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type") #warning disabled for msvc
+endif()
+
+
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 set(BUILD_STATIC_LIBS ON CACHE INTERNAL "")

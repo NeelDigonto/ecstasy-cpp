@@ -6,7 +6,7 @@ namespace shader {
 
 void simple(filamat::MaterialBuilder& _builder) {
     _builder.name("Simple Lit Shader")
-        .material(R"MS_START(    
+        .material(R"MS_START(
             void material(inout MaterialInputs material) {
                 prepareMaterial(material);
                 material.baseColor.rgb = materialParams.baseColor;
@@ -20,9 +20,12 @@ void simple(filamat::MaterialBuilder& _builder) {
         .parameter("roughness", filament::backend::UniformType::FLOAT)
         .parameter("reflectance", filament::backend::UniformType::FLOAT)
         .shading(filamat::MaterialBuilder::Shading::LIT)
+        .require(filamat::MaterialBuilder::VertexAttribute::POSITION)
+        .require(filamat::MaterialBuilder::VertexAttribute::TANGENTS)
         .doubleSided(true)
         .targetApi(filamat::MaterialBuilder::TargetApi::OPENGL)
         .platform(filamat::MaterialBuilder::Platform::DESKTOP);
 }
+
 } // namespace shader
 } // namespace ecstasy

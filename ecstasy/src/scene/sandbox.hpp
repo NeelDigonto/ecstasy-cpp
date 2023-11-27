@@ -35,12 +35,13 @@
 #include <utils/Entity.h>
 #include <utils/EntityManager.h>
 #include <math/norm.h>
+#include <math/mat3.h>
 #include <numbers>
 
 namespace ecstasy {
 namespace scene {
 
-struct Vertex {
+/* struct Vertex {
     filament::math::float2 position;
     uint32_t color;
 };
@@ -51,7 +52,24 @@ static const Vertex TRIANGLE_VERTICES[3] = {
     {{cos(std::numbers::pi * 4 / 3), sin(std::numbers::pi * 4 / 3)}, 0xff0000ffu},
 };
 
-static constexpr uint16_t TRIANGLE_INDICES[3] = {0, 1, 2};
+static constexpr uint16_t TRIANGLE_INDICES[3] = {0, 1, 2}; */
+
+const static uint32_t indices[] = {0, 1, 2, 2, 3, 0};
+
+const static filament::math::float3 vertices[] = {
+    {-10, 0, -10},
+    {-10, 0, 10},
+    {10, 0, 10},
+    {10, 0, -10},
+};
+
+filament::math::short4 tbn = filament::math::packSnorm16(
+    filament::math::mat3f::packTangentFrame(filament::math::mat3f{filament::math::float3{1.0f, 0.0f, 0.0f},
+                                                                  filament::math::float3{0.0f, 0.0f, 1.0f},
+                                                                  filament::math::float3{0.0f, 1.0f, 0.0f}})
+        .xyzw);
+
+const static filament::math::short4 normals[]{tbn, tbn, tbn, tbn};
 
 class sandbox : public scene {
     app* app_;
@@ -64,6 +82,14 @@ class sandbox : public scene {
     filament::Skybox* skybox_;
     InputController* input_controller_;
     EditorController* editor_controller_;
+
+    filament::VertexBuffer* vertex_buffer_;
+    filament::IndexBuffer* index_buffer_;
+    filament::Material* material_;
+    filament::MaterialInstance* material_instance_;
+
+    utils::Entity light_;
+    utils::Entity renderable_;
 
   public:
     sandbox() = delete;
@@ -84,7 +110,7 @@ class sandbox : public scene {
         view_->setViewport({0, 0, static_cast<std::uint32_t>(viewport_dimension.x()),
                             static_cast<std::uint32_t>(viewport_dimension.y())});
 
-        camera_->lookAt(filament::math::float3(0, 0, 50.f), filament::math::float3(0, 0, 0),
+        camera_->lookAt(filament::math::float3(0, 0, 20.f), filament::math::float3(0, 0, 0),
                         filament::math::float3(0, 1.f, 0));
         camera_->setProjection(
             90.0, static_cast<double>(viewport_dimension.x()) / static_cast<double>(viewport_dimension.y()),
@@ -96,45 +122,48 @@ class sandbox : public scene {
         scene_->setSkybox(skybox_);
         view_->setPostProcessingEnabled(false);
 
-        static_assert(sizeof(Vertex) == 12, "Strange vertex size.");
-        auto vb = filament::VertexBuffer::Builder()
-                      .vertexCount(3)
-                      .bufferCount(1)
-                      .attribute(filament::VertexAttribute::POSITION, 0,
-                                 filament::VertexBuffer::AttributeType::FLOAT2, 0, 12)
-                      .attribute(filament::VertexAttribute::COLOR, 0,
-                                 filament::VertexBuffer::AttributeType::UBYTE4, 8, 12)
-                      .normalized(filament::VertexAttribute::COLOR)
-                      .build(*filament_engine_);
-        vb->setBufferAt(*filament_engine_, 0,
-                        filament::VertexBuffer::BufferDescriptor(TRIANGLE_VERTICES, 36, nullptr));
+        vertex_buffer_ = filament::VertexBuffer::Builder()
+                             .vertexCount(4)
+                             .bufferCount(2)
+                             .attribute(filament::VertexAttribute::POSITION, 0,
+                                        filament::VertexBuffer::AttributeType::FLOAT3)
+                             .attribute(filament::VertexAttribute::TANGENTS, 1,
+                                        filament::VertexBuffer::AttributeType::SHORT4)
+                             .normalized(filament::VertexAttribute::TANGENTS)
+                             .build(*filament_engine_);
 
-        auto ib = filament::IndexBuffer::Builder()
-                      .indexCount(3)
-                      .bufferType(filament::IndexBuffer::IndexType::USHORT)
-                      .build(*filament_engine_);
-        ib->setBuffer(*filament_engine_,
-                      filament::IndexBuffer::BufferDescriptor(TRIANGLE_INDICES, 6, nullptr));
+        vertex_buffer_->setBufferAt(*filament_engine_, 0,
+                                    filament::VertexBuffer::BufferDescriptor(
+                                        vertices, vertex_buffer_->getVertexCount() * sizeof(vertices[0])));
+        vertex_buffer_->setBufferAt(*filament_engine_, 1,
+                                    filament::VertexBuffer::BufferDescriptor(
+                                        normals, vertex_buffer_->getVertexCount() * sizeof(normals[0])));
+
+        index_buffer_ = filament::IndexBuffer::Builder().indexCount(6).build(*filament_engine_);
+
+        index_buffer_->setBuffer(*filament_engine_,
+                                 filament::IndexBuffer::BufferDescriptor(
+                                     indices, index_buffer_->getIndexCount() * sizeof(uint32_t)));
 
         filamat::MaterialBuilder::init();
         filamat::MaterialBuilder builder;
         ecstasy::shader::simple(builder);
         filamat::Package package = builder.build(filament_engine_->getJobSystem());
 
-        filament::Material* material = filament::Material::Builder()
-                                           .package(package.getData(), package.getSize())
-                                           .build(*filament_engine_);
-        material->setDefaultParameter("baseColor", filament::RgbType::LINEAR,
-                                      filament::math::float3{0, 1, 0});
-        material->setDefaultParameter("metallic", 0.0f);
-        material->setDefaultParameter("roughness", 0.4f);
-        material->setDefaultParameter("reflectance", 0.5f);
+        material_ = filament::Material::Builder()
+                        .package(package.getData(), package.getSize())
+                        .build(*filament_engine_);
+        material_->setDefaultParameter("baseColor", filament::RgbType::LINEAR,
+                                       filament::math::float3{0, 1, 0});
+        material_->setDefaultParameter("metallic", 0.0f);
+        material_->setDefaultParameter("roughness", 0.4f);
+        material_->setDefaultParameter("reflectance", 0.5f);
 
-        filament::MaterialInstance* materialInstance = material->createInstance();
+        material_instance_ = material_->createInstance();
 
-        auto renderable = utils::EntityManager::get().create();
+        renderable_ = utils::EntityManager::get().create();
 
-        utils::Entity light = utils::EntityManager::get().create();
+        light_ = utils::EntityManager::get().create();
 
         filament::LightManager::Builder(filament::LightManager::Type::SUN)
             .color(filament::Color::toLinear<filament::ACCURATE>(filament::sRGBColor(0.98f, 0.92f, 0.89f)))
@@ -143,22 +172,24 @@ class sandbox : public scene {
             .direction({0, 0, 5})
             .sunAngularRadius(1.9f)
             .castShadows(true)
-            .build(*filament_engine_, light);
-        scene_->addEntity(light);
+            .build(*filament_engine_, light_);
+        scene_->addEntity(light_);
 
         filament::RenderableManager::Builder(1)
             .boundingBox({{-1, -1, -1}, {1, 1, 1}})
-            .material(0, materialInstance)
-            .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vb, ib, 0, 3)
+            .material(0, material_instance_)
+            //.geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vb, ib, 0, 3)
+            .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertex_buffer_, index_buffer_,
+                      0, 6)
             .culling(false)
             .receiveShadows(false)
             .castShadows(false)
-            .build(*filament_engine_, renderable);
+            .build(*filament_engine_, renderable_);
     }
 
     void build() {}
     void animate(std::chrono::steady_clock::duration _last_animation_time) {
-        editor_controller_->animate(_last_animation_time);
+        // editor_controller_->animate(_last_animation_time);
         renderer_->render(view_);
     }
 
