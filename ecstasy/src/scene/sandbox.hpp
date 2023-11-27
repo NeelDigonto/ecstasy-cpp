@@ -44,7 +44,6 @@
 namespace ecstasy {
 
 Eigen::Quaternionf getQuatFromEuler(Eigen::Vector3f _euler) {
-    float roll = 1.5707, pitch = 0, yaw = 0.707;
     Eigen::Quaternionf q;
     q = Eigen::AngleAxisf(_euler.x(), Eigen::Vector3f::UnitX()) *
         Eigen::AngleAxisf(_euler.y(), Eigen::Vector3f::UnitY()) *
@@ -60,19 +59,6 @@ Eigen::Vector4f getFloat4FromEuler(Eigen::Vector3f _euler) {
 }
 
 namespace scene {
-
-/* struct Vertex {
-    filament::math::float2 position;
-    uint32_t color;
-};
-
-static const Vertex TRIANGLE_VERTICES[3] = {
-    {{1, 0}, 0xffff0000u},
-    {{cos(std::numbers::pi * 2 / 3), sin(std::numbers::pi * 2 / 3)}, 0xff00ff00u},
-    {{cos(std::numbers::pi * 4 / 3), sin(std::numbers::pi * 4 / 3)}, 0xff0000ffu},
-};
-
-static constexpr uint16_t TRIANGLE_INDICES[3] = {0, 1, 2}; */
 
 const static std::vector<uint32_t> indices = {0, 1, 2};
 
@@ -125,7 +111,7 @@ class sandbox : public scene {
         view_->setViewport({0, 0, static_cast<std::uint32_t>(viewport_dimension.x()),
                             static_cast<std::uint32_t>(viewport_dimension.y())});
 
-        camera_->lookAt(filament ::math::float3(0, 0, 20.0f), filament ::math::float3(0, 0, 0),
+        camera_->lookAt(filament ::math::float3(0, 0, 50.0f), filament ::math::float3(0, 0, 0),
                         filament ::math::float3(0.f, 1.f, 0));
         camera_->setProjection(
             45.0, static_cast<double>(viewport_dimension.x()) / static_cast<double>(viewport_dimension.y()),
@@ -139,23 +125,22 @@ class sandbox : public scene {
 
         vertex_buffer_ = filament::VertexBuffer::Builder()
                              .vertexCount(3)
-                             .bufferCount(1)
+                             .bufferCount(2)
                              .attribute(filament::VertexAttribute::POSITION, 0,
                                         filament::VertexBuffer::AttributeType::FLOAT3)
-                             /* .attribute(filament::VertexAttribute::TANGENTS, 1,
+                             .attribute(filament::VertexAttribute::TANGENTS, 1,
                                         filament::VertexBuffer::AttributeType::FLOAT4)
-                             .normalized(filament::VertexAttribute::TANGENTS) */
+                             .normalized(filament::VertexAttribute::TANGENTS)
                              .build(*filament_engine_);
 
         vertex_buffer_->setBufferAt(
             *filament_engine_, 0,
             filament::VertexBuffer::BufferDescriptor(vertices.data(),
                                                      vertex_buffer_->getVertexCount() * sizeof(vertices[0])));
-        /*  vertex_buffer_->setBufferAt(
-             *filament_engine_, 1,
-             filament::VertexBuffer::BufferDescriptor(normals.data(),
-                                                      vertex_buffer_->getVertexCount() * sizeof(normals[0])));
-         */
+        vertex_buffer_->setBufferAt(
+            *filament_engine_, 1,
+            filament::VertexBuffer::BufferDescriptor(normals.data(),
+                                                     vertex_buffer_->getVertexCount() * sizeof(normals[0])));
 
         index_buffer_ = filament::IndexBuffer::Builder().indexCount(6).build(*filament_engine_);
 
@@ -173,9 +158,9 @@ class sandbox : public scene {
                         .build(*filament_engine_);
         material_->setDefaultParameter("baseColor", filament::RgbType::LINEAR,
                                        filament::math::float3{0, 1, 0});
-        /*         material_->setDefaultParameter("metallic", 0.0f);
-                material_->setDefaultParameter("roughness", 0.4f);
-                material_->setDefaultParameter("reflectance", 0.5f); */
+        material_->setDefaultParameter("metallic", 0.0f);
+        material_->setDefaultParameter("roughness", 0.4f);
+        material_->setDefaultParameter("reflectance", 0.5f);
 
         material_instance_ = material_->createInstance();
 
@@ -186,7 +171,6 @@ class sandbox : public scene {
         filament::LightManager::Builder(filament::LightManager::Type::SUN)
             .color(filament::Color::toLinear<filament::ACCURATE>(filament::sRGBColor(0.98f, 0.92f, 0.89f)))
             .intensity(150'000)
-            //.direction({0.7, -1, -0.8})
             .direction({0, 0, 5})
             .sunAngularRadius(1.9f)
             .castShadows(true)
@@ -197,7 +181,6 @@ class sandbox : public scene {
         filament::RenderableManager::Builder(1)
             .boundingBox({{-1, -1, -1}, {1, 1, 1}})
             .material(0, material_instance_)
-            //.geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vb, ib, 0, 3)
             .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertex_buffer_, index_buffer_,
                       0, 3)
             .culling(false)

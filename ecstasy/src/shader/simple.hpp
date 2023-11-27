@@ -4,7 +4,7 @@
 namespace ecstasy {
 namespace shader {
 
-/* void simple(filamat::MaterialBuilder& _builder) {
+void simple(filamat::MaterialBuilder& _builder) {
     _builder.name("Simple Lit Shader")
         .material(R"MS_START(
             void material(inout MaterialInputs material) {
@@ -25,9 +25,9 @@ namespace shader {
         .doubleSided(true)
         .targetApi(filamat::MaterialBuilder::TargetApi::OPENGL)
         .platform(filamat::MaterialBuilder::Platform::DESKTOP);
-} */
+}
 
-void simple(filamat::MaterialBuilder& _builder) {
+/* void simple(filamat::MaterialBuilder& _builder) {
     _builder.name("Simple Lit Shader")
         .material(R"MS_START(
             void material(inout MaterialInputs material) {
@@ -41,7 +41,7 @@ void simple(filamat::MaterialBuilder& _builder) {
         .doubleSided(true)
         .targetApi(filamat::MaterialBuilder::TargetApi::OPENGL)
         .platform(filamat::MaterialBuilder::Platform::DESKTOP);
-}
+} */
 
 } // namespace shader
 } // namespace ecstasy
