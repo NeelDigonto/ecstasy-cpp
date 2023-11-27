@@ -130,6 +130,7 @@
     "openglsupport": "cpp",
     "specialfunctions": "cpp",
     "splines": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "matrixfunctions": "cpp"
   }
 }
