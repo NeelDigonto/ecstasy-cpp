@@ -54,8 +54,6 @@ class app {
   public:
   private:
     std::string app_name_;
-    std::uint32_t window_width_;
-    std::uint32_t window_height_;
     Eigen::Vector4d clear_color_{0.5, 0.5, 0.5, 1.0};
     std::chrono::steady_clock::time_point last_animation_start_timestamp_{};
     std::chrono::steady_clock::duration last_animation_time_{};
@@ -78,9 +76,6 @@ class app {
     void setClearColor(const Eigen::Vector4d& _clear_color) noexcept;
     bool shouldClose() const noexcept;
     InputController* getInputController() noexcept;
-    inline std::pair<std::uint32_t, std::uint32_t> getWindowDimension() const {
-        return std::pair<std::uint32_t, std::uint32_t>{window_width_, window_height_};
-    }
     template <ecstasy::AnimationTime T = std::chrono::microseconds>
     typename T::rep getLastAnimationTime() const noexcept;
     void printUsage(std::chrono::steady_clock::duration _duration);

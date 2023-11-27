@@ -4,30 +4,34 @@
 #include <ecstasy/ecstasy.hpp>
 
 ecstasy::InputController::InputController(GLFWwindow* _window, Eigen::Vector2i _window_dimension) {
+
     int width, height;
     glfwGetWindowSize(_window, &width, &height);
     viewport_dimension_ = {width, height};
+
+    glfwSetFramebufferSizeCallback(_window, [](GLFWwindow* window, int width, int height) {
+        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
+        app->getInputController()->updateViewportDimension({width, height});
+    });
 
     glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         auto input_controller = app->getInputController();
         input_controller->kbutton_state_[key] = action;
-        // fmt::print("{}\n", action);
     });
 
-    glfwSetCharCallback(_window, [](GLFWwindow* window, unsigned int codepoint) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-    });
+    // glfwSetCharCallback(_window, [](GLFWwindow* window, unsigned int codepoint) {
+    //     auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
+    // });
 
-    glfwSetCharModsCallback(_window, [](GLFWwindow* window, unsigned int codepoint, int mods) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-    });
+    // glfwSetCharModsCallback(_window, [](GLFWwindow* window, unsigned int codepoint, int mods) {
+    //     auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
+    // });
 
     glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, int button, int action, int mods) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         auto input_controller = app->getInputController();
         input_controller->mbutton_state_[button] = action;
-        // fmt::print("{}\n", action);
     });
 
     glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xposIn, double yposIn) {
@@ -86,7 +90,12 @@ ecstasy::InputController::SubscriberID ecstasy::InputController::registerCursorP
 }
 
 void ecstasy::InputController::deregisterCursorPosChangeUpdater(SubscriberID _subscriber_id) {
-    cursor_pos_changes_.erase(_subscriber_id);
+    const auto it = cursor_pos_changes_.find(_subscriber_id);
+    if (it == end(cursor_pos_changes_)) {
+        throw new std::runtime_error("Unkown Subscriber");
+    }
+
+    cursor_pos_changes_.erase(it);
 }
 
 ecstasy::InputController::SubscriberID ecstasy::InputController::registerScrollChangeAccumulator() {
@@ -97,33 +106,46 @@ ecstasy::InputController::SubscriberID ecstasy::InputController::registerScrollC
 }
 
 void ecstasy::InputController::deregisterScrollChangeAccumulator(SubscriberID _subscriber_id) {
-    scroll_changes_.erase(_subscriber_id);
+    const auto it = scroll_changes_.find(_subscriber_id);
+    if (it == end(scroll_changes_)) {
+        throw new std::runtime_error("Unkown Subscriber");
+    }
+
+    scroll_changes_.erase(it);
 }
 
 ecstasy::CursorPosInfo& ecstasy::InputController::getCursorPosChange(SubscriberID _subscriber_id) {
     const auto it = cursor_pos_changes_.find(_subscriber_id);
-    assert(it != end(cursor_pos_changes_) && "Unkown Subscriber");
+    if (it == end(cursor_pos_changes_)) {
+        throw new std::runtime_error("Unkown Subscriber");
+    }
 
     return it->second;
 }
 
 void ecstasy::InputController::setCursorPosChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _pos) {
     const auto it = cursor_pos_changes_.find(_subscriber_id);
-    assert(it != end(cursor_pos_changes_) && "Unkown Subscriber");
+    if (it == end(cursor_pos_changes_)) {
+        throw new std::runtime_error("Unkown Subscriber");
+    }
 
     it->second = {_pos, _pos};
 }
 
 Eigen::Vector2i& ecstasy::InputController::getScrollChange(SubscriberID _subscriber_id) {
     const auto it = scroll_changes_.find(_subscriber_id);
-    assert(it != end(scroll_change_) && "Unkown Subscriber");
+    if (it == end(scroll_changes_)) {
+        throw new std::runtime_error("Unkown Subscriber");
+    }
 
     return it->second;
 }
 
 void ecstasy::InputController::setScrollChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _change) {
     const auto it = scroll_changes_.find(_subscriber_id);
-    assert(it != end(scroll_changes_) && "Unkown Subscriber");
+    if (it == end(scroll_changes_)) {
+        throw new std::runtime_error("Unkown Subscriber");
+    }
 
     it->second = _change;
 }

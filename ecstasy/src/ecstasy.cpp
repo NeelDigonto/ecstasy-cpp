@@ -24,27 +24,20 @@
 
 ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint32_t _window_height) {
     app_name_ = _app_name;
-    window_height_ = _window_height;
-    window_width_ = _window_width;
 
     if (!glfwInit())
         throw std::runtime_error("Could not initialize GLFW!");
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    window_ = glfwCreateWindow(window_width_, window_height_, app_name_.c_str(), NULL, NULL);
+    window_ = glfwCreateWindow(_window_width, _window_height, app_name_.c_str(), NULL, NULL);
     if (!window_)
         throw std::runtime_error("Could not open window!");
 
     glfwMakeContextCurrent(window_);
     glfwSetWindowUserPointer(window_, this);
 
-    input_controller_ = new InputController(window_, {window_width_, window_height_});
-
-    glfwSetFramebufferSizeCallback(window_, [](GLFWwindow* window, int width, int height) {
-        auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-        app->getInputController()->updateViewportDimension({width, height});
-    });
+    input_controller_ = new InputController(window_, {_window_width, _window_height});
 
     filament_engine_ = filament::Engine::create(filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN
 
@@ -64,6 +57,7 @@ ecstasy::InputController* ecstasy::app::getInputController() noexcept { return i
 void ecstasy::app::setScene(std::string _scene_name) {
     if (_scene_name == "sandbox") {
         scene_ = new scene::sandbox();
+        scene_->build();
     }
 
     else {
@@ -93,7 +87,7 @@ void ecstasy::app::animate() {
 
     if (renderer_->beginFrame(filament_swapchain_)) {
         // renderer_->render(view_);
-
+        scene_->animate();
         renderer_->endFrame();
     }
 }
