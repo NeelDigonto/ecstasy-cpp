@@ -23,6 +23,9 @@ namespace ecstasy {
 
 class InputController;
 class EditorController;
+namespace scene {
+class scene;
+}
 
 template <typename T, typename U> inline T cast(U& _data) noexcept { return *reinterpret_cast<T*>(&_data); }
 
@@ -62,24 +65,22 @@ class app {
     filament::Engine* filament_engine_;
     filament::SwapChain* filament_swapchain_;
     filament::Renderer* renderer_;
-    filament::Camera* camera_;
-    filament::View* view_;
-    filament::Scene* scene_;
-    filament::Skybox* skybox_;
+    scene::scene* scene_;
 
     InputController* input_controller_;
-    EditorController* editor_controller_;
 
   public:
     app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 1920U,
         std::uint32_t _window_height = 1080U);
     app(const app& _app) = delete;
     app(app&& _app) = delete;
-    // ecstasy::scene createScene();
+    void setScene(std::string _scene_name = "sandbox");
     void setClearColor(const Eigen::Vector4d& _clear_color) noexcept;
     bool shouldClose() const noexcept;
     InputController* getInputController() noexcept;
-    EditorController* getEditorController() noexcept;
+    inline std::pair<std::uint32_t, std::uint32_t> getWindowDimension() const {
+        return std::pair<std::uint32_t, std::uint32_t>{window_width_, window_height_};
+    }
     template <ecstasy::AnimationTime T = std::chrono::microseconds>
     typename T::rep getLastAnimationTime() const noexcept;
     void printUsage(std::chrono::steady_clock::duration _duration);
