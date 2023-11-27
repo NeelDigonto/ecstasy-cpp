@@ -56,7 +56,7 @@ ecstasy::InputController* ecstasy::app::getInputController() noexcept { return i
 
 void ecstasy::app::setScene(std::string _scene_name) {
     if (_scene_name == "sandbox") {
-        scene_ = new scene::sandbox();
+        scene_ = new scene::sandbox(filament_engine_, renderer_, input_controller_);
         scene_->build();
     }
 
@@ -82,12 +82,12 @@ void ecstasy::app::animate() {
     const auto current_timestamp = std::chrono::steady_clock::now();
     last_animation_time_ = current_timestamp - last_animation_start_timestamp_;
     last_animation_start_timestamp_ = current_timestamp;
-
+    // fmt::print("{}us\n", getLastAnimationTime<std::chrono::microseconds>());
     glfwPollEvents();
 
     if (renderer_->beginFrame(filament_swapchain_)) {
-        // renderer_->render(view_);
-        scene_->animate();
+        log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
+        scene_->animate(last_animation_time_);
         renderer_->endFrame();
     }
 }

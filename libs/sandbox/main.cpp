@@ -12,8 +12,7 @@ int main(int argc, char** argv) {
 
         app.animate();
 
-        /* std::wcout << "Time difference = "
-                   << app.getLastAnimationTime<std::chrono::microseconds>()
-                   << "us" << std::endl; */
+        /* std::wcout << "Time difference = " << app.getLastAnimationTime<std::chrono::microseconds>() << "us"
+                   << std::endl; */
     }
 }

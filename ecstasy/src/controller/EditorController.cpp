@@ -6,6 +6,8 @@
 #include <math/vec3.h>
 #include <Eigen/Eigen>
 
+#include <common/common.hpp>
+
 ecstasy::EditorController::EditorController(InputController* _input_controller, filament::Camera* _camera) {
     input_controller_ = _input_controller;
     camera_ = _camera;
@@ -52,6 +54,8 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
 
     if (input_controller_->getKButtonState().at(KButton::LEFT_CONTROL))
         translation.y = -delta * y_movement_speed_;
+
+    log::info("{} {} {}", translation.x, translation.y, translation.z);
 
     /*  fmt::print("translation: {} {} {}\n", translation.x, translation.y,
                 translation.z); */

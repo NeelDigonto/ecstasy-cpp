@@ -56,6 +56,7 @@ class app {
     std::string app_name_;
     Eigen::Vector4d clear_color_{0.5, 0.5, 0.5, 1.0};
     std::chrono::steady_clock::time_point last_animation_start_timestamp_{};
+    std::chrono::steady_clock::time_point last_animation_end_timestamp_{};
     std::chrono::steady_clock::duration last_animation_time_{};
 
     GLFWwindow* window_;

@@ -191,11 +191,9 @@ class InputController {
     void deregisterScrollChangeAccumulator(SubscriberID _subscriber_id);
 
     CursorPosInfo& getCursorPosChange(SubscriberID _subscriber_id);
-    void setScrollChange(SubscriberID _subscriber_id,
-                         const Eigen::Vector2i& _change);
+    void setScrollChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _change);
 
     Eigen::Vector2i& getScrollChange(SubscriberID _subscriber_id);
-    void setCursorPosChange(SubscriberID _subscriber_id,
-                            const Eigen::Vector2i& _change);
+    void setCursorPosChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _change);
 };
 } // namespace ecstasy
