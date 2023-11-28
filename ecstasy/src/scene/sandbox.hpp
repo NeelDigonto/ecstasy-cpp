@@ -38,6 +38,8 @@
 #include <math/mat3.h>
 #include <numbers>
 
+#include <imgui.h>
+
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
 
@@ -193,7 +195,8 @@ class sandbox : public scene {
 
     void build() {}
     void animate(std::chrono::steady_clock::duration _last_animation_time) {
-        // editor_controller_->animate(_last_animation_time);
+        editor_controller_->animate(_last_animation_time);
+        // log::info("{}", (void*)editor_controller_);
         renderer_->render(view_);
     }
 

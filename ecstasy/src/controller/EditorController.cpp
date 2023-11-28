@@ -18,45 +18,45 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
 
 void ecstasy::EditorController::animate(const std::chrono::steady_clock::duration& _delta) {
 
-    filament::math::double3 up_vector{0.0, 1.0, 0.0};
-    filament::math::mat4 model_mat = camera_->getModelMatrix();
-    filament::math::double3 camera_position{model_mat[3][0], model_mat[3][1], model_mat[3][2]};
-    auto camera_target_direction = normalize(cross(camera_->getLeftVector(), camera_->getUpVector()));
-    auto camera_target = camera_position - camera_target_direction;
+    /*   filament::math::double3 up_vector{0.0, 1.0, 0.0};
+      filament::math::mat4 model_mat = camera_->getModelMatrix();
+      filament::math::double3 camera_position{model_mat[3][0], model_mat[3][1], model_mat[3][2]};
+      auto camera_target_direction = normalize(cross(camera_->getLeftVector(), camera_->getUpVector()));
+      auto camera_target = camera_position - camera_target_direction;
 
-    // Update
-    double delta = std::chrono::duration_cast<std::chrono::nanoseconds>(_delta).count();
-    filament::math::double3 translation{0., 0., 0.};
+      // Update
+      double delta = std::chrono::duration_cast<std::chrono::nanoseconds>(_delta).count();
+      filament::math::double3 translation{0., 0., 0.};
 
-    const auto scroll_change = input_controller_->getScrollChange(scroll_change_sid_);
+      const auto scroll_change = input_controller_->getScrollChange(scroll_change_sid_);
 
-    if (scroll_change.y() != 0) {
-        translation.z = -scroll_change.y() * mouse_wheel_zoom_speed_;
-        input_controller_->setScrollChange(scroll_change_sid_, {0, 0});
-    }
+      if (scroll_change.y() != 0) {
+          translation.z = -scroll_change.y() * mouse_wheel_zoom_speed_;
+          input_controller_->setScrollChange(scroll_change_sid_, {0, 0});
+      }
 
-    if (input_controller_->getKButtonState().at(KButton::W))
-        translation.z = -delta * z_movement_speed_;
+      if (input_controller_->getKButtonState().at(KButton::W))
+          translation.z = -delta * z_movement_speed_;
 
-    if (input_controller_->getKButtonState().at(KButton::S))
-        translation.z = +delta * z_movement_speed_;
+      if (input_controller_->getKButtonState().at(KButton::S))
+          translation.z = +delta * z_movement_speed_;
 
-    if (input_controller_->getKButtonState().at(KButton::A))
-        translation.x = -delta * x_movement_speed_;
+      if (input_controller_->getKButtonState().at(KButton::A))
+          translation.x = -delta * x_movement_speed_;
 
-    if (input_controller_->getKButtonState().at(KButton::D))
-        translation.x = delta * x_movement_speed_;
+      if (input_controller_->getKButtonState().at(KButton::D))
+          translation.x = delta * x_movement_speed_;
 
-    if (input_controller_->getKButtonState().at(KButton::SPACE))
-        translation.y = delta * y_movement_speed_;
+      if (input_controller_->getKButtonState().at(KButton::SPACE))
+          translation.y = delta * y_movement_speed_;
 
-    if (input_controller_->getKButtonState().at(KButton::LEFT_CONTROL))
-        translation.y = -delta * y_movement_speed_;
+      if (input_controller_->getKButtonState().at(KButton::LEFT_CONTROL))
+          translation.y = -delta * y_movement_speed_;
 
-    camera_position += translation;
-    camera_target += translation;
+      camera_position += translation;
+      camera_target += translation; */
 
-    camera_->lookAt(camera_position, camera_target, up_vector);
+    // camera_->lookAt(camera_position, camera_target, up_vector);
 
     // log::info("{} {} {}", translation.x, translation.y, translation.z);
 
@@ -78,15 +78,15 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
     camera_target_direction.x, camera_target_direction.y,
     camera_target_direction.z); */
 
-        /*  auto cursor_pos_info =
-        input_controller_->getCursorPosChange(cursor_pos_change_sid_);
-    if (cursor_pos_info.cursor_pos_diff_.x() != 0 ||
-            cursor_pos_info.cursor_pos_diff_.y() != 0)
-            fmt::print("{}, {}\n", cursor_pos_info.cursor_pos_diff_.x(),
-                       cursor_pos_info.cursor_pos_diff_.y());
-        input_controller_->setCursorPosChange(
-            cursor_pos_change_sid_,
-       std::move(cursor_pos_info.current_cursor_pos_)); */
+    /*  auto cursor_pos_info =
+    input_controller_->getCursorPosChange(cursor_pos_change_sid_);
+if (cursor_pos_info.cursor_pos_diff_.x() != 0 ||
+        cursor_pos_info.cursor_pos_diff_.y() != 0)
+        fmt::print("{}, {}\n", cursor_pos_info.cursor_pos_diff_.x(),
+                   cursor_pos_info.cursor_pos_diff_.y());
+    input_controller_->setCursorPosChange(
+        cursor_pos_change_sid_,
+   std::move(cursor_pos_info.current_cursor_pos_)); */
 
     /* const auto mouseMove =
         input_controller_->getScrollChange(scroll_change_sid_);

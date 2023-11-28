@@ -26,8 +26,8 @@ project(Ecstasy
 
 include(FetchContent)
 include(cmake/download_file.cmake)
-include(cmake/dll_utils.cmake)
-include(cmake/CPM.cmake)
+# include(cmake/dll_utils.cmake)
+# include(cmake/CPM.cmake)
 include(CheckLanguage)
 
 set(CMAKE_C_STANDARD 23)
@@ -109,29 +109,29 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
+# FetchContent_Declare(
+#     stb
+#     GIT_REPOSITORY "https://github.com/nothings/stb"
+#     GIT_TAG master
+#     GIT_PROGRESS TRUE
+# )
+# FetchContent_MakeAvailable(stb)
+
 FetchContent_Declare(
-    stb
-    GIT_REPOSITORY "https://github.com/nothings/stb"
-    GIT_TAG master
+    imgui
+    GIT_REPOSITORY "https://github.com/ocornut/imgui"
+    GIT_TAG v1.90
     GIT_PROGRESS TRUE
 )
-FetchContent_MakeAvailable(stb)
+FetchContent_MakeAvailable(imgui)
 
-#FetchContent_Declare(
-#    imgui
-#    GIT_REPOSITORY "https://github.com/ocornut/imgui"
-#    GIT_TAG v1.90
-#    GIT_PROGRESS TRUE
-#)
-#FetchContent_MakeAvailable(imgui)
-#
-#FetchContent_Declare(
-#    implot
-#    GIT_REPOSITORY "https://github.com/epezent/implot"
-#    GIT_TAG v0.16
-#    GIT_PROGRESS TRUE
-#)
-#FetchContent_Populate(implot)
+FetchContent_Declare(
+    implot
+    GIT_REPOSITORY "https://github.com/epezent/implot"
+    GIT_TAG v0.16
+    GIT_PROGRESS TRUE
+)
+FetchContent_Populate(implot)
 
 add_subdirectory(ecstasy)
 add_subdirectory(libs)

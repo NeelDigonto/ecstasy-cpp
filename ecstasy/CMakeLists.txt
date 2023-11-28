@@ -1,25 +1,36 @@
 add_subdirectory(src)
 #add_subdirectory(third_party)
 
-add_library(${ECSTASY_LIB} STATIC ${ECSTASY_SOURCES})
+add_library(${ECSTASY_LIB} STATIC 
+    ${ECSTASY_SOURCES}
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${implot_SOURCE_DIR}/implot.cpp
+    ${implot_SOURCE_DIR}/implot_items.cpp
+)
+
+
 #target_compile_options(${ECSTASY_LIB} PRIVATE -Wall -Wextra -Werror)
 
 #target_include_directories( ${ECSTASY_LIB} PRIVATE ${stb_SOURCE_DIR})
 #target_include_directories( ${ECSTASY_LIB} PRIVATE ${EnTT_SOURCE_DIR}/src)
-#target_include_directories(
-#        ${ECSTASY_LIB} PRIVATE 
-#        ${webgpu_SOURCE_DIR}/include
-#        ${webgpu_SOURCE_DIR}/include/webgpu
-#        )
 
 target_include_directories(
         ${ECSTASY_LIB} PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends
+        ${implot_SOURCE_DIR}
         )
 
 if(MSVC)
-
     target_link_libraries(${ECSTASY_LIB} PRIVATE opengl32)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -39,7 +50,6 @@ else()
         target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/release/filament/include)
         target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/release/filament/lib/x86_64)
     endif()
-
 endif()
 
 target_link_libraries(${ECSTASY_LIB} PRIVATE 
