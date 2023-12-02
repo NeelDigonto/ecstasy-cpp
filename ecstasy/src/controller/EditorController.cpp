@@ -15,10 +15,10 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
     camera_ = _camera;
 
     camera_position_ = {0., 0., 60.};
-    camera_rotation_ = Eigen::AngleAxisd(0., Eigen::Vector3d::UnitX()) *
-                       Eigen::AngleAxisd(0., Eigen::Vector3d::UnitY()) *
-                       Eigen::AngleAxisd(0., Eigen::Vector3d::UnitZ());
-    camera_rotation_.normalize();
+    Eigen::Quaterniond camera_rotationq = Eigen::AngleAxisd(0., Eigen::Vector3d::UnitX()) *
+                                          Eigen::AngleAxisd(0., Eigen::Vector3d::UnitY()) *
+                                          Eigen::AngleAxisd(0., Eigen::Vector3d::UnitZ());
+    camera_rotationq.normalize();
 
     auto viewport_dimension = input_controller_->getViewportDimension();
     camera_->setProjection(
@@ -26,14 +26,14 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
         1000, filament::Camera::Fov::VERTICAL);
 
     camera_->setModelMatrix(filament::math::mat4(
-        filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),
-                                                  camera_rotation_.z(), camera_rotation_.w()}),
+        filament::math::mat3(filament::math::quat{camera_rotationq.x(), camera_rotationq.y(),
+                                                  camera_rotationq.z(), camera_rotationq.w()}),
         filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()}));
 
     x_movement_speed_ = 1.0E-4;
     y_movement_speed_ = 2.0E-5;
     z_movement_speed_ = 1.0E-4;
-    mouse_wheel_zoom_speed_ = 2.0E-2;
+    mouse_wheel_zoom_speed_ = 5.0E-2;
     horizontalRotationSpeed = 1.0E-3;
     verticalRotationSpeed = 1.0E-3;
 }
@@ -72,32 +72,19 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
     auto cursor_pos_change = input_controller_->getCursorPosChange();
     if (std::abs(cursor_pos_change.x()) > std::numeric_limits<double>::epsilon() ||
         std::abs(cursor_pos_change.y()) > std::numeric_limits<double>::epsilon()) {
-        /* log::info("{}, {}\n", cursor_pos_change.x() * verticalRotationSpeed,
-                  cursor_pos_change.y() * horizontalRotationSpeed); */
 
-        Eigen::Quaterniond rotation;
-        /* rotation = Eigen::AngleAxisd(cursor_pos_change.x(), Eigen::Vector3d::UnitX()) *
-                   Eigen::AngleAxisd(cursor_pos_change.y(), Eigen::Vector3d::UnitY()) *
-                   Eigen::AngleAxisd(cursor_pos_change.z(), Eigen::Vector3d::UnitZ()); */
-
-        rotation =
-            /*     Eigen::AngleAxisd(cursor_pos_change.y() * horizontalRotationSpeed,
-               Eigen::Vector3d::UnitX()) * */
-            Eigen::AngleAxisd(cursor_pos_change.x() * verticalRotationSpeed, Eigen::Vector3d::UnitY());
-        rotation.normalize();
-
-        camera_rotation_ = camera_rotation_ * rotation;
-        camera_rotation_.normalize();
-
-        auto euler = camera_rotation_.toRotationMatrix().eulerAngles(0, 1, 2);
-        // log::info("{}, {}, {}\n", euler.x(), euler.y(), euler.z());
+        camera_rotation_.x() += cursor_pos_change.x() * horizontalRotationSpeed;
+        camera_rotation_.y() -= cursor_pos_change.y() * verticalRotationSpeed;
 
         input_controller_->setCursorPosChange({0., 0.});
     }
 
+    Eigen::Quaterniond rotation = Eigen::AngleAxisd(camera_rotation_.y(), Eigen::Vector3d::UnitX()) *
+                                  Eigen::AngleAxisd(camera_rotation_.x(), Eigen::Vector3d::UnitY());
+    rotation.normalize();
+
     camera_->setModelMatrix(filament::math::mat4(
-        filament::math::mat3(filament::math::quat{camera_rotation_.w(), camera_rotation_.x(),
-                                                  camera_rotation_.y(), camera_rotation_.z()}),
+        filament::math::mat3(filament::math::quat{rotation.w(), rotation.x(), rotation.y(), rotation.z()}),
         filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()}));
 }
 
