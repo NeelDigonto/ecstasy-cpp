@@ -46,7 +46,14 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint3
 
     filament_engine_ = filament::Engine::create(filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
     auto native_window = glfwGetWin32Window(window_);
+#endif
+
+#ifdef linux
+    auto native_window = glfwGetX11Window(window_);
+#endif
+
     filament_swapchain_ = filament_engine_->createSwapChain((void*)native_window);
     renderer_ = filament_engine_->createRenderer();
 }
@@ -92,11 +99,12 @@ void ecstasy::app::animate() {
     // fmt::print("{}us\n", getLastAnimationTime<std::chrono::microseconds>());
     glfwPollEvents();
 
-    renderer_->beginFrame(filament_swapchain_);
-    // log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
-    scene_->animate(last_animation_time_);
-    renderer_->endFrame();
-    // std::this_thread::sleep_for(500ms);
+    if (renderer_->beginFrame(filament_swapchain_)) {
+        log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
+        scene_->animate(last_animation_time_);
+        renderer_->endFrame();
+        // std::this_thread::sleep_for(500ms);
+    }
 }
 
 ecstasy::app::~app() {

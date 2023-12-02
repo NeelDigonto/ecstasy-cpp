@@ -103,7 +103,14 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint3
 
     filament_engine_ = filament::Engine::create(filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
     auto native_window = glfwGetWin32Window(window_);
+#endif
+
+#ifdef linux
+    auto native_window = glfwGetX11Window(window_);
+#endif
+
     filament_swapchain_ = filament_engine_->createSwapChain((void*)native_window);
     renderer_ = filament_engine_->createRenderer();
 

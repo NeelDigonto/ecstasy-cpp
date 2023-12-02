@@ -61,10 +61,10 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
 
     // log::info("{} {} {}", camera_position_.x(), camera_position_.y(), camera_position_.z());
 
-    camera_->setModelMatrix(filament::math::mat4(
-        filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),
-                                                  camera_rotation_.z(), camera_rotation_.w()}),
-        filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()}));
+    /*     camera_->setModelMatrix(filament::math::mat4(
+            filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),
+                                                      camera_rotation_.z(), camera_rotation_.w()}),
+            filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()})); */
 }
 
 ecstasy::EditorController::~EditorController() {

@@ -42,6 +42,7 @@ if(MSVC)
     endif()
 
 else()
+    target_link_libraries(${ECSTASY_LIB} PRIVATE c++)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/debug/filament/include)
