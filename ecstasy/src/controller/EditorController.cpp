@@ -27,7 +27,7 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
     x_movement_speed_ = 1.0E-4;
     y_movement_speed_ = 1.0E-4;
     z_movement_speed_ = 1.0E-4;
-    mouse_wheel_zoom_speed_ = 25.0E-2;
+    mouse_wheel_zoom_speed_ = 5.0E-2;
     horizontalRotationSpeed = 1.0E-3;
     verticalRotationSpeed = 1.0E-3;
 
@@ -57,9 +57,22 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
     if (input_controller_->getKButtonState().at(KButton::S))
         translation.z() = delta * z_movement_speed_;
 
+    const auto mouseMove = input_controller_->getScrollChange(scroll_change_sid_);
+    if (mouseMove.x() != 0 || mouseMove.y() != 0) {
+        input_controller_->setScrollChange(scroll_change_sid_, std::move<Eigen::Vector2i>({0, 0}));
+
+        translation.z() = mouse_wheel_zoom_speed_ * -mouseMove.y();
+    }
+
     camera_position_ += translation;
 
     // log::info("{} {} {}", camera_position_.x(), camera_position_.y(), camera_position_.z());
+
+    auto cursor_pos_change = input_controller_->getCursorPosChange(cursor_pos_change_sid_);
+    if (cursor_pos_change.x() != 0 || cursor_pos_change.y() != 0) {
+        log::info("{}, {}\n", cursor_pos_change.x(), cursor_pos_change.y());
+        input_controller_->setCursorPosChange(cursor_pos_change_sid_, std::move<Eigen::Vector2i>({0, 0}));
+    }
 
     camera_->setModelMatrix(filament::math::mat4(
         filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),

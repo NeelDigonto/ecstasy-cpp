@@ -1,6 +1,5 @@
 #pragma once
 #include <controller/InputController.hpp>
-#include <math/vec3.h>
 #include <chrono>
 
 namespace filament {
@@ -23,7 +22,7 @@ class EditorController {
 
     Eigen::Quaterniond camera_rotation_;
     Eigen::Vector3d camera_position_{0., 0., 30.};
-    filament::math::double3 up_vector_{0., 1., 0.};
+    Eigen::Vector3d up_vector_{0., 1., 0.};
 
   public:
     EditorController() = delete;

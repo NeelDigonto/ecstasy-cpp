@@ -49,10 +49,13 @@ ecstasy::InputController::InputController(GLFWwindow* _window, Eigen::Vector2i _
 
     glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xposIn, double yposIn) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
-        app->getInputController()->current_cursor_pos_ = {
+        /* app->getInputController()->current_cursor_pos_ = {
             xposIn, app->getInputController()->viewport_dimension_.y() - yposIn};
 
-        app->getInputController()->updateCursorPos(app->getInputController()->current_cursor_pos_);
+        app->getInputController()->updateCursorPos(app->getInputController()->current_cursor_pos_); */
+
+        app->getInputController()->updateCursorPos(
+            {xposIn, app->getInputController()->viewport_dimension_.y() - yposIn});
     });
 
     glfwSetScrollCallback(_window, [](GLFWwindow* window, double xoffset, double yoffset) {
@@ -74,19 +77,19 @@ decltype(ecstasy::InputController::kbutton_state_)& ecstasy::InputController::ge
 }
 
 void ecstasy::InputController::updateCursorPos(const Eigen::Vector2i& _new_pos) {
+
     for (auto& [_, cursor_pos_change] : cursor_pos_changes_) {
-        cursor_pos_change.current_cursor_pos_ = _new_pos;
 
-        const auto diffx = static_cast<float>(cursor_pos_change.current_cursor_pos_.x() -
-                                              cursor_pos_change.last_animate_cursor_pos.x()) /
-                           viewport_dimension_.x();
+        const auto diffx =
+            static_cast<double>(current_cursor_pos_.x() - _new_pos.x()) / viewport_dimension_.x();
 
-        const auto diffy = static_cast<float>(cursor_pos_change.current_cursor_pos_.y() -
-                                              cursor_pos_change.last_animate_cursor_pos.y()) /
-                           viewport_dimension_.y();
+        const auto diffy =
+            static_cast<double>(current_cursor_pos_.y() - _new_pos.y()) / viewport_dimension_.y();
 
-        cursor_pos_change.cursor_pos_diff_ = {diffx, diffy};
+        cursor_pos_change = {diffx, diffy};
     }
+
+    current_cursor_pos_ = _new_pos;
 }
 
 void ecstasy::InputController::accumulateScrollChange(const Eigen::Vector2i& _change) {
@@ -97,7 +100,7 @@ void ecstasy::InputController::accumulateScrollChange(const Eigen::Vector2i& _ch
 
 ecstasy::InputController::SubscriberID ecstasy::InputController::registerCursorPosChangeUpdater() {
     const auto subscriber_id = cursor_pos_changes_.size();
-    cursor_pos_changes_.insert({subscriber_id, {current_cursor_pos_, current_cursor_pos_}});
+    cursor_pos_changes_.insert({subscriber_id, {0., 0.}});
 
     return subscriber_id;
 }
@@ -112,7 +115,7 @@ void ecstasy::InputController::deregisterCursorPosChangeUpdater(SubscriberID _su
 }
 
 ecstasy::InputController::SubscriberID ecstasy::InputController::registerScrollChangeAccumulator() {
-    const auto subscriber_id = cursor_pos_changes_.size();
+    const auto subscriber_id = scroll_changes_.size();
     scroll_changes_.insert({subscriber_id, {0, 0}});
 
     return subscriber_id;
@@ -127,7 +130,7 @@ void ecstasy::InputController::deregisterScrollChangeAccumulator(SubscriberID _s
     scroll_changes_.erase(it);
 }
 
-ecstasy::CursorPosInfo& ecstasy::InputController::getCursorPosChange(SubscriberID _subscriber_id) {
+const Eigen::Vector2i& ecstasy::InputController::getCursorPosChange(SubscriberID _subscriber_id) const {
     const auto it = cursor_pos_changes_.find(_subscriber_id);
     if (it == end(cursor_pos_changes_)) {
         throw new std::runtime_error("Unkown Subscriber");
@@ -136,13 +139,14 @@ ecstasy::CursorPosInfo& ecstasy::InputController::getCursorPosChange(SubscriberI
     return it->second;
 }
 
-void ecstasy::InputController::setCursorPosChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _pos) {
+void ecstasy::InputController::setCursorPosChange(SubscriberID _subscriber_id,
+                                                  const Eigen::Vector2i& _new_pos) {
     const auto it = cursor_pos_changes_.find(_subscriber_id);
     if (it == end(cursor_pos_changes_)) {
         throw new std::runtime_error("Unkown Subscriber");
     }
 
-    it->second = {_pos, _pos};
+    it->second = _new_pos;
 }
 
 Eigen::Vector2i& ecstasy::InputController::getScrollChange(SubscriberID _subscriber_id) {

@@ -152,11 +152,11 @@ enum KButton {
     LAST = MENU
 };
 
-struct CursorPosInfo {
+/* struct CursorPosInfo {
     Eigen::Vector2i last_animate_cursor_pos;
     Eigen::Vector2i current_cursor_pos_;
-    Eigen::Vector2f cursor_pos_diff_;
-};
+    Eigen::Vector2d cursor_pos_diff_;
+}; */
 
 class InputController {
   public:
@@ -167,7 +167,7 @@ class InputController {
     std::array<bool, 16> mbutton_state_;
     std::array<bool, 1350> kbutton_state_;
     Eigen::Vector2i current_cursor_pos_;
-    std::unordered_map<SubscriberID, CursorPosInfo> cursor_pos_changes_;
+    std::unordered_map<SubscriberID, Eigen::Vector2i> cursor_pos_changes_;
     std::unordered_map<SubscriberID, Eigen::Vector2i> scroll_changes_;
 
   public:
@@ -190,7 +190,7 @@ class InputController {
     SubscriberID registerScrollChangeAccumulator();
     void deregisterScrollChangeAccumulator(SubscriberID _subscriber_id);
 
-    CursorPosInfo& getCursorPosChange(SubscriberID _subscriber_id);
+    const Eigen::Vector2i& getCursorPosChange(SubscriberID _subscriber_id) const;
     void setScrollChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _change);
 
     Eigen::Vector2i& getScrollChange(SubscriberID _subscriber_id);

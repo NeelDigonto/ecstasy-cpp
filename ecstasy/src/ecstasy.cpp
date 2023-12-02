@@ -100,7 +100,6 @@ void ecstasy::app::animate() {
     const auto current_timestamp = std::chrono::steady_clock::now();
     last_animation_time_ = current_timestamp - last_animation_start_timestamp_;
     last_animation_start_timestamp_ = current_timestamp;
-    // fmt::print("{}us\n", getLastAnimationTime<std::chrono::microseconds>());
     glfwPollEvents();
 
     if (renderer_->beginFrame(filament_swapchain_)) {
