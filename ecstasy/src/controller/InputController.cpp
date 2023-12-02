@@ -18,6 +18,12 @@ ecstasy::InputController::InputController(GLFWwindow* _window, Eigen::Vector2i _
     glfwGetWindowSize(_window, &width, &height);
     viewport_dimension_ = {width, height};
 
+    const auto mid_viewport = Eigen::Vector2d(getViewportDimension().x(), getViewportDimension().y());
+
+    current_cursor_pos_ = mid_viewport / 2.;
+    cursor_pos_change_ = {0., 0.};
+    scroll_change_ = {0., 0.};
+
     glfwSetFramebufferSizeCallback(_window, [](GLFWwindow* window, int width, int height) {
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         app->getInputController()->setViewportDimension({width, height});
@@ -85,8 +91,6 @@ void ecstasy::InputController::setCursorPos(const Eigen::Vector2d& _new_pos) {
 
     cursor_pos_change_ = {diffx, diffy};
     current_cursor_pos_ = _new_pos;
-
-    // log::info("{}, {}\n", cursor_pos_change_.x(), cursor_pos_change_.y());
 }
 
 void ecstasy::InputController::setCursorPosChange(const Eigen::Vector2d& _cursor_pos_change) {

@@ -19,7 +19,7 @@ class EditorController {
     double verticalRotationSpeed;
 
     Eigen::Quaterniond camera_rotation_;
-    Eigen::Vector3d camera_position_{0., 0., 30.};
+    Eigen::Vector3d camera_position_;
     Eigen::Vector3d up_vector_{0., 1., 0.};
 
   public:

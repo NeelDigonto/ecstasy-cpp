@@ -13,6 +13,8 @@
 ecstasy::EditorController::EditorController(InputController* _input_controller, filament::Camera* _camera) {
     input_controller_ = _input_controller;
     camera_ = _camera;
+
+    camera_position_ = {0., 0., 60.};
     camera_rotation_ = Eigen::AngleAxisd(0., Eigen::Vector3d::UnitX()) *
                        Eigen::AngleAxisd(0., Eigen::Vector3d::UnitY()) *
                        Eigen::AngleAxisd(0., Eigen::Vector3d::UnitZ());
@@ -21,7 +23,7 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
     auto viewport_dimension = input_controller_->getViewportDimension();
     camera_->setProjection(
         45.0, static_cast<double>(viewport_dimension.x()) / static_cast<double>(viewport_dimension.y()), 0.1,
-        50, filament::Camera::Fov::VERTICAL);
+        1000, filament::Camera::Fov::VERTICAL);
 
     camera_->setModelMatrix(filament::math::mat4(
         filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),
@@ -88,7 +90,7 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
         camera_rotation_.normalize();
 
         auto euler = camera_rotation_.toRotationMatrix().eulerAngles(0, 1, 2);
-        log::info("{}, {}, {}\n", euler.x(), euler.y(), euler.z());
+        // log::info("{}, {}, {}\n", euler.x(), euler.y(), euler.z());
 
         input_controller_->setCursorPosChange({0., 0.});
     }
