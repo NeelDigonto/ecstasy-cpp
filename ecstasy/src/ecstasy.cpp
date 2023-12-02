@@ -27,6 +27,12 @@
 #include <imgui_impl_opengl3.h>
 #include <implot.h>
 
+Eigen::IOFormat ecstasy::CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "",
+                                      " << ", ";");
+Eigen::IOFormat ecstasy::CleanFmt(4, 0, ", ", "\n", "[", "]");
+Eigen::IOFormat ecstasy::OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");
+Eigen::IOFormat ecstasy::HeavyFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
+
 ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint32_t _window_height) {
     app_name_ = _app_name;
 
@@ -48,9 +54,7 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint3
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
     auto native_window = glfwGetWin32Window(window_);
-#endif
-
-#ifdef linux
+#elif (1)
     auto native_window = glfwGetX11Window(window_);
 #endif
 
@@ -100,10 +104,10 @@ void ecstasy::app::animate() {
     glfwPollEvents();
 
     if (renderer_->beginFrame(filament_swapchain_)) {
-        log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
+        // log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
         scene_->animate(last_animation_time_);
         renderer_->endFrame();
-        // std::this_thread::sleep_for(500ms);
+        std::this_thread::sleep_for(5ms);
     }
 }
 

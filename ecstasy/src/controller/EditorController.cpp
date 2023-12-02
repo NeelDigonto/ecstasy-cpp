@@ -24,9 +24,9 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
                                                   camera_rotation_.z(), camera_rotation_.w()}),
         filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()}));
 
-    x_movement_speed_ = 1.0E-6;
-    y_movement_speed_ = 1.0E-6;
-    z_movement_speed_ = 1.0E-6;
+    x_movement_speed_ = 1.0E-4;
+    y_movement_speed_ = 1.0E-4;
+    z_movement_speed_ = 1.0E-4;
     mouse_wheel_zoom_speed_ = 25.0E-2;
     horizontalRotationSpeed = 1.0E-3;
     verticalRotationSpeed = 1.0E-3;
@@ -61,10 +61,10 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
 
     // log::info("{} {} {}", camera_position_.x(), camera_position_.y(), camera_position_.z());
 
-    /*     camera_->setModelMatrix(filament::math::mat4(
-            filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),
-                                                      camera_rotation_.z(), camera_rotation_.w()}),
-            filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()})); */
+    camera_->setModelMatrix(filament::math::mat4(
+        filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),
+                                                  camera_rotation_.z(), camera_rotation_.w()}),
+        filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()}));
 }
 
 ecstasy::EditorController::~EditorController() {

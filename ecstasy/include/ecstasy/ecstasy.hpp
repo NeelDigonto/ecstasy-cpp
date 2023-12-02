@@ -38,12 +38,6 @@ extern Eigen::IOFormat CleanFmt;
 extern Eigen::IOFormat OctaveFmt;
 extern Eigen::IOFormat HeavyFmt;
 
-static inline Eigen::IOFormat ecstasy::CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ",
-                                                    "", "", " << ", ";");
-static inline Eigen::IOFormat ecstasy::CleanFmt(4, 0, ", ", "\n", "[", "]");
-static inline Eigen::IOFormat ecstasy::OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");
-static inline Eigen::IOFormat ecstasy::HeavyFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
-
 template <class T>
 concept AnimationTime =
     std::same_as<T, std::chrono::nanoseconds> || std::same_as<T, std::chrono::microseconds> ||
@@ -69,8 +63,8 @@ class app {
     InputController* input_controller_;
 
   public:
-    app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 1920U,
-        std::uint32_t _window_height = 1080U);
+    app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 2920U,
+        std::uint32_t _window_height = 2080U);
     app(const app& _app) = delete;
     app(app&& _app) = delete;
     void setScene(std::string _scene_name = "sandbox");

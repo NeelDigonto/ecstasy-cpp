@@ -6,9 +6,9 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #define GLFW_EXPOSE_NATIVE_WIN32
 #define GLFW_EXPOSE_NATIVE_WGL
-#endif
 
-#ifdef linux
+#elif (1)
+
 #define GLFW_EXPOSE_NATIVE_X11
 #define GLFW_EXPOSE_NATIVE_GLX
 #endif
