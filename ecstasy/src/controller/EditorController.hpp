@@ -1,5 +1,6 @@
 #pragma once
 #include <controller/InputController.hpp>
+#include <math/vec3.h>
 #include <chrono>
 
 namespace filament {
@@ -13,18 +14,23 @@ class EditorController {
     filament::Camera* camera_;
     InputController::SubscriberID cursor_pos_change_sid_;
     InputController::SubscriberID scroll_change_sid_;
-    double x_movement_speed_{0.00000001};
-    double y_movement_speed_{0.00000001};
-    double z_movement_speed_{0.00000001};
-    double mouse_wheel_zoom_speed_{0.25};
-    double horizontalRotationSpeed{0.001};
-    double verticalRotationSpeed = {0.001};
+    double x_movement_speed_;
+    double y_movement_speed_;
+    double z_movement_speed_;
+    double mouse_wheel_zoom_speed_;
+    double horizontalRotationSpeed;
+    double verticalRotationSpeed;
+
+    Eigen::Quaterniond camera_rotation_;
+    Eigen::Vector3d camera_position_{0., 0., 30.};
+    filament::math::double3 up_vector_{0., 1., 0.};
 
   public:
     EditorController() = delete;
     EditorController(const EditorController&) = delete;
     EditorController(EditorController&&) = delete;
-    EditorController(InputController* _input_controller, filament::Camera* _camera);
+    EditorController(InputController* _input_controller, filament::Camera* _camera/* ,
+                     Eigen::Vector3d _camera_position, Eigen::Vector3d _camera_target */);
     ~EditorController();
 
     void animate(const std::chrono::steady_clock::duration& _delta);

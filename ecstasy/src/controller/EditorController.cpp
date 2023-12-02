@@ -4,6 +4,8 @@
 #include <filament/Camera.h>
 #include <math/mat4.h>
 #include <math/vec3.h>
+#include <math/TQuatHelpers.h>
+#include <math/TMatHelpers.h>
 #include <Eigen/Eigen>
 
 #include <common/common.hpp>
@@ -12,88 +14,57 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
     input_controller_ = _input_controller;
     camera_ = _camera;
 
+    auto viewport_dimension = input_controller_->viewport_dimension_;
+    camera_->setProjection(
+        45.0, static_cast<double>(viewport_dimension.x()) / static_cast<double>(viewport_dimension.y()), 0.1,
+        50, filament::Camera::Fov::VERTICAL);
+
+    camera_->setModelMatrix(filament::math::mat4(
+        filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),
+                                                  camera_rotation_.z(), camera_rotation_.w()}),
+        filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()}));
+
+    x_movement_speed_ = 1.0E-6;
+    y_movement_speed_ = 1.0E-6;
+    z_movement_speed_ = 1.0E-6;
+    mouse_wheel_zoom_speed_ = 25.0E-2;
+    horizontalRotationSpeed = 1.0E-3;
+    verticalRotationSpeed = 1.0E-3;
+
     cursor_pos_change_sid_ = input_controller_->registerCursorPosChangeUpdater();
     scroll_change_sid_ = input_controller_->registerScrollChangeAccumulator();
 }
 
 void ecstasy::EditorController::animate(const std::chrono::steady_clock::duration& _delta) {
+    double delta = std::chrono::duration_cast<std::chrono::microseconds>(_delta).count();
+    Eigen::Vector3d translation{0., 0., 0.};
 
-    /*   filament::math::double3 up_vector{0.0, 1.0, 0.0};
-      filament::math::mat4 model_mat = camera_->getModelMatrix();
-      filament::math::double3 camera_position{model_mat[3][0], model_mat[3][1], model_mat[3][2]};
-      auto camera_target_direction = normalize(cross(camera_->getLeftVector(), camera_->getUpVector()));
-      auto camera_target = camera_position - camera_target_direction;
+    if (input_controller_->getKButtonState().at(KButton::A))
+        translation.x() = -delta * x_movement_speed_;
 
-      // Update
-      double delta = std::chrono::duration_cast<std::chrono::nanoseconds>(_delta).count();
-      filament::math::double3 translation{0., 0., 0.};
+    if (input_controller_->getKButtonState().at(KButton::D))
+        translation.x() = delta * x_movement_speed_;
 
-      const auto scroll_change = input_controller_->getScrollChange(scroll_change_sid_);
+    if (input_controller_->getKButtonState().at(KButton::SPACE))
+        translation.y() = delta * y_movement_speed_;
 
-      if (scroll_change.y() != 0) {
-          translation.z = -scroll_change.y() * mouse_wheel_zoom_speed_;
-          input_controller_->setScrollChange(scroll_change_sid_, {0, 0});
-      }
+    if (input_controller_->getKButtonState().at(KButton::LEFT_CONTROL))
+        translation.y() = -delta * y_movement_speed_;
 
-      if (input_controller_->getKButtonState().at(KButton::W))
-          translation.z = -delta * z_movement_speed_;
+    if (input_controller_->getKButtonState().at(KButton::W))
+        translation.z() = -delta * z_movement_speed_;
 
-      if (input_controller_->getKButtonState().at(KButton::S))
-          translation.z = +delta * z_movement_speed_;
+    if (input_controller_->getKButtonState().at(KButton::S))
+        translation.z() = delta * z_movement_speed_;
 
-      if (input_controller_->getKButtonState().at(KButton::A))
-          translation.x = -delta * x_movement_speed_;
+    camera_position_ += translation;
 
-      if (input_controller_->getKButtonState().at(KButton::D))
-          translation.x = delta * x_movement_speed_;
+    // log::info("{} {} {}", camera_position_.x(), camera_position_.y(), camera_position_.z());
 
-      if (input_controller_->getKButtonState().at(KButton::SPACE))
-          translation.y = delta * y_movement_speed_;
-
-      if (input_controller_->getKButtonState().at(KButton::LEFT_CONTROL))
-          translation.y = -delta * y_movement_speed_;
-
-      camera_position += translation;
-      camera_target += translation; */
-
-    // camera_->lookAt(camera_position, camera_target, up_vector);
-
-    // log::info("{} {} {}", translation.x, translation.y, translation.z);
-
-    /*  fmt::print("translation: {} {} {}\n", translation.x, translation.y,
-                translation.z); */
-
-    /*  Eigen::Vector3f up_vector{0.0f, 1.0f, 0.0f};
-    Eigen::Vector3f camera_position{0.0f, 50.0f, 0.0f};
-    Eigen::Vector3f camera_target{0.0f, 0.0f, 0.0f};
-    Eigen::Vector3f camera_direction =
-        (camera_position - camera_target).normalized();
-    Eigen::Vector3f right_axis = up_vector.cross(camera_direction);
-    right_axis.normalize();
-    Eigen::Matrix4f view; */
-
-    /*     fmt::print("camera_position: {} {} {}\n", camera_position.x,
-                camera_position.y, camera_position.z);
-     fmt::print("camera_target_direction: {} {} {}\n",
-    camera_target_direction.x, camera_target_direction.y,
-    camera_target_direction.z); */
-
-    /*  auto cursor_pos_info =
-    input_controller_->getCursorPosChange(cursor_pos_change_sid_);
-if (cursor_pos_info.cursor_pos_diff_.x() != 0 ||
-        cursor_pos_info.cursor_pos_diff_.y() != 0)
-        fmt::print("{}, {}\n", cursor_pos_info.cursor_pos_diff_.x(),
-                   cursor_pos_info.cursor_pos_diff_.y());
-    input_controller_->setCursorPosChange(
-        cursor_pos_change_sid_,
-   std::move(cursor_pos_info.current_cursor_pos_)); */
-
-    /* const auto mouseMove =
-        input_controller_->getScrollChange(scroll_change_sid_);
-    if (mouseMove.x() != 0 || mouseMove.y() != 0)
-        fmt::print("{}, {}\n", mouseMove.x(), mouseMove.y());
-    input_controller_->setScrollChange(scroll_change_sid_,
-                                       std::move<Eigen::Vector2i>({0, 0})); */
+    camera_->setModelMatrix(filament::math::mat4(
+        filament::math::mat3(filament::math::quat{camera_rotation_.x(), camera_rotation_.y(),
+                                                  camera_rotation_.z(), camera_rotation_.w()}),
+        filament::math::double3{camera_position_.x(), camera_position_.y(), camera_position_.z()}));
 }
 
 ecstasy::EditorController::~EditorController() {

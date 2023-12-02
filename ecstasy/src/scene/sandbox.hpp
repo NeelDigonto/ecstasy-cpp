@@ -38,7 +38,11 @@
 #include <math/mat3.h>
 #include <numbers>
 
+#include <common/imgui.hpp>
 #include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <implot.h>
 
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
@@ -99,6 +103,7 @@ class sandbox : public scene {
 
     sandbox(filament::Engine* _filament_engine, filament::Renderer* _renderer,
             InputController* _input_controller) {
+
         filament_engine_ = _filament_engine;
         renderer_ = _renderer;
         auto viewport_dimension = _input_controller->viewport_dimension_;
@@ -113,13 +118,8 @@ class sandbox : public scene {
         view_->setViewport({0, 0, static_cast<std::uint32_t>(viewport_dimension.x()),
                             static_cast<std::uint32_t>(viewport_dimension.y())});
 
-        camera_->lookAt(filament ::math::float3(0, 0, 50.0f), filament ::math::float3(0, 0, 0),
-                        filament ::math::float3(0.f, 1.f, 0));
-        camera_->setProjection(
-            45.0, static_cast<double>(viewport_dimension.x()) / static_cast<double>(viewport_dimension.y()),
-            0.1, 50, filament::Camera::Fov::VERTICAL);
-
-        editor_controller_ = new EditorController(_input_controller, camera_);
+        editor_controller_ =
+            new EditorController(_input_controller, camera_ /* , {0, 0, 50.0f}, {0, 0, 0} */);
 
         skybox_ = filament::Skybox::Builder().color({0.1, 0.125, 0.25, 1.0}).build(*filament_engine_);
         scene_->setSkybox(skybox_);
@@ -195,12 +195,26 @@ class sandbox : public scene {
 
     void build() {}
     void animate(std::chrono::steady_clock::duration _last_animation_time) {
+
+        /* ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame(); */
+
         editor_controller_->animate(_last_animation_time);
-        // log::info("{}", (void*)editor_controller_);
+
         renderer_->render(view_);
+
+        // Render UI
+
+        /*   ImGui::Render();
+          ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); */
     }
 
-    void destroy() {}
+    void destroy() {
+        // ImGui_ImplOpenGL3_Shutdown();
+        // ImGui_ImplGlfw_Shutdown();
+        // ImGui::DestroyContext();
+    }
 };
 } // namespace scene
 

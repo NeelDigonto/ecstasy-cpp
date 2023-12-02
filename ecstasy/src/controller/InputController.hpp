@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 #include <utility>
 
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace ecstasy {
 enum MButton {

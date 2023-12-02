@@ -22,6 +22,11 @@
 
 #include <common/glfw.hpp>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <implot.h>
+
 ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint32_t _window_height) {
     app_name_ = _app_name;
 
@@ -53,6 +58,8 @@ void ecstasy::app::setClearColor(const Eigen::Vector4d& _clear_color) noexcept {
 bool ecstasy::app::shouldClose() const noexcept { return glfwWindowShouldClose(window_); }
 
 ecstasy::InputController* ecstasy::app::getInputController() noexcept { return input_controller_; }
+
+GLFWwindow* ecstasy::app::getGLFWWindow() noexcept { return window_; }
 
 void ecstasy::app::setScene(std::string _scene_name) {
     if (_scene_name == "sandbox") {
@@ -89,7 +96,7 @@ void ecstasy::app::animate() {
     // log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
     scene_->animate(last_animation_time_);
     renderer_->endFrame();
-    std::this_thread::sleep_for(500ms);
+    // std::this_thread::sleep_for(500ms);
 }
 
 ecstasy::app::~app() {

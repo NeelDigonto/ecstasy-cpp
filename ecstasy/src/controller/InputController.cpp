@@ -1,9 +1,18 @@
 #include <controller/InputController.hpp>
 #include <cassert>
 #include <GLFW/glfw3.h>
+#include <common/common.hpp>
 #include <ecstasy/ecstasy.hpp>
 
 ecstasy::InputController::InputController(GLFWwindow* _window, Eigen::Vector2i _window_dimension) {
+
+    /*  #define GLFW_RELEASE 0
+        #define GLFW_PRESS 1
+        #define GLFW_REPEAT 2
+    */
+
+    mbutton_state_.fill(GLFW_RELEASE);
+    kbutton_state_.fill(GLFW_RELEASE);
 
     int width, height;
     glfwGetWindowSize(_window, &width, &height);
@@ -15,6 +24,10 @@ ecstasy::InputController::InputController(GLFWwindow* _window, Eigen::Vector2i _
     });
 
     glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (key <= KButton::UNKNOWN && key > KButton::LAST) {
+            return;
+        }
+
         auto app = static_cast<ecstasy::app*>(glfwGetWindowUserPointer(window));
         auto input_controller = app->getInputController();
         input_controller->kbutton_state_[key] = action;

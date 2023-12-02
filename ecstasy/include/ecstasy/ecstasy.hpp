@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 
 // auto create a default scene
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace filament {
 class Engine;
@@ -77,6 +77,7 @@ class app {
     void setClearColor(const Eigen::Vector4d& _clear_color) noexcept;
     bool shouldClose() const noexcept;
     InputController* getInputController() noexcept;
+    GLFWwindow* getGLFWWindow() noexcept;
     template <ecstasy::AnimationTime T = std::chrono::microseconds>
     typename T::rep getLastAnimationTime() const noexcept;
     void printUsage(std::chrono::steady_clock::duration _duration);

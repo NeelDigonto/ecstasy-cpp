@@ -120,7 +120,7 @@ FetchContent_MakeAvailable(glfw)
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY "https://github.com/ocornut/imgui"
-    GIT_TAG v1.90
+    GIT_TAG "docking" #v1.90
     GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(imgui)
