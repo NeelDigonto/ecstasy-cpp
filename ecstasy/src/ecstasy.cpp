@@ -48,6 +48,9 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint3
     glfwMakeContextCurrent(window_);
     glfwSetWindowUserPointer(window_, this);
 
+    glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
     input_controller_ = new InputController(window_, {_window_width, _window_height});
 
     filament_engine_ = filament::Engine::create(filament::Engine::Backend::OPENGL); // Engine::Backend::VULKAN

@@ -106,7 +106,7 @@ class sandbox : public scene {
 
         filament_engine_ = _filament_engine;
         renderer_ = _renderer;
-        auto viewport_dimension = _input_controller->viewport_dimension_;
+        auto viewport_dimension = _input_controller->getViewportDimension();
 
         auto cameraEntity = utils::EntityManager::get().create();
         camera_ = filament_engine_->createCamera(cameraEntity);

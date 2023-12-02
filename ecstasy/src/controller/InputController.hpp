@@ -161,14 +161,14 @@ enum KButton {
 class InputController {
   public:
     using SubscriberID = size_t;
-    Eigen::Vector2i viewport_dimension_;
 
   private:
+    Eigen::Vector2i viewport_dimension_;
     std::array<bool, 16> mbutton_state_;
     std::array<bool, 1350> kbutton_state_;
-    Eigen::Vector2i current_cursor_pos_;
-    std::unordered_map<SubscriberID, Eigen::Vector2i> cursor_pos_changes_;
-    std::unordered_map<SubscriberID, Eigen::Vector2i> scroll_changes_;
+    Eigen::Vector2d current_cursor_pos_;
+    Eigen::Vector2d cursor_pos_change_;
+    Eigen::Vector2d scroll_change_;
 
   public:
     InputController() = delete;
@@ -176,24 +176,31 @@ class InputController {
     InputController(InputController&&) = delete;
     InputController(GLFWwindow* _window, Eigen::Vector2i _window_dimension);
 
-    void updateViewportDimension(const Eigen::Vector2i& _viewport_dimension);
+    void setViewportDimension(const Eigen::Vector2i& _viewport_dimension);
+    const Eigen::Vector2i& getViewportDimension() const;
 
     decltype(mbutton_state_)& getMButtonState();
     decltype(kbutton_state_)& getKButtonState();
 
-    void updateCursorPos(const Eigen::Vector2i& _new_pos);
-    void accumulateScrollChange(const Eigen::Vector2i& _change);
+    void setCursorPos(const Eigen::Vector2d& _new_pos);
+    void setCursorPosChange(const Eigen::Vector2d& _cursor_pos_change);
+    void setScrollChange(const Eigen::Vector2d& _change);
 
-    SubscriberID registerCursorPosChangeUpdater();
-    void deregisterCursorPosChangeUpdater(SubscriberID _subscriber_id);
+    const Eigen::Vector2d& getCursorPosChange() const;
+    const Eigen::Vector2d& getScrollChange() const;
 
-    SubscriberID registerScrollChangeAccumulator();
-    void deregisterScrollChangeAccumulator(SubscriberID _subscriber_id);
+    /*     void accumulateScrollChange(const Eigen::Vector2i& _change);
 
-    const Eigen::Vector2i& getCursorPosChange(SubscriberID _subscriber_id) const;
-    void setScrollChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _change);
+        SubscriberID registerCursorPosChangeUpdater();
+        void deregisterCursorPosChangeUpdater(SubscriberID _subscriber_id);
 
-    Eigen::Vector2i& getScrollChange(SubscriberID _subscriber_id);
-    void setCursorPosChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _change);
+        SubscriberID registerScrollChangeAccumulator();
+        void deregisterScrollChangeAccumulator(SubscriberID _subscriber_id);
+
+        const Eigen::Vector2i& getCursorPosChange(SubscriberID _subscriber_id) const;
+        void setScrollChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _change);
+
+        Eigen::Vector2i& getScrollChange(SubscriberID _subscriber_id);
+        void setCursorPosChange(SubscriberID _subscriber_id, const Eigen::Vector2i& _change); */
 };
 } // namespace ecstasy
