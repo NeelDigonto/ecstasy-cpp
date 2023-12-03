@@ -131,6 +131,7 @@
     "specialfunctions": "cpp",
     "splines": "cpp",
     "stack": "cpp",
-    "matrixfunctions": "cpp"
+    "matrixfunctions": "cpp",
+    "__hash_table": "cpp"
   }
 }

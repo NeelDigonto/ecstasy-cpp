@@ -62,20 +62,23 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     glfw          
     #${stb_SOURCE_DIR}
     #OpenEXR::OpenEXR
+    camutils
+    # filagui
+    filamat
+    filament-iblprefilter
     filament
     backend
     bluegl
     bluevk
     filabridge
     filaflat
-    utils
     geometry
     smol-v
     vkshaders
-    ibl
     matdbg 
-    filamat
     utils
     shaders
+    image
+    ibl
     )
 

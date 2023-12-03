@@ -31,6 +31,7 @@
 #include <filament/TextureSampler.h>
 #include <filament/Viewport.h>
 #include <filament/IndirectLight.h>
+#include <filament-iblprefilter/IBLPrefilterContext.h>
 
 #include <utils/Entity.h>
 #include <utils/EntityManager.h>
@@ -46,6 +47,10 @@
 
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
+#include <fstream>
+#include <filesystem>
+
+#include "stb_image.h"
 
 namespace ecstasy {
 
@@ -89,6 +94,10 @@ class sandbox : public scene {
     filament::Skybox* skybox_;
     InputController* input_controller_;
     EditorController* editor_controller_;
+    filament::Texture* skybox_texture_;
+    filament::Texture* ibl_texture_;
+    filament::Texture* fog_texture_;
+    filament::IndirectLight* indirect_light_;
 
     filament::VertexBuffer* vertex_buffer_;
     filament::IndexBuffer* index_buffer_;
@@ -108,10 +117,79 @@ class sandbox : public scene {
         renderer_ = _renderer;
         auto viewport_dimension = _input_controller->getViewportDimension();
 
+        auto path = std::filesystem::path("../hdri/dancing_hall_8k.hdr").lexically_normal();
+
+        int w, h;
+        stbi_info(path.c_str(), &w, &h, nullptr);
+        log::info("{}, {}", w, h);
+        if (w != h * 2) {
+            log::error("not an equirectangular image!");
+        }
+
+        // load image as float
+        int n;
+        const size_t size = w * h * sizeof(filament::math::float3);
+        filament::math::float3* const data = (filament::math::float3*)stbi_loadf(path.c_str(), &w, &h, &n, 3);
+        if (data == nullptr || n != 3) {
+            log::error("Could not decode image ");
+        }
+
+        // now load texture
+        filament::Texture::PixelBufferDescriptor buffer(
+            data, size, filament::Texture::Format::RGB, filament::Texture::Type::FLOAT,
+            [](void* buffer, size_t size, void* user) { stbi_image_free(buffer); });
+
+        filament::Texture* const equirect = filament::Texture::Builder()
+                                                .width((uint32_t)w)
+                                                .height((uint32_t)h)
+                                                .levels(0xff)
+                                                .format(filament::Texture::InternalFormat::R11F_G11F_B10F)
+                                                .sampler(filament::Texture::Sampler::SAMPLER_2D)
+                                                .build(*filament_engine_);
+
+        equirect->setImage(*filament_engine_, 0, std::move(buffer));
+
+        IBLPrefilterContext context(*filament_engine_);
+        IBLPrefilterContext::EquirectangularToCubemap equirectangularToCubemap(context);
+        IBLPrefilterContext::SpecularFilter specularFilter(context);
+        IBLPrefilterContext::IrradianceFilter irradianceFilter(context);
+
+        skybox_texture_ = equirectangularToCubemap(equirect);
+        filament_engine_->destroy(equirect);
+
+        ibl_texture_ = specularFilter(skybox_texture_);
+
+        fog_texture_ = irradianceFilter({.generateMipmap = false}, skybox_texture_);
+        fog_texture_->generateMipmaps(*filament_engine_);
+
         auto cameraEntity = utils::EntityManager::get().create();
         camera_ = filament_engine_->createCamera(cameraEntity);
         view_ = filament_engine_->createView();
         scene_ = filament_engine_->createScene();
+
+        indirect_light_ = filament::IndirectLight::Builder()
+                              .reflections(ibl_texture_)
+                              .intensity(60000.0f)
+                              .build(*filament_engine_);
+        scene_->setIndirectLight(indirect_light_);
+
+        skybox_ =
+            filament::Skybox::Builder().environment(skybox_texture_).showSun(false).build(*filament_engine_);
+
+        /* light_ = utils::EntityManager::get().create();
+        filament::LightManager::Builder(filament::LightManager::Type::SUN)
+            .color(filament::Color::toLinear<filament::ACCURATE>(filament::sRGBColor(0.98f, 0.92f, 0.89f)))
+            .intensity(150'000)
+            .direction({0, 0, 5})
+            .sunAngularRadius(1.9f)
+            .castShadows(true)
+            .build(*filament_engine_, light_);
+
+        scene_->addEntity(light_);
+
+        skybox_ = filament::Skybox::Builder().color({0.1, 0.125, 0.25, 1.0}).build(*filament_engine_); */
+
+        scene_->setSkybox(skybox_);
 
         view_->setCamera(camera_);
         view_->setScene(scene_);
@@ -121,8 +199,6 @@ class sandbox : public scene {
         editor_controller_ =
             new EditorController(_input_controller, camera_ /* , {0, 0, 50.0f}, {0, 0, 0} */);
 
-        skybox_ = filament::Skybox::Builder().color({0.1, 0.125, 0.25, 1.0}).build(*filament_engine_);
-        scene_->setSkybox(skybox_);
         view_->setPostProcessingEnabled(false);
 
         vertex_buffer_ = filament::VertexBuffer::Builder()
@@ -167,18 +243,6 @@ class sandbox : public scene {
         material_instance_ = material_->createInstance();
 
         renderable_ = utils::EntityManager::get().create();
-
-        light_ = utils::EntityManager::get().create();
-
-        filament::LightManager::Builder(filament::LightManager::Type::SUN)
-            .color(filament::Color::toLinear<filament::ACCURATE>(filament::sRGBColor(0.98f, 0.92f, 0.89f)))
-            .intensity(150'000)
-            .direction({0, 0, 5})
-            .sunAngularRadius(1.9f)
-            .castShadows(true)
-            .build(*filament_engine_, light_);
-
-        scene_->addEntity(light_);
 
         filament::RenderableManager::Builder(1)
             .boundingBox({{-1, -1, -1}, {1, 1, 1}})

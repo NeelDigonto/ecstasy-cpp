@@ -27,6 +27,9 @@
 #include <imgui_impl_opengl3.h>
 #include <implot.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 Eigen::IOFormat ecstasy::CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "",
                                       " << ", ";");
 Eigen::IOFormat ecstasy::CleanFmt(4, 0, ", ", "\n", "[", "]");
