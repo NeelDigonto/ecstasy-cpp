@@ -109,13 +109,21 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
-# FetchContent_Declare(
-#     stb
-#     GIT_REPOSITORY "https://github.com/nothings/stb"
-#     GIT_TAG master
-#     GIT_PROGRESS TRUE
-# )
-# FetchContent_MakeAvailable(stb)
+ FetchContent_Declare(
+     stb
+     GIT_REPOSITORY "https://github.com/nothings/stb"
+     GIT_TAG master
+     GIT_PROGRESS TRUE
+ )
+ FetchContent_MakeAvailable(stb)
+
+FetchContent_Declare(
+    implot
+    GIT_REPOSITORY "https://github.com/epezent/implot"
+    GIT_TAG v0.16
+    GIT_PROGRESS TRUE
+)
+FetchContent_Populate(implot)
 
 FetchContent_Declare(
     imgui
@@ -125,13 +133,21 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui)
 
+#FetchContent_Declare(
+#    OpenEXR
+#    GIT_REPOSITORY "https://github.com/AcademySoftwareFoundation/openexr"
+#    GIT_TAG v3.2.1
+#    GIT_PROGRESS TRUE
+#)
+#FetchContent_Populate(OpenEXR)
+
 FetchContent_Declare(
-    implot
-    GIT_REPOSITORY "https://github.com/epezent/implot"
-    GIT_TAG v0.16
+    tinyexr
+    GIT_REPOSITORY "https://github.com/syoyo/tinyexr"
+    GIT_TAG v1.0.7
     GIT_PROGRESS TRUE
 )
-FetchContent_Populate(implot)
+FetchContent_Populate(tinyexr)
 
 add_subdirectory(ecstasy)
 add_subdirectory(libs)

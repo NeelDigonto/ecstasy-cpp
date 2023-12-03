@@ -25,6 +25,8 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         
+        ${stb_SOURCE_DIR}
+        ${tinyexr_SOURCE_DIR}
         ${imgui_SOURCE_DIR}
         ${imgui_SOURCE_DIR}/backends
         ${implot_SOURCE_DIR}
@@ -58,7 +60,8 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     Eigen3::Eigen 
     EnTT::EnTT 
     glfw          
-    ${stb_SOURCE_DIR}
+    #${stb_SOURCE_DIR}
+    #OpenEXR::OpenEXR
     filament
     backend
     bluegl
@@ -74,6 +77,5 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     filamat
     utils
     shaders
-    vkshaders
     )
 

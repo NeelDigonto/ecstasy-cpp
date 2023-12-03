@@ -23,7 +23,7 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
     auto viewport_dimension = input_controller_->getViewportDimension();
     camera_->setProjection(
         45.0, static_cast<double>(viewport_dimension.x()) / static_cast<double>(viewport_dimension.y()), 0.1,
-        1000, filament::Camera::Fov::VERTICAL);
+        100, filament::Camera::Fov::VERTICAL);
 
     camera_->setModelMatrix(filament::math::mat4(
         filament::math::mat3(filament::math::quat{camera_rotationq.x(), camera_rotationq.y(),
