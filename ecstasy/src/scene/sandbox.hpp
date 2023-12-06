@@ -74,9 +74,9 @@ namespace scene {
 const static std::vector<uint32_t> indices = {0, 1, 2};
 
 const static std::vector<Eigen::Vector3f> vertices = {
-    Eigen::Vector3f{-10, -10, 0},
-    Eigen::Vector3f{0, 10, 0},
-    Eigen::Vector3f{10, -10, 0},
+    Eigen::Vector3f{-5, -5, 0},
+    Eigen::Vector3f{0, 5, 0},
+    Eigen::Vector3f{5, -5, 0},
 };
 
 const static std::vector<Eigen::Vector4f> normals{getFloat4FromEuler({0.0f, 0.0f, 1.0f}),
@@ -176,8 +176,8 @@ class sandbox : public scene {
         skybox_ =
             filament::Skybox::Builder().environment(skybox_texture_).showSun(false).build(*filament_engine_);
 
-        /* light_ = utils::EntityManager::get().create();
-        filament::LightManager::Builder(filament::LightManager::Type::SUN)
+        // light_ = utils::EntityManager::get().create();
+        /*filament::LightManager::Builder(filament::LightManager::Type::SUN)
             .color(filament::Color::toLinear<filament::ACCURATE>(filament::sRGBColor(0.98f, 0.92f, 0.89f)))
             .intensity(150'000)
             .direction({0, 0, 5})
@@ -185,9 +185,9 @@ class sandbox : public scene {
             .castShadows(true)
             .build(*filament_engine_, light_);
 
-        scene_->addEntity(light_);
+        scene_->addEntity(light_);*/
 
-        skybox_ = filament::Skybox::Builder().color({0.1, 0.125, 0.25, 1.0}).build(*filament_engine_); */
+        skybox_ = filament::Skybox::Builder().color({0.1, 0.125, 0.25, 1.0}).build(*filament_engine_);
 
         scene_->setSkybox(skybox_);
 
