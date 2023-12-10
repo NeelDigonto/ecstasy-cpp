@@ -18,7 +18,8 @@ class EditorController {
     double horizontalRotationSpeed;
     double verticalRotationSpeed;
 
-    Eigen::Matrix4d camera_model_transformation_;
+    Eigen::Vector3d camera_position_;
+    Eigen::Quaterniond camera_rotation_;
     Eigen::Vector3d up_vector_{0., 1., 0.};
 
   public:
