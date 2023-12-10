@@ -74,6 +74,10 @@ void ecstasy::EditorController::animate(const std::chrono::steady_clock::duratio
     if (std::abs(cursor_pos_change.x()) > std::numeric_limits<double>::epsilon() ||
         std::abs(cursor_pos_change.y()) > std::numeric_limits<double>::epsilon()) {
 
+        /**
+         * @brief Reference to inspiration.
+         * https://github.com/cg-tuwien/Auto-Vk-Toolkit/blob/40d71e37f8b070cc3a35371fecd50aededfa833f/auto_vk_toolkit/src/quake_camera.cpp#L54
+         */
         camera_rotation_ =
             Eigen::AngleAxisd(cursor_pos_change.x() * horizontalRotationSpeed, Eigen::Vector3d::UnitY()) *
             camera_rotation_ *
