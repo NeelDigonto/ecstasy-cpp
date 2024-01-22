@@ -5,15 +5,28 @@ namespace filament {
 class Engine;
 class VertexBuffer;
 class IndexBuffer;
-class Material;
-class MaterialInstance;
+// class Material;
+// class MaterialInstance;
 } // namespace filament
 
 namespace ecstasy {
-class Cube {
+class cube {
+  private:
+    filament::Engine* filament_engine_;
+    filament::VertexBuffer* vertex_buffer_;
+    filament::IndexBuffer* index_buffer_;
+
+    std::vector<Eigen::Vector3f> vertices_;
+    std::vector<Eigen::Vector3f> normals_;
+    std::vector<Eigen::Vector2f> uvs_;
+    std::vector<std::uint8_t> indices_;
+
+    void build_plane();
+
   public:
-    Cube() = delete;
-    Cube(filament::Engine* _engine, Eigen::Vector3d _dimention, Eigen::Vector3d _segments);
+    cube() = delete;
+    cube(filament::Engine* _engine, Eigen::Vector3d _dimention, Eigen::Vector3d _segments);
+    std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
 };
 } // namespace ecstasy
 

@@ -49,25 +49,11 @@
 #include <Eigen/Dense>
 #include <fstream>
 #include <filesystem>
+#include <common/utils.hpp>
 
 #include "stb_image.h"
 
 namespace ecstasy {
-
-Eigen::Quaternionf getQuatFromEuler(Eigen::Vector3f _euler) {
-    Eigen::Quaternionf q;
-    q = Eigen::AngleAxisf(_euler.x(), Eigen::Vector3f::UnitX()) *
-        Eigen::AngleAxisf(_euler.y(), Eigen::Vector3f::UnitY()) *
-        Eigen::AngleAxisf(_euler.z(), Eigen::Vector3f::UnitZ());
-    q.normalize();
-
-    return q;
-}
-
-Eigen::Vector4f getFloat4FromEuler(Eigen::Vector3f _euler) {
-    auto q = getQuatFromEuler(_euler);
-    return Eigen::Vector4f{q.x(), q.y(), q.z(), q.w()};
-}
 
 namespace scene {
 
