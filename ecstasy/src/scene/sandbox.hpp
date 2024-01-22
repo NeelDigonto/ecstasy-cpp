@@ -103,50 +103,49 @@ class sandbox : public scene {
         renderer_ = _renderer;
         auto viewport_dimension = _input_controller->getViewportDimension();
 
-        auto path = std::filesystem::path("../hdri/dancing_hall_8k.hdr").lexically_normal();
+        /*         auto path = std::filesystem::path("../hdri/dancing_hall_8k.hdr").lexically_normal();
 
-        int w, h;
-        stbi_info(path.c_str(), &w, &h, nullptr);
-        log::info("{}, {}", w, h);
-        if (w != h * 2) {
-            log::error("not an equirectangular image!");
-        }
+                int w, h;
+                stbi_info(path.c_str(), &w, &h, nullptr);
+                log::info("{}, {}", w, h);
+                if (w != h * 2) {
+                    log::error("not an equirectangular image!");
+                }
 
-        // load image as float
-        int n;
-        const size_t size = w * h * sizeof(filament::math::float3);
-        filament::math::float3* const data = (filament::math::float3*)stbi_loadf(path.c_str(), &w, &h, &n, 3);
-        if (data == nullptr || n != 3) {
-            log::error("Could not decode image ");
-        }
+                // load image as float
+                int n;
+                const size_t size = w * h * sizeof(filament::math::float3);
+                filament::math::float3* const data = (filament::math::float3*)stbi_loadf(path.c_str(), &w, &h,
+           &n, 3); if (data == nullptr || n != 3) { log::error("Could not decode image ");
+                }
 
-        // now load texture
-        filament::Texture::PixelBufferDescriptor buffer(
-            data, size, filament::Texture::Format::RGB, filament::Texture::Type::FLOAT,
-            [](void* buffer, size_t size, void* user) { stbi_image_free(buffer); });
+                // now load texture
+                filament::Texture::PixelBufferDescriptor buffer(
+                    data, size, filament::Texture::Format::RGB, filament::Texture::Type::FLOAT,
+                    [](void* buffer, size_t size, void* user) { stbi_image_free(buffer); }); */
 
-        filament::Texture* const equirect = filament::Texture::Builder()
-                                                .width((uint32_t)w)
-                                                .height((uint32_t)h)
-                                                .levels(0xff)
-                                                .format(filament::Texture::InternalFormat::R11F_G11F_B10F)
-                                                .sampler(filament::Texture::Sampler::SAMPLER_2D)
-                                                .build(*filament_engine_);
+        // filament::Texture* const equirect = filament::Texture::Builder()
+        //                                         .width((uint32_t)w)
+        //                                         .height((uint32_t)h)
+        //                                         .levels(0xff)
+        //                                         .format(filament::Texture::InternalFormat::R11F_G11F_B10F)
+        //                                         .sampler(filament::Texture::Sampler::SAMPLER_2D)
+        //                                         .build(*filament_engine_);
 
-        equirect->setImage(*filament_engine_, 0, std::move(buffer));
+        // equirect->setImage(*filament_engine_, 0, std::move(buffer));
 
-        IBLPrefilterContext context(*filament_engine_);
-        IBLPrefilterContext::EquirectangularToCubemap equirectangularToCubemap(context);
-        IBLPrefilterContext::SpecularFilter specularFilter(context);
-        IBLPrefilterContext::IrradianceFilter irradianceFilter(context);
+        // IBLPrefilterContext context(*filament_engine_);
+        // IBLPrefilterContext::EquirectangularToCubemap equirectangularToCubemap(context);
+        // IBLPrefilterContext::SpecularFilter specularFilter(context);
+        // IBLPrefilterContext::IrradianceFilter irradianceFilter(context);
 
-        skybox_texture_ = equirectangularToCubemap(equirect);
-        filament_engine_->destroy(equirect);
+        // skybox_texture_ = equirectangularToCubemap(equirect);
+        // filament_engine_->destroy(equirect);
 
-        ibl_texture_ = specularFilter(skybox_texture_);
+        // ibl_texture_ = specularFilter(skybox_texture_);
 
-        fog_texture_ = irradianceFilter({.generateMipmap = false}, skybox_texture_);
-        fog_texture_->generateMipmaps(*filament_engine_);
+        // fog_texture_ = irradianceFilter({.generateMipmap = false}, skybox_texture_);
+        // fog_texture_->generateMipmaps(*filament_engine_);
 
         auto cameraEntity = utils::EntityManager::get().create();
         camera_ = filament_engine_->createCamera(cameraEntity);
@@ -159,8 +158,8 @@ class sandbox : public scene {
                               .build(*filament_engine_);
         scene_->setIndirectLight(indirect_light_);
 
-        skybox_ =
-            filament::Skybox::Builder().environment(skybox_texture_).showSun(false).build(*filament_engine_);
+        // skybox_ =
+        //     filament::Skybox::Builder().environment(skybox_texture_).showSun(false).build(*filament_engine_);
 
         // light_ = utils::EntityManager::get().create();
         /*filament::LightManager::Builder(filament::LightManager::Type::SUN)
