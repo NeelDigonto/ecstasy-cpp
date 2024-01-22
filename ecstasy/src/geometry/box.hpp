@@ -10,22 +10,22 @@ class IndexBuffer;
 } // namespace filament
 
 namespace ecstasy {
-class cube {
+class box {
   private:
     filament::Engine* filament_engine_;
     filament::VertexBuffer* vertex_buffer_;
     filament::IndexBuffer* index_buffer_;
 
     std::vector<Eigen::Vector3f> vertices_;
-    std::vector<Eigen::Vector3f> normals_;
+    std::vector<Eigen::Vector4f> normals_;
     std::vector<Eigen::Vector2f> uvs_;
     std::vector<std::uint8_t> indices_;
 
     void build_plane();
 
   public:
-    cube() = delete;
-    cube(filament::Engine* _engine, Eigen::Vector3d _dimention, Eigen::Vector3d _segments);
+    box() = delete;
+    box(filament::Engine* _engine, Eigen::Vector3d _dimention, Eigen::Vector3d _segments);
     std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
 };
 } // namespace ecstasy

@@ -1,7 +1,7 @@
 #include <geometry/box.hpp>
 #include <common/utils.hpp>
 
-ecstasy::cube::cube(filament::Engine* _engine, Eigen::Vector3d _dimention, Eigen::Vector3d _segments) {
+ecstasy::box::box(filament::Engine* _engine, Eigen::Vector3d _dimention, Eigen::Vector3d _segments) {
     filament_engine_ = _engine;
     vertices_ = {
         Eigen::Vector3f{-1, -1, 1},  // 0. left bottom far
@@ -46,9 +46,9 @@ ecstasy::cube::cube(filament::Engine* _engine, Eigen::Vector3d _dimention, Eigen
       } */
 }
 
-void ecstasy::cube::build_plane() {
+void ecstasy::box::build_plane() {
 
     // Build Front Plane
 }
 
-std::pair<Eigen::Vector3d, Eigen::Vector3d> ecstasy::cube::getBoundingBox() { return {}; }
+std::pair<Eigen::Vector3d, Eigen::Vector3d> ecstasy::box::getBoundingBox() { return {}; }
