@@ -53,6 +53,7 @@
 
 #include "stb_image.h"
 #include <skybox/skybox.hpp>
+#include <geometry/box.hpp>
 
 namespace ecstasy {
 
@@ -96,6 +97,8 @@ class sandbox : public scene {
     utils::Entity light_;
     utils::Entity renderable_;
 
+    box* north_wall_;
+
   public:
     sandbox() = delete;
 
@@ -133,6 +136,22 @@ class sandbox : public scene {
         editor_controller_ =
             new EditorController(_input_controller, camera_ /* , {0, 0, 50.0f}, {0, 0, 0} */);
 
+        filamat::MaterialBuilder::init();
+        filamat::MaterialBuilder builder;
+        ecstasy::shader::simple(builder);
+        filamat::Package package = builder.build(filament_engine_->getJobSystem());
+
+        material_ = filament::Material::Builder()
+                        .package(package.getData(), package.getSize())
+                        .build(*filament_engine_);
+        material_->setDefaultParameter("baseColor", filament::RgbType::LINEAR,
+                                       filament::math::float3{0, 1, 0});
+        material_->setDefaultParameter("metallic", 0.0f);
+        material_->setDefaultParameter("roughness", 0.4f);
+        material_->setDefaultParameter("reflectance", 0.5f);
+
+        material_instance_ = material_->createInstance();
+
         vertex_buffer_ = filament::VertexBuffer::Builder()
                              .vertexCount(3)
                              .bufferCount(2)
@@ -152,27 +171,11 @@ class sandbox : public scene {
             filament::VertexBuffer::BufferDescriptor(normals.data(),
                                                      vertex_buffer_->getVertexCount() * sizeof(normals[0])));
 
-        index_buffer_ = filament::IndexBuffer::Builder().indexCount(6).build(*filament_engine_);
+        index_buffer_ = filament::IndexBuffer::Builder().indexCount(3).build(*filament_engine_);
 
         index_buffer_->setBuffer(*filament_engine_,
                                  filament::IndexBuffer::BufferDescriptor(
                                      indices.data(), index_buffer_->getIndexCount() * sizeof(uint32_t)));
-
-        filamat::MaterialBuilder::init();
-        filamat::MaterialBuilder builder;
-        ecstasy::shader::simple(builder);
-        filamat::Package package = builder.build(filament_engine_->getJobSystem());
-
-        material_ = filament::Material::Builder()
-                        .package(package.getData(), package.getSize())
-                        .build(*filament_engine_);
-        material_->setDefaultParameter("baseColor", filament::RgbType::LINEAR,
-                                       filament::math::float3{0, 1, 0});
-        material_->setDefaultParameter("metallic", 0.0f);
-        material_->setDefaultParameter("roughness", 0.4f);
-        material_->setDefaultParameter("reflectance", 0.5f);
-
-        material_instance_ = material_->createInstance();
 
         renderable_ = utils::EntityManager::get().create();
 
@@ -182,11 +185,13 @@ class sandbox : public scene {
             .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertex_buffer_, index_buffer_,
                       0, 3)
             .culling(false)
-            //.receiveShadows(false)
-            //.castShadows(false)
+            .receiveShadows(false)
+            .castShadows(false)
             .build(*filament_engine_, renderable_);
 
-        scene_->addEntity(renderable_);
+        north_wall_ = new box(*filament_engine_, {1., 1., 1.}, material_, {1., 1., 1.}, false);
+        scene_->addEntity(north_wall_->getSolidRenderable());
+        // scene_->addEntity(renderable_);
     }
 
     void build() {}
@@ -210,6 +215,7 @@ class sandbox : public scene {
         // ImGui_ImplGlfw_Shutdown();
         // ImGui::DestroyContext();
         delete skybox_;
+        delete north_wall_;
     }
 };
 } // namespace scene
