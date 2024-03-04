@@ -11,7 +11,7 @@ class MaterialInstance;
 } // namespace filament
 
 namespace ecstasy {
-class box {
+class plane {
   private:
     static constexpr size_t WIREFRAME_OFFSET = 3 * 2 * 6;
 
@@ -24,21 +24,17 @@ class box {
     filament::VertexBuffer* vertex_buffer_ = nullptr;
     filament::IndexBuffer* index_buffer_ = nullptr;
     filament::Material const* material_ = nullptr;
-    filament::MaterialInstance* material_instance_solid_ = nullptr;
-    filament::MaterialInstance* material_instance_wireframe_ = nullptr;
-    utils::Entity solid_renderable_;
-    utils::Entity wireframe_renderable_;
+    filament::MaterialInstance* material_instance_ = nullptr;
+    utils::Entity renderable_;
 
   public:
-    box() = delete;
-    box(filament::Engine& _filament_engine, Eigen::Vector3d _dimention, filament::Material const* _material,
-        Eigen::Vector3d _linear_color, bool _culling = true);
+    plane() = delete;
+    plane(filament::Engine& _filament_engine, Eigen::Vector3d _dimention, filament::Material const* _material,
+          Eigen::Vector3d _linear_color, bool _culling = true);
     std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
 
-    utils::Entity getSolidRenderable() { return solid_renderable_; }
+    utils::Entity getRenderable() { return renderable_; }
 
-    utils::Entity getWireFrameRenderable() { return wireframe_renderable_; }
-
-    ~box();
+    ~plane();
 };
 } // namespace ecstasy

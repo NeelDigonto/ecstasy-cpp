@@ -22,7 +22,7 @@ void simple(filamat::MaterialBuilder& _builder) {
         .shading(filamat::MaterialBuilder::Shading::LIT)
         .require(filamat::MaterialBuilder::VertexAttribute::POSITION)
         .require(filamat::MaterialBuilder::VertexAttribute::TANGENTS)
-        .doubleSided(true)
+        .doubleSided(false)
         .targetApi(filamat::MaterialBuilder::TargetApi::OPENGL)
         .platform(filamat::MaterialBuilder::Platform::DESKTOP);
 }

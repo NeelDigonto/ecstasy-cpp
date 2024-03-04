@@ -53,6 +53,7 @@
 
 #include "stb_image.h"
 #include <skybox/skybox.hpp>
+#include <geometry/plane.hpp>
 #include <geometry/box.hpp>
 
 namespace ecstasy {
@@ -98,6 +99,11 @@ class sandbox : public scene {
     utils::Entity renderable_;
 
     box* north_wall_;
+    box* south_wall_;
+    box* east_wall_;
+    box* west_wall_;
+
+    plane* plane_;
 
   public:
     sandbox() = delete;
@@ -114,13 +120,14 @@ class sandbox : public scene {
         view_->setPostProcessingEnabled(false);
 
         skybox_ = new skybox(filament_engine_, scene_);
-        skybox_->buildClearColor();
+        // skybox_->buildClearColor();
+        skybox_->buildIBL();
 
         light_ = utils::EntityManager::get().create();
         filament::LightManager::Builder(filament::LightManager::Type::SUN)
             .color(filament::Color::toLinear<filament::ACCURATE>(filament::sRGBColor(0.98f, 0.92f, 0.89f)))
-            .intensity(150'000)
-            .direction({0, 0, 5})
+            .intensity(200'000)
+            .direction({20, 20, 20})
             .sunAngularRadius(1.9f)
             .castShadows(true)
             .build(*filament_engine_, light_);
@@ -189,8 +196,20 @@ class sandbox : public scene {
             .castShadows(false)
             .build(*filament_engine_, renderable_);
 
-        north_wall_ = new box(*filament_engine_, {1., 1., 1.}, material_, {1., 1., 1.}, false);
-        scene_->addEntity(north_wall_->getSolidRenderable());
+        north_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
+        // scene_->addEntity(north_wall_->getSolidRenderable());
+
+        plane_ = new plane(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
+        scene_->addEntity(plane_->getRenderable());
+
+        // south_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
+        // scene_->addEntity(south_wall_->getSolidRenderable());
+
+        // east_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
+        // scene_->addEntity(east_wall_->getSolidRenderable());
+
+        // west_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
+        // scene_->addEntity(west_wall_->getSolidRenderable());
         // scene_->addEntity(renderable_);
     }
 
