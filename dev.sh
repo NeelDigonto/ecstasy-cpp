@@ -1,1 +1,1 @@
-cmake --build -j --preset=lin-clang-rel && ./build/lin-clang-rel/libs/sandbox/sandbox
+cmake --build -j --preset=lin-clang-dbg && ./build/lin-clang-dbg/libs/sandbox/sandbox

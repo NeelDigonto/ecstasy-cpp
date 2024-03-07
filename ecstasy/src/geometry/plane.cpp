@@ -31,10 +31,10 @@ ecstasy::plane::plane(filament::Engine& _filament_engine, Eigen::Vector3d _dimen
     };
 
     uvs_ = {
-        Eigen::Vector2f{0, 0}, // 0. left bottom far
-        Eigen::Vector2f{1, 0}, // 1. right bottom far
-        Eigen::Vector2f{0, 1}, // 2. left top far
-        Eigen::Vector2f{1, 1}, // 3. right top far
+        Eigen::Vector2f{0, 1}, // 0. top left
+        Eigen::Vector2f{0, 0}, // 1. bottom left
+        Eigen::Vector2f{1, 0}, // 2. bottom right
+        Eigen::Vector2f{1, 1}, // 3. top right
     };
 
     indices_ = {
@@ -45,10 +45,12 @@ ecstasy::plane::plane(filament::Engine& _filament_engine, Eigen::Vector3d _dimen
     vertex_buffer_ =
         filament::VertexBuffer::Builder()
             .vertexCount(vertices_.size())
-            .bufferCount(2)
+            .bufferCount(3)
             .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3)
             .attribute(filament::VertexAttribute::TANGENTS, 1, filament::VertexBuffer::AttributeType::FLOAT4)
             .normalized(filament::VertexAttribute::TANGENTS)
+            .attribute(filament::VertexAttribute::UV0, 2, filament::VertexBuffer::AttributeType::FLOAT2)
+            .normalized(filament::VertexAttribute::UV0)
             .build(filament_engine_);
 
     vertex_buffer_->setBufferAt(
@@ -60,6 +62,11 @@ ecstasy::plane::plane(filament::Engine& _filament_engine, Eigen::Vector3d _dimen
         filament_engine_, 1,
         filament::VertexBuffer::BufferDescriptor(
             normals_.data(), vertex_buffer_->getVertexCount() * sizeof(decltype(normals_)::value_type)));
+
+    vertex_buffer_->setBufferAt(
+        filament_engine_, 2,
+        filament::VertexBuffer::BufferDescriptor(uvs_.data(), vertex_buffer_->getVertexCount() *
+                                                                  sizeof(decltype(uvs_)::value_type)));
 
     index_buffer_ = filament::IndexBuffer::Builder().indexCount(indices_.size()).build(filament_engine_);
 
@@ -77,7 +84,7 @@ ecstasy::plane::plane(filament::Engine& _filament_engine, Eigen::Vector3d _dimen
         .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertex_buffer_, index_buffer_, 0,
                   index_buffer_->getIndexCount())
         .priority(4)
-        .culling(false)
+        .culling(_culling)
         .build(filament_engine_, renderable_);
 
     filament::TransformManager& tm = filament_engine_.getTransformManager();

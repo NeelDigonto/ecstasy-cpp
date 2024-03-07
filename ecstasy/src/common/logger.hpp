@@ -19,9 +19,10 @@ class log {
     }
 
     template <typename... Args> static void debug(std::string_view _sv, Args&&... args) {
-        if constexpr (!(NDEBUG))
-            fmt::print(fg(fmt::color::blue), "DEBUG  : {}\n",
-                       fmt::format(fg(fmt::color::blue), _sv, std::forward<Args>(args)...));
+#ifndef NDEBUG
+        fmt::print(fg(fmt::color::blue), "DEBUG  : {}\n",
+                   fmt::format(fg(fmt::color::blue), _sv, std::forward<Args>(args)...));
+#endif
     }
 
     template <typename... Args> static void info(std::string_view _sv, Args&&... args) {

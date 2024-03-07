@@ -185,19 +185,28 @@ class sandbox : public scene {
                                      indices.data(), index_buffer_->getIndexCount() * sizeof(uint32_t)));
 
         renderable_ = utils::EntityManager::get().create();
+        // filament::RenderableManager::Builder(1)
+        //     .boundingBox({{-1, -1, -1}, {1, 1, 1}})
+        //     .material(0, material_instance_)
+        //     .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertex_buffer_,
+        //     index_buffer_,
+        //               0, 3)
+        //     .culling(false)
+        //     .receiveShadows(false)
+        //     .castShadows(false)
+        //     .build(*filament_engine_, renderable_);
 
-        filament::RenderableManager::Builder(1)
-            .boundingBox({{-1, -1, -1}, {1, 1, 1}})
-            .material(0, material_instance_)
-            .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertex_buffer_, index_buffer_,
-                      0, 3)
-            .culling(false)
-            .receiveShadows(false)
-            .castShadows(false)
-            .build(*filament_engine_, renderable_);
-
-        north_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
+        // north_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
         // scene_->addEntity(north_wall_->getSolidRenderable());
+
+        // view->setAmbientOcclusionOptions({.radius = 0.01f,
+        //                                   .bilateralThreshold = 0.005f,
+        //                                   .quality = View::QualityLevel::ULTRA,
+        //                                   .lowPassFilter = View::QualityLevel::MEDIUM,
+        //                                   .upsampling = View::QualityLevel::HIGH,
+        //                                   .enabled = true});
+
+        ecstasy::shader::pbr(*filament_engine_, "Wall Mat 1", shader::PBROptions{});
 
         plane_ = new plane(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
         scene_->addEntity(plane_->getRenderable());

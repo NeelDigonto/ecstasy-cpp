@@ -1,0 +1,1 @@
+cmake --build -j --preset=lin-clang-rel && ./build/lin-clang-rel/libs/sandbox/sandbox
