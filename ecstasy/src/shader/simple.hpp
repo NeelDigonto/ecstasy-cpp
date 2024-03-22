@@ -32,7 +32,7 @@ void simple(filamat::MaterialBuilder& _builder) {
 
 struct PBROptions {
     std::optional<double> aoMap = 1.0;
-    std::optional<Eigen::Vector3d> baseColorMap = Eigen::Vector3d{1.0, 1.0, 1.0};
+    std::optional<Eigen::Vector3d> baseColorMap = Eigen::Vector3d{102 / 255., 51 / 255., 153 / 255.};
     std::optional<bool> bentNormalMap = false;
     std::optional<bool> heightMap = false;
     std::optional<double> metallicMap = 0.0;

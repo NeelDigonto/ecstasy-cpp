@@ -143,22 +143,6 @@ class sandbox : public scene {
         editor_controller_ =
             new EditorController(_input_controller, camera_ /* , {0, 0, 50.0f}, {0, 0, 0} */);
 
-        filamat::MaterialBuilder::init();
-        filamat::MaterialBuilder builder;
-        ecstasy::shader::simple(builder);
-        filamat::Package package = builder.build(filament_engine_->getJobSystem());
-
-        material_ = filament::Material::Builder()
-                        .package(package.getData(), package.getSize())
-                        .build(*filament_engine_);
-        material_->setDefaultParameter("baseColor", filament::RgbType::LINEAR,
-                                       filament::math::float3{0, 1, 0});
-        material_->setDefaultParameter("metallic", 0.0f);
-        material_->setDefaultParameter("roughness", 0.4f);
-        material_->setDefaultParameter("reflectance", 0.5f);
-
-        material_instance_ = material_->createInstance();
-
         vertex_buffer_ = filament::VertexBuffer::Builder()
                              .vertexCount(3)
                              .bufferCount(2)
@@ -206,7 +190,11 @@ class sandbox : public scene {
         //                                   .upsampling = View::QualityLevel::HIGH,
         //                                   .enabled = true});
 
-        ecstasy::shader::pbr(*filament_engine_, "Wall Mat 1", shader::PBROptions{});
+        material_ = ecstasy::shader::pbr(
+            *filament_engine_, "Wall Mat 1",
+            shader::PBROptions{.baseColorMap = Eigen::Vector3d{193 / 255., 154 / 255., 107 / 255.}});
+
+        material_instance_ = material_->createInstance();
 
         plane_ = new plane(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
         scene_->addEntity(plane_->getRenderable());
