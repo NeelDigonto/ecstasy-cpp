@@ -27,7 +27,7 @@ ecstasy::EditorController::EditorController(InputController* _input_controller, 
         45.0, static_cast<double>(viewport_dimension.x()) / static_cast<double>(viewport_dimension.y()), 0.1,
         100, filament::Camera::Fov::VERTICAL);
 
-    camera_position_ = {0., 0., 25.};
+    camera_position_ = {0., 0., 10.};
     camera_rotation_.setIdentity();
 
     Eigen::Matrix4d camera_model_transformation;

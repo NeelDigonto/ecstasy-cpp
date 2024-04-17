@@ -30,7 +30,8 @@ class plane {
   public:
     plane() = delete;
     plane(filament::Engine& _filament_engine, Eigen::Vector3d _dimention, filament::Material const* _material,
-          Eigen::Vector3d _linear_color, bool _culling = true);
+          Eigen::Vector3d _linear_color, const Eigen::Vector3f& _translation,
+          const Eigen::Vector3f& _rotation, bool _culling = true);
     std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
 
     utils::Entity getRenderable() { return renderable_; }

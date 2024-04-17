@@ -32,7 +32,7 @@ void simple(filamat::MaterialBuilder& _builder) {
 
 struct PBROptions {
     std::optional<double> aoMap = 1.0;
-    std::optional<Eigen::Vector3d> baseColorMap = Eigen::Vector3d{102 / 255., 51 / 255., 153 / 255.};
+    std::optional<Eigen::Vector3d> baseColorMap /* = Eigen::Vector3d{102 / 255., 51 / 255., 153 / 255.} */;
     std::optional<bool> bentNormalMap = false;
     std::optional<bool> heightMap = false;
     std::optional<double> metallicMap = 0.0;
@@ -218,7 +218,7 @@ filament::Material* pbr(filament::Engine& _filament_engine, std::string _name, c
         .require(filamat::MaterialBuilder::VertexAttribute::TANGENTS)
         .targetApi(filamat::MaterialBuilder::TargetApi::OPENGL)
         .platform(filamat::MaterialBuilder::Platform::DESKTOP)
-        .optimization(filamat::MaterialBuilderBase::Optimization::PERFORMANCE);
+        .optimization(filamat::MaterialBuilderBase::Optimization::PREPROCESSOR);
 
     filamat::Package package = builder.build(_filament_engine.getJobSystem());
 

@@ -72,6 +72,35 @@ const static std::vector<Eigen::Vector4f> normals{getFloat4FromEuler({0.0f, 0.0f
                                                   getFloat4FromEuler({0.0f, 0.0f, 1.0f}),
                                                   getFloat4FromEuler({0.0f, 0.0f, 1.0f})};
 
+/* bool loadTexture(filament::Engine* engine, const std::string& filePath, filament::Texture** map,
+                 bool sRGB = true) {
+    if (!filePath.empty()) {
+        Path const path(filePath);
+        if (path.exists()) {
+            int w, h, n;
+            unsigned char* data = stbi_load(path.getAbsolutePath().c_str(), &w, &h, &n, 3);
+            if (data != nullptr) {
+                *map = filament::Texture::Builder()
+                           .width(uint32_t(w))
+                           .height(uint32_t(h))
+                           .levels(0xff)
+                           .format(sRGB ? filament::Texture::InternalFormat::SRGB8
+                                        : filament::Texture::InternalFormat::RGB8)
+                           .build(*engine);
+                filament::Texture::PixelBufferDescriptor buffer(
+                    data, size_t(w * h * 3), filament::Texture::Format::RGB, filament::Texture::Type::UBYTE,
+                    (filament::Texture::PixelBufferDescriptor::Callback)&stbi_image_free);
+                (*map)->setImage(*engine, 0, std::move(buffer));
+                (*map)->generateMipmaps(*engine);
+                return true;
+            } else {
+                std::cout << "The texture " << path << " could not be loaded" << std::endl;
+            }
+        }
+    }
+    return false;
+} */
+
 class sandbox : public scene {
     app* app_;
     filament::Engine* filament_engine_;
@@ -120,7 +149,7 @@ class sandbox : public scene {
         view_->setPostProcessingEnabled(false);
 
         skybox_ = new skybox(filament_engine_, scene_);
-        // skybox_->buildClearColor();
+        skybox_->buildClearColor();
         skybox_->buildIBL();
 
         light_ = utils::EntityManager::get().create();
@@ -192,12 +221,42 @@ class sandbox : public scene {
 
         material_ = ecstasy::shader::pbr(
             *filament_engine_, "Wall Mat 1",
-            shader::PBROptions{.baseColorMap = Eigen::Vector3d{193 / 255., 154 / 255., 107 / 255.}});
+            shader::PBROptions{/* .baseColorMap = Eigen::Vector3d{193 / 255., 154 / 255., 107 / 255.} */});
 
         material_instance_ = material_->createInstance();
 
-        plane_ = new plane(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
+        int w, h, n;
+        auto path = std::filesystem::path("./xepkaecs_2K_Albedo.jpg").lexically_normal();
+        unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 3);
+        log::info("{} {} {}", w, h, n);
+        if (data != nullptr) {
+            filament::Texture* map = filament::Texture::Builder()
+                                         .width(uint32_t(w))
+                                         .height(uint32_t(h))
+                                         .levels(0xff)
+                                         .format(filament::Texture::InternalFormat::SRGB8)
+                                         .build(*filament_engine_);
+            filament::Texture::PixelBufferDescriptor buffer(
+                data, size_t(w * h * 3), filament::Texture::Format::RGB, filament::Texture::Type::UBYTE,
+                (filament::Texture::PixelBufferDescriptor::Callback)&stbi_image_free);
+            map->setImage(*filament_engine_, 0, std::move(buffer));
+            // map->generateMipmaps(*filament_engine_);
+
+            filament::TextureSampler sampler(filament::TextureSampler::MinFilter::LINEAR_MIPMAP_LINEAR,
+                                             filament::TextureSampler::MagFilter::LINEAR,
+                                             filament::TextureSampler::WrapMode::REPEAT);
+            sampler.setAnisotropy(8.0f);
+
+            material_instance_->setParameter("baseColorMap", map, sampler);
+        } else {
+            std::cout << "The texture " << path << " could not be loaded" << std::endl;
+        }
+
+        plane_ = new plane(*filament_engine_, {10, 2.0, 0.2}, material_, {1., 1., 1.},
+                           Eigen::Vector3f{0., 0., 0.}, degreeToRad(Eigen::Vector3f{0., 0, 0.}), false);
         scene_->addEntity(plane_->getRenderable());
+
+        log::info("yoyo");
 
         // south_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
         // scene_->addEntity(south_wall_->getSolidRenderable());

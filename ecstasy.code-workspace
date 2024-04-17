@@ -73,7 +73,12 @@
       "__verbose_abort": "cpp",
       "ios": "cpp",
       "locale": "cpp",
-      "optional": "cpp"
+      "optional": "cpp",
+      "dense": "cpp",
+      "numbers": "cpp",
+      "ranges": "cpp",
+      "regex": "cpp",
+      "__tree": "cpp"
     }
   }
 }
