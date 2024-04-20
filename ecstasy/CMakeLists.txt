@@ -82,3 +82,4 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     ibl
     )
 
+set_target_properties(${ECSTASY_LIB} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)

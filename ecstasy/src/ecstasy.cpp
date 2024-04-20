@@ -80,7 +80,7 @@ GLFWwindow* ecstasy::app::getGLFWWindow() noexcept { return window_; }
 
 void ecstasy::app::setScene(std::string _scene_name) {
     if (_scene_name == "sandbox") {
-        scene_ = new scene::sandbox(filament_engine_, renderer_, input_controller_);
+        scene_ = new scene::sandbox(*filament_engine_, *renderer_, input_controller_);
         scene_->build();
     }
 

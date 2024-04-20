@@ -11,8 +11,10 @@
 #include <filament/TransformManager.h>
 #include <Eigen/Dense>
 
+#include <material/Material.hpp>
+
 ecstasy::plane::plane(filament::Engine& _filament_engine, Eigen::Vector3d _dimention,
-                      filament::Material const* _material, Eigen::Vector3d _linear_color,
+                      ecstasy::Material* _material, Eigen::Vector3d _linear_color,
                       const Eigen::Vector3f& _translation, const Eigen::Vector3f& _rotation, bool _culling)
     : filament_engine_(_filament_engine), material_(_material) {
     const Eigen::Vector3d half_dim = _dimention / 2.0;

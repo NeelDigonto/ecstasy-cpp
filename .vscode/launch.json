@@ -8,7 +8,7 @@
       "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/win-msvc-rel/sample/sandbox/sandbox",
+      "program": "${workspaceFolder}/build/lin-clang-dbg/libs/sandbox/sandbox",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

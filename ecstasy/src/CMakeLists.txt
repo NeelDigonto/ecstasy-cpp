@@ -5,6 +5,8 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/controller/EditorController.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geometry/plane.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geometry/box.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/material/Material.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/material/MaterialManager.cpp
         )
 
 add_subdirectory(audio)

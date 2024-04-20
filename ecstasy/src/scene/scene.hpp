@@ -1,6 +1,8 @@
 #pragma once
 #include <chrono>
 
+#include <material/MaterialManager.hpp>
+
 namespace ecstasy {
 namespace scene {
 class scene {
