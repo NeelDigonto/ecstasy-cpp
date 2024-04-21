@@ -10,7 +10,7 @@
 #include <common/filament.hpp>
 
 namespace ecstasy {
-class MaterialManager;
+class RendererResourceManager;
 
 class Material {
   public:
@@ -38,13 +38,13 @@ class Material {
 
   private:
     filament::Engine& filament_engine_;
-    MaterialManager& material_manager_;
+    RendererResourceManager& renderer_resource_manager_;
     Options options_;
     filament::Material* material_;
     std::string name_;
 
   public:
-    Material(filament::Engine& _filament_engine, MaterialManager& _material_manager, Options _options,
+    Material(filament::Engine& _filament_engine, RendererResourceManager& _material_manager, Options _options,
              const std::string& _name = "untitled");
 
     void generateLitShaderSource(const Material::LitOptions& _lit_options);
@@ -57,13 +57,6 @@ class Material {
     ~Material();
 };
 } // namespace ecstasy
-
-template <typename T> struct std::hash<Eigen::Vector4<T>> {
-    std::size_t operator()(const Eigen::Vector4<T>& _vec4) const {
-        return std::hash<T>{}(_vec4.x()) ^ std::hash<T>{}(_vec4.y()) ^ std::hash<T>{}(_vec4.z()) ^
-               std::hash<T>{}(_vec4.w());
-    }
-};
 
 template <> struct std::hash<ecstasy::Material::Options> {
     std::size_t operator()(const ecstasy::Material::Options& _options) const {

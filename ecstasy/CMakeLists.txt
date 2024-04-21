@@ -46,6 +46,9 @@ if(MSVC)
 else()
     target_link_libraries(${ECSTASY_LIB} PRIVATE c++)
 
+    target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/mujoco-3.1.4/include)
+    target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/mujoco-3.1.4/lib)
+
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/debug/filament/include)
         target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/filament/out/debug/filament/lib/x86_64)
@@ -80,6 +83,7 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     shaders
     image
     ibl
+    mujoco
     )
 
 set_target_properties(${ECSTASY_LIB} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)

@@ -11,13 +11,13 @@
 #include "stb_image.h"
 
 #include <material/Material.hpp>
-#include <material/MaterialManager.hpp>
+#include <manager/RendererResourceManager.hpp>
 
 namespace ecstasy {
-Material::Material(filament::Engine& _filament_engine, MaterialManager& _material_manager,
+Material::Material(filament::Engine& _filament_engine, RendererResourceManager& _renderer_resource_manager,
                    Material::Options _options, const std::string& _name)
-    : filament_engine_{_filament_engine}, material_manager_{_material_manager}, options_{_options},
-      name_{_name} {
+    : filament_engine_{_filament_engine}, renderer_resource_manager_{_renderer_resource_manager},
+      options_{_options}, name_{_name} {
 
     std::visit(
         [this](auto&& arg) {
@@ -216,36 +216,36 @@ void Material::generateLitShaderSource(const Material::LitOptions& _lit_options)
         .platform(filamat::MaterialBuilder::Platform::DESKTOP)
         .optimization(filamat::MaterialBuilderBase::Optimization::PREPROCESSOR);
 
-    material_ = material_manager_.getMaterial(builder, options_);
+    material_ = renderer_resource_manager_.getMaterial(builder, options_);
 }
 
 void Material::loadLitTextures(const Material::LitOptions& _lit_options) {
     if (std::holds_alternative<FilePath>(_lit_options.albedo)) {
-        material_manager_.getTexture(std::get<FilePath>(_lit_options.albedo), true);
+        renderer_resource_manager_.getTexture(std::get<FilePath>(_lit_options.albedo), true);
     }
 
     if (std::holds_alternative<FilePath>(_lit_options.ao)) {
-        material_manager_.getTexture(std::get<FilePath>(_lit_options.ao), false);
+        renderer_resource_manager_.getTexture(std::get<FilePath>(_lit_options.ao), false);
     }
 
     if (_lit_options.bentNormalMap.has_value()) {
-        material_manager_.getTexture(_lit_options.bentNormalMap.value(), false);
+        renderer_resource_manager_.getTexture(_lit_options.bentNormalMap.value(), false);
     }
 
     if (_lit_options.heightMap.has_value()) {
-        material_manager_.getTexture(_lit_options.heightMap.value(), false);
+        renderer_resource_manager_.getTexture(_lit_options.heightMap.value(), false);
     }
 
     if (std::holds_alternative<FilePath>(_lit_options.metallic)) {
-        material_manager_.getTexture(std::get<FilePath>(_lit_options.metallic), false);
+        renderer_resource_manager_.getTexture(std::get<FilePath>(_lit_options.metallic), false);
     }
 
     if (_lit_options.normalMap.has_value()) {
-        material_manager_.getTexture(_lit_options.normalMap.value(), false);
+        renderer_resource_manager_.getTexture(_lit_options.normalMap.value(), false);
     }
 
     if (std::holds_alternative<FilePath>(_lit_options.roughness)) {
-        material_manager_.getTexture(std::get<FilePath>(_lit_options.roughness), false);
+        renderer_resource_manager_.getTexture(std::get<FilePath>(_lit_options.roughness), false);
     }
 }
 
@@ -271,17 +271,17 @@ filament::MaterialInstance* Material::createLitInstance(const std::string& _name
     sampler.setAnisotropy(8.0f);
 
     if (_lit_options.heightMap.has_value()) {
-        const auto texture = material_manager_.getTexture(_lit_options.heightMap.value(), false);
+        const auto texture = renderer_resource_manager_.getTexture(_lit_options.heightMap.value(), false);
         instance->setParameter("heightMap", texture, sampler);
     }
 
     if (_lit_options.normalMap.has_value()) {
-        const auto texture = material_manager_.getTexture(_lit_options.normalMap.value(), false);
+        const auto texture = renderer_resource_manager_.getTexture(_lit_options.normalMap.value(), false);
         instance->setParameter("normalMap", texture, sampler);
     }
 
     if (_lit_options.bentNormalMap.has_value()) {
-        const auto texture = material_manager_.getTexture(_lit_options.bentNormalMap.value(), false);
+        const auto texture = renderer_resource_manager_.getTexture(_lit_options.bentNormalMap.value(), false);
         instance->setParameter("bentNormalMap", texture, sampler);
     }
 
@@ -290,7 +290,8 @@ filament::MaterialInstance* Material::createLitInstance(const std::string& _name
         instance->setParameter("albedo",
                                filament::math::float4{albedo.x(), albedo.y(), albedo.z(), albedo.w()});
     } else if (std::holds_alternative<FilePath>(_lit_options.albedo)) {
-        const auto texture = material_manager_.getTexture(std::get<FilePath>(_lit_options.albedo), true);
+        const auto texture =
+            renderer_resource_manager_.getTexture(std::get<FilePath>(_lit_options.albedo), true);
         instance->setParameter("baseColorMap", texture, sampler);
     }
 
@@ -298,7 +299,8 @@ filament::MaterialInstance* Material::createLitInstance(const std::string& _name
         const auto metallic = std::get<float>(_lit_options.metallic);
         instance->setParameter("metallic", metallic);
     } else if (std::holds_alternative<FilePath>(_lit_options.metallic)) {
-        const auto texture = material_manager_.getTexture(std::get<FilePath>(_lit_options.metallic), true);
+        const auto texture =
+            renderer_resource_manager_.getTexture(std::get<FilePath>(_lit_options.metallic), true);
         instance->setParameter("metallicMap", texture, sampler);
     }
 
@@ -306,7 +308,8 @@ filament::MaterialInstance* Material::createLitInstance(const std::string& _name
         const auto roughness = std::get<float>(_lit_options.roughness);
         instance->setParameter("roughness", roughness);
     } else if (std::holds_alternative<FilePath>(_lit_options.roughness)) {
-        const auto texture = material_manager_.getTexture(std::get<FilePath>(_lit_options.roughness), true);
+        const auto texture =
+            renderer_resource_manager_.getTexture(std::get<FilePath>(_lit_options.roughness), true);
         instance->setParameter("roughnessMap", texture, sampler);
     }
 
@@ -314,7 +317,7 @@ filament::MaterialInstance* Material::createLitInstance(const std::string& _name
         const auto ambientOcclusion = std::get<float>(_lit_options.ao);
         instance->setParameter("ambientOcclusion", ambientOcclusion);
     } else if (std::holds_alternative<FilePath>(_lit_options.ao)) {
-        const auto texture = material_manager_.getTexture(std::get<FilePath>(_lit_options.ao), true);
+        const auto texture = renderer_resource_manager_.getTexture(std::get<FilePath>(_lit_options.ao), true);
         instance->setParameter("aoMap", texture, sampler);
     }
 

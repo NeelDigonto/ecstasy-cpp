@@ -5,12 +5,13 @@
 #include <filament/Texture.h>
 #include "stb_image.h"
 
-#include <material/MaterialManager.hpp>
+#include <manager/RendererResourceManager.hpp>
 
 namespace ecstasy {
-MaterialManager::MaterialManager(filament::Engine& _filament_engine) : filament_engine_{_filament_engine} {}
-filament::Material* MaterialManager::getMaterial(filamat::MaterialBuilder& _builder,
-                                                 const Material::Options& _options) {
+RendererResourceManager::RendererResourceManager(filament::Engine& _filament_engine)
+    : filament_engine_{_filament_engine} {}
+filament::Material* RendererResourceManager::getMaterial(filamat::MaterialBuilder& _builder,
+                                                         const Material::Options& _options) {
     auto material_it = material_cache_.find(_options);
 
     if (material_it != std::end(material_cache_)) {
@@ -26,7 +27,7 @@ filament::Material* MaterialManager::getMaterial(filamat::MaterialBuilder& _buil
     return material;
 }
 
-filament::Texture* MaterialManager::getTexture(const std::string& _file_path, const bool sRGB) {
+filament::Texture* RendererResourceManager::getTexture(const std::string& _file_path, const bool sRGB) {
     auto texture_it = texture_cache_.find(_file_path);
 
     if (texture_it != std::end(texture_cache_)) {

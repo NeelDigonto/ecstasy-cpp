@@ -13,6 +13,15 @@ class MaterialInstance;
 namespace ecstasy {
 class Material;
 
+struct PlaneOptions {
+    Eigen::Vector4f dimention;
+    Material* material;
+
+    bool operator==(const PlaneOptions& rhs) const { return (dimention == rhs.dimention); }
+};
+
+using Options = std::variant<PlaneOptions>;
+
 class plane {
   private:
     static constexpr size_t WIREFRAME_OFFSET = 3 * 2 * 6;

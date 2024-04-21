@@ -57,6 +57,9 @@
 #include <geometry/box.hpp>
 
 #include <material/Material.hpp>
+#include <manager/RendererResourceManager.hpp>
+
+#include <mujoco/mujoco.h>
 
 namespace ecstasy {
 
@@ -106,7 +109,7 @@ const static std::vector<Eigen::Vector4f> normals{getFloat4FromEuler({0.0f, 0.0f
 class sandbox : public scene {
     app* app_;
     filament::Engine& filament_engine_;
-    MaterialManager material_manager_;
+    RendererResourceManager renderer_resource_manager_;
     filament::Renderer& renderer_;
     utils::Entity camera_entity_;
     filament::Camera* camera_;
@@ -143,7 +146,7 @@ class sandbox : public scene {
     sandbox(filament::Engine& _filament_engine, filament::Renderer& _renderer,
             InputController* _input_controller)
         : filament_engine_{_filament_engine}, renderer_{_renderer},
-          material_manager_{MaterialManager(_filament_engine)} {
+          renderer_resource_manager_{RendererResourceManager(_filament_engine)} {
         auto viewport_dimension = _input_controller->getViewportDimension();
 
         scene_ = filament_engine_.createScene();
@@ -254,7 +257,7 @@ class sandbox : public scene {
         //     std::cout << "The texture " << path << " could not be loaded" << std::endl;
         // }
 
-        material_ = new Material(filament_engine_, material_manager_,
+        material_ = new Material(filament_engine_, renderer_resource_manager_,
                                  Material::LitOptions{.albedo = "./xepkaecs_2K_Albedo.jpg",
                                                       .ao = "./xepkaecs_2K_AO.jpg",
                                                       .normalMap = "./xepkaecs_2K_Normal.jpg",
@@ -275,6 +278,13 @@ class sandbox : public scene {
         // scene_->addEntity(renderable_);
 
         // material->createInstance("tty");
+
+        // recommended version check
+        if (mjVERSION_HEADER != mj_version()) {
+            log::error("Mujoco Version Mismatch");
+        }
+
+        mjModel* m = mj_loadXML("mymodel.xml", NULL, errstr, errstr_sz);
     }
 
     void build() {}

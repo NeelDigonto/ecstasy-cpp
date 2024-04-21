@@ -105,7 +105,13 @@
       "unordered_set": "cpp",
       "hash_map": "cpp",
       "set": "cpp",
-      "any": "cpp"
+      "any": "cpp",
+      "valarray": "cpp",
+      "stop_token": "cpp",
+      "__hash_table": "cpp",
+      "__node_handle": "cpp",
+      "queue": "cpp",
+      "stack": "cpp"
     }
   }
 }
