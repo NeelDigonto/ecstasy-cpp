@@ -1,4 +1,4 @@
-#include <geometry/plane.hpp>
+#include <geometry/Plane.hpp>
 #include <common/utils.hpp>
 #include <filament/Material.h>
 

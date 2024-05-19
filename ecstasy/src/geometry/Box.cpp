@@ -1,4 +1,4 @@
-#include <geometry/box.hpp>
+#include <geometry/Box.hpp>
 #include <common/utils.hpp>
 #include <filament/Material.h>
 

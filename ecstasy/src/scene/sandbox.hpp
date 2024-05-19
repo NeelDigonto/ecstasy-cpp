@@ -54,7 +54,7 @@
 #include "stb_image.h"
 #include <skybox/skybox.hpp>
 #include <geometry/Plane.hpp>
-#include <geometry/box.hpp>
+#include <geometry/Box.hpp>
 
 #include <material/Material.hpp>
 #include <manager/RendererResourceManager.hpp>
