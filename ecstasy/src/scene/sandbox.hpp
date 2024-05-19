@@ -63,18 +63,6 @@ namespace ecstasy {
 
 namespace scene {
 
-const static std::vector<uint32_t> indices = {0, 1, 2};
-
-const static std::vector<Eigen::Vector3f> vertices = {
-    Eigen::Vector3f{-5, -5, 0},
-    Eigen::Vector3f{0, 5, 0},
-    Eigen::Vector3f{5, -5, 0},
-};
-
-const static std::vector<Eigen::Vector4f> normals{getFloat4FromEuler({0.0f, 0.0f, 1.0f}),
-                                                  getFloat4FromEuler({0.0f, 0.0f, 1.0f}),
-                                                  getFloat4FromEuler({0.0f, 0.0f, 1.0f})};
-
 /* bool loadTexture(filament::Engine* engine, const std::string& filePath, filament::Texture** map,
                  bool sRGB = true) {
     if (!filePath.empty()) {
@@ -115,11 +103,6 @@ class sandbox : public scene {
     filament::Scene* scene_;
     InputController* input_controller_;
     EditorController* editor_controller_;
-    // filament::Skybox* skybox_;
-    // filament::Texture* skybox_texture_;
-    // filament::Texture* ibl_texture_;
-    // filament::Texture* fog_texture_;
-    // filament::IndirectLight* indirect_light_;
 
     skybox* skybox_;
 
@@ -151,7 +134,7 @@ class sandbox : public scene {
         view_ = filament_engine_.createView();
         view_->setPostProcessingEnabled(false);
 
-        skybox_ = new skybox(&filament_engine_, scene_);
+        skybox_ = new skybox(filament_engine_, scene_);
         skybox_->buildClearColor();
         // skybox_->buildIBL();
 
@@ -165,52 +148,15 @@ class sandbox : public scene {
             .build(filament_engine_, light_);
         scene_->addEntity(light_);
 
-        auto cameraEntity = utils::EntityManager::get().create();
-        camera_ = filament_engine_.createCamera(cameraEntity);
+        camera_entity_ = utils::EntityManager::get().create();
+        camera_ = filament_engine_.createCamera(camera_entity_);
         view_->setCamera(camera_);
         view_->setScene(scene_);
         view_->setViewport({0, 0, static_cast<std::uint32_t>(viewport_dimension.x()),
                             static_cast<std::uint32_t>(viewport_dimension.y())});
 
-        editor_controller_ =
-            new EditorController(_input_controller, camera_ /* , {0, 0, 50.0f}, {0, 0, 0} */);
-
-        vertex_buffer_ = filament::VertexBuffer::Builder()
-                             .vertexCount(3)
-                             .bufferCount(2)
-                             .attribute(filament::VertexAttribute::POSITION, 0,
-                                        filament::VertexBuffer::AttributeType::FLOAT3)
-                             .attribute(filament::VertexAttribute::TANGENTS, 1,
-                                        filament::VertexBuffer::AttributeType::FLOAT4)
-                             .normalized(filament::VertexAttribute::TANGENTS)
-                             .build(filament_engine_);
-
-        vertex_buffer_->setBufferAt(
-            filament_engine_, 0,
-            filament::VertexBuffer::BufferDescriptor(vertices.data(),
-                                                     vertex_buffer_->getVertexCount() * sizeof(vertices[0])));
-        vertex_buffer_->setBufferAt(
-            filament_engine_, 1,
-            filament::VertexBuffer::BufferDescriptor(normals.data(),
-                                                     vertex_buffer_->getVertexCount() * sizeof(normals[0])));
-
-        index_buffer_ = filament::IndexBuffer::Builder().indexCount(3).build(filament_engine_);
-
-        index_buffer_->setBuffer(filament_engine_,
-                                 filament::IndexBuffer::BufferDescriptor(
-                                     indices.data(), index_buffer_->getIndexCount() * sizeof(uint32_t)));
-
-        renderable_ = utils::EntityManager::get().create();
-        // filament::RenderableManager::Builder(1)
-        //     .boundingBox({{-1, -1, -1}, {1, 1, 1}})
-        //     .material(0, material_instance_)
-        //     .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertex_buffer_,
-        //     index_buffer_,
-        //               0, 3)
-        //     .culling(false)
-        //     .receiveShadows(false)
-        //     .castShadows(false)
-        //     .build(*filament_engine_, renderable_);
+        // editor_controller_ =
+        //     new EditorController(_input_controller, camera_ /* , {0, 0, 50.0f}, {0, 0, 0} */);
 
         // north_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
         // scene_->addEntity(north_wall_->getSolidRenderable());
@@ -255,19 +201,20 @@ class sandbox : public scene {
         //     std::cout << "The texture " << path << " could not be loaded" << std::endl;
         // }
 
-        /*         material_ = new Material(filament_engine_, renderer_resource_manager_,
-                                         Material::LitOptions{.albedo = "./xepkaecs_2K_Albedo.jpg",
-                                                              .ao = "./xepkaecs_2K_AO.jpg",
-                                                              .normalMap = "./xepkaecs_2K_Normal.jpg",
-                                                              .roughness = "./xepkaecs_2K_Roughness.jpg"});
+        material_ = new Material(filament_engine_, renderer_resource_manager_,
+                                 Material::LitOptions{.albedo = "./xepkaecs_2K_Albedo.jpg",
+                                                      .ao = "./xepkaecs_2K_AO.jpg",
+                                                      .normalMap = "./xepkaecs_2K_Normal.jpg",
+                                                      .roughness = "./xepkaecs_2K_Roughness.jpg"});
 
-                plane_ = new Plane(filament_engine_, renderer_resource_manager_,
-                                   Plane::GeometryOptions{.dimention = {10, 2.0, 0.2}, .segments =
-           {1., 1., 1.}}, material_);
+        /*   plane_ = new Plane(filament_engine_, renderer_resource_manager_,
+                             Plane::GeometryOptions{.dimention = {10, 2.0, 0.2}, .segments = {1., 1., 1.}},
+                             material_); */
 
-                // plane_ = new plane(filament_engine_, {10, 2.0, 0.2}, material_, {1., 1., 1.},
-                //                    Eigen::Vector3f{0., 0., 0.}, degreeToRad(Eigen::Vector3f{0., 0, 0.}),
-           false); scene_->addEntity(plane_->getRenderable()); */
+        // plane_ = new plane(filament_engine_, {10, 2.0, 0.2}, material_, {1., 1., 1.},
+        //                    Eigen::Vector3f{0., 0., 0.}, degreeToRad(Eigen::Vector3f{0., 0, 0.}),false);
+
+        // scene_->addEntity(plane_->getRenderable());
 
         // south_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
         // scene_->addEntity(south_wall_->getSolidRenderable());
@@ -291,7 +238,7 @@ class sandbox : public scene {
 
         // log::trace("Animation Time:", _last_animation_time.count());
 
-        editor_controller_->animate(_last_animation_time);
+        //        editor_controller_->animate(_last_animation_time);
         renderer_.render(view_);
 
         // Render UI

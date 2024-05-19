@@ -64,8 +64,8 @@ filament::Texture* RendererResourceManager::getTexture(const std::string& _file_
             .build(filament_engine_);
 
     filament::Texture::PixelBufferDescriptor buffer(
-        data, size_t(w * h * 3), filament::Texture::Format::RGB, filament::Texture::Type::UBYTE,
-        (filament::Texture::PixelBufferDescriptor::Callback)&stbi_image_free);
+        data, size_t(w * h * 3), filament::Texture::Format::RGB, filament::Texture::Type::UBYTE
+        /* ,(filament::Texture::PixelBufferDescriptor::Callback)&stbi_image_free */);
 
     texture->setImage(filament_engine_, 0, std::move(buffer));
     // texture->generateMipmaps(filament_engine_);
