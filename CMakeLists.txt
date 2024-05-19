@@ -34,7 +34,7 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 
 if(NOT MSVC)
-    set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type -flto") #warning disabled for msvc
+    set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Werror=return-type") #warning disabled for msvc
 endif()
 
 
@@ -54,9 +54,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_link_options(-fsanitize=undefined)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_link_options(-flto)
-endif()
+# if(CMAKE_BUILD_TYPE STREQUAL "Release")
+#     add_link_options(-flto)
+# endif()
 
 set(ECSTASY_LIB "ecstasy")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

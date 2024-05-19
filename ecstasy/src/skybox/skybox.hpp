@@ -31,10 +31,10 @@ class skybox {
         // ------------------------------------------------------------------
         // ------------- LOAD SKYBOX ----------------------------------------
         // ------------------------------------------------------------------
-        auto path = std::filesystem::path("../hdri/dancing_hall_8k.hdr").lexically_normal();
+        auto path = std::filesystem::path("./dancing_hall_8k.hdr").lexically_normal();
 
         int w, h;
-        stbi_info(path.c_str(), &w, &h, nullptr);
+        stbi_info(path.string().c_str(), &w, &h, nullptr);
         log::info("{}, {}", w, h);
         if (w != h * 2) {
             log::error("not an equirectangular image!");
@@ -43,7 +43,7 @@ class skybox {
         // load image as float
         int n;
         const size_t size = w * h * sizeof(filament::math::float3);
-        filament::math::float3* const data = (filament::math::float3*)stbi_loadf(path.c_str(), &w, &h, &n, 3);
+        filament::math::float3* const data = (filament::math::float3*)stbi_loadf(path.string().c_str(), &w, &h, &n, 3);
         if (data == nullptr || n != 3) {
             log::error("Could not decode image ");
         }

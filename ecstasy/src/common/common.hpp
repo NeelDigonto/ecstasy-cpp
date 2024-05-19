@@ -17,14 +17,14 @@ using FilePath = std::string;
 using namespace std::literals::chrono_literals;
 
 template <typename T> struct std::hash<Eigen::Vector2<T>> {
-    std::size_t operator()(const Eigen::Vector4<T>& _vec4) const {
-        return std::hash<T>{}(_vec4.x()) ^ std::hash<T>{}(_vec4.y());
+    std::size_t operator()(const Eigen::Vector2<T>& _vec2) const {
+        return std::hash<T>{}(_vec2.x()) ^ std::hash<T>{}(_vec2.y());
     }
 };
 
 template <typename T> struct std::hash<Eigen::Vector3<T>> {
-    std::size_t operator()(const Eigen::Vector4<T>& _vec4) const {
-        return std::hash<T>{}(_vec4.x()) ^ std::hash<T>{}(_vec4.y()) ^ std::hash<T>{}(_vec4.z());
+    std::size_t operator()(const Eigen::Vector3<T>& _vec3) const {
+        return std::hash<T>{}(_vec3.x()) ^ std::hash<T>{}(_vec3.y()) ^ std::hash<T>{}(_vec3.z());
     }
 };
 

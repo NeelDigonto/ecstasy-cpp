@@ -31,7 +31,7 @@ class box {
 
   public:
     box() = delete;
-    box(filament::Engine& _filament_engine, Eigen::Vector3d _dimention, filament::Material const* _material,
+    box(filament::Engine& _filament_engine, Eigen::Vector3f _dimention, filament::Material const* _material,
         Eigen::Vector3d _linear_color, bool _culling = true);
     std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
 

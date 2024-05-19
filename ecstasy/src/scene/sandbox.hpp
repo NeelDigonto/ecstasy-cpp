@@ -53,13 +53,11 @@
 
 #include "stb_image.h"
 #include <skybox/skybox.hpp>
-#include <geometry/plane.hpp>
+#include <geometry/Plane.hpp>
 #include <geometry/box.hpp>
 
 #include <material/Material.hpp>
 #include <manager/RendererResourceManager.hpp>
-
-#include <mujoco/mujoco.h>
 
 namespace ecstasy {
 
@@ -138,7 +136,7 @@ class sandbox : public scene {
     box* east_wall_;
     box* west_wall_;
 
-    plane* plane_;
+    Plane* plane_;
 
   public:
     sandbox() = delete;
@@ -155,7 +153,7 @@ class sandbox : public scene {
 
         skybox_ = new skybox(&filament_engine_, scene_);
         skybox_->buildClearColor();
-        skybox_->buildIBL();
+        // skybox_->buildIBL();
 
         light_ = utils::EntityManager::get().create();
         filament::LightManager::Builder(filament::LightManager::Type::SUN)
@@ -257,15 +255,19 @@ class sandbox : public scene {
         //     std::cout << "The texture " << path << " could not be loaded" << std::endl;
         // }
 
-        material_ = new Material(filament_engine_, renderer_resource_manager_,
-                                 Material::LitOptions{.albedo = "./xepkaecs_2K_Albedo.jpg",
-                                                      .ao = "./xepkaecs_2K_AO.jpg",
-                                                      .normalMap = "./xepkaecs_2K_Normal.jpg",
-                                                      .roughness = "./xepkaecs_2K_Roughness.jpg"});
+        /*         material_ = new Material(filament_engine_, renderer_resource_manager_,
+                                         Material::LitOptions{.albedo = "./xepkaecs_2K_Albedo.jpg",
+                                                              .ao = "./xepkaecs_2K_AO.jpg",
+                                                              .normalMap = "./xepkaecs_2K_Normal.jpg",
+                                                              .roughness = "./xepkaecs_2K_Roughness.jpg"});
 
-        plane_ = new plane(filament_engine_, {10, 2.0, 0.2}, material_, {1., 1., 1.},
-                           Eigen::Vector3f{0., 0., 0.}, degreeToRad(Eigen::Vector3f{0., 0, 0.}), false);
-        scene_->addEntity(plane_->getRenderable());
+                plane_ = new Plane(filament_engine_, renderer_resource_manager_,
+                                   Plane::GeometryOptions{.dimention = {10, 2.0, 0.2}, .segments =
+           {1., 1., 1.}}, material_);
+
+                // plane_ = new plane(filament_engine_, {10, 2.0, 0.2}, material_, {1., 1., 1.},
+                //                    Eigen::Vector3f{0., 0., 0.}, degreeToRad(Eigen::Vector3f{0., 0, 0.}),
+           false); scene_->addEntity(plane_->getRenderable()); */
 
         // south_wall_ = new box(*filament_engine_, {10., 2., .2}, material_, {1., 1., 1.}, false);
         // scene_->addEntity(south_wall_->getSolidRenderable());
@@ -278,13 +280,6 @@ class sandbox : public scene {
         // scene_->addEntity(renderable_);
 
         // material->createInstance("tty");
-
-        // recommended version check
-        if (mjVERSION_HEADER != mj_version()) {
-            log::error("Mujoco Version Mismatch");
-        }
-
-        mjModel* m = mj_loadXML("mymodel.xml", NULL, errstr, errstr_sz);
     }
 
     void build() {}
@@ -293,6 +288,8 @@ class sandbox : public scene {
         // ImGui_ImplOpenGL3_NewFrame();
         // ImGui_ImplGlfw_NewFrame();
         // ImGui::NewFrame();
+
+        // log::trace("Animation Time:", _last_animation_time.count());
 
         editor_controller_->animate(_last_animation_time);
         renderer_.render(view_);

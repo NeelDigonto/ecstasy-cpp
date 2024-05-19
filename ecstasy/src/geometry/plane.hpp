@@ -1,5 +1,5 @@
 #pragma once
-#include <ecstasy/ecstasy.hpp>
+#include <common/common.hpp>
 #include <utils/Entity.h>
 
 namespace filament {
@@ -12,32 +12,51 @@ class MaterialInstance;
 
 namespace ecstasy {
 class Material;
+class RendererResourceManager;
 
-class plane {
+class Plane {
+  public:
+    struct GeometryOptions {
+        Eigen::Vector3f dimention = Eigen::Vector3f{1., 1., 1.};
+        Eigen::Vector3f segments = Eigen::Vector3f{1., 1., 1.};
+
+        bool operator==(const GeometryOptions& rhs) const {
+            return (dimention == rhs.dimention) && (segments == rhs.segments);
+        }
+    };
+
+    struct GeometryData {
+        filament::VertexBuffer* vertex_buffer;
+        filament::IndexBuffer* index_buffer;
+    };
+
   private:
-    static constexpr size_t WIREFRAME_OFFSET = 3 * 2 * 6;
-
-    std::vector<Eigen::Vector3f> vertices_;
-    std::vector<Eigen::Vector4f> normals_;
-    std::vector<Eigen::Vector2f> uvs_;
-    std::vector<std::uint32_t> indices_;
-
     filament::Engine& filament_engine_;
-    filament::VertexBuffer* vertex_buffer_ = nullptr;
-    filament::IndexBuffer* index_buffer_ = nullptr;
+    RendererResourceManager& renderer_resource_manager_;
+    GeometryData geometry_data_;
     Material* material_ = nullptr;
     filament::MaterialInstance* material_instance_ = nullptr;
     utils::Entity renderable_;
 
   public:
-    plane() = delete;
-    plane(filament::Engine& _filament_engine, Eigen::Vector3d _dimention, ecstasy::Material* _material,
-          Eigen::Vector3d _linear_color, const Eigen::Vector3f& _translation,
-          const Eigen::Vector3f& _rotation, bool _culling = true);
+    Plane() = delete;
+    Plane(filament::Engine& _filament_engine, RendererResourceManager& renderer_resource_manager_,
+          GeometryOptions _geometry_options, ecstasy::Material* _material);
+
     std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
+    Plane* setTranslation(Eigen::Vector3f _translation);
+    Plane* setTotation(Eigen::Vector3f _rotation);
+    Plane* setScale(Eigen::Vector3f _scale);
 
     utils::Entity getRenderable() { return renderable_; }
 
-    ~plane();
+    ~Plane();
 };
 } // namespace ecstasy
+
+template <> struct std::hash<ecstasy::Plane::GeometryOptions> {
+    std::size_t operator()(const ecstasy::Plane::GeometryOptions& _options) const {
+        return std::hash<decltype(_options.dimention)>{}(_options.dimention) ^
+               std::hash<decltype(_options.segments)>{}(_options.segments);
+    }
+};

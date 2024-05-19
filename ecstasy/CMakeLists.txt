@@ -36,18 +36,15 @@ if(MSVC)
     target_link_libraries(${ECSTASY_LIB} PRIVATE opengl32)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_include_directories(${ECSTASY_LIB} PRIVATE "C:\\Users\\fathomless\\lib\\filament-v1.46.0-windows\\include")
-        target_link_directories(${ECSTASY_LIB} INTERFACE "C:\\Users\\fathomless\\lib\\filament-v1.46.0-windows\\lib\\x86_64\\mdd")
+        target_include_directories(${ECSTASY_LIB} PRIVATE "C:\\Users\\fathomless\\lib\\filament-v1.51.5-windows\\include")
+        target_link_directories(${ECSTASY_LIB} INTERFACE "C:\\Users\\fathomless\\lib\\filament-v1.51.5-windows\\lib\\x86_64\\mdd")
     else()
-        target_include_directories(${ECSTASY_LIB} PRIVATE "C:\\Users\\fathomless\\lib\\filament-v1.46.0-windows\\include")
-        target_link_directories(${ECSTASY_LIB} INTERFACE "C:\\Users\\fathomless\\lib\\filament-v1.46.0-windows\\lib\\x86_64\\md")
+        target_include_directories(${ECSTASY_LIB} PRIVATE "C:\\Users\\fathomless\\lib\\filament-v1.51.5-windows\\include")
+        target_link_directories(${ECSTASY_LIB} INTERFACE "C:\\Users\\fathomless\\lib\\filament-v1.51.5-windows\\lib\\x86_64\\md")
     endif()
 
 else()
     target_link_libraries(${ECSTASY_LIB} PRIVATE c++)
-
-    target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/mujoco-3.1.4/include)
-    target_link_directories(${ECSTASY_LIB} INTERFACE /home/fathomless/lib/mujoco-3.1.4/lib)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_include_directories(${ECSTASY_LIB} PRIVATE /home/fathomless/lib/filament/out/debug/filament/include)
@@ -83,7 +80,6 @@ target_link_libraries(${ECSTASY_LIB} PRIVATE
     shaders
     image
     ibl
-    mujoco
     )
 
 set_target_properties(${ECSTASY_LIB} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)

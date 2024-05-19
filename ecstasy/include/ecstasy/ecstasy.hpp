@@ -63,8 +63,8 @@ class app {
     InputController* input_controller_;
 
   public:
-    app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 16U * 250,
-        std::uint32_t _window_height = 9U * 250);
+    app(std::string _app_name = "Ecstasy", std::uint32_t _window_width = 16U * 120,
+        std::uint32_t _window_height = 9U * 120);
     app(const app& _app) = delete;
     app(app&& _app) = delete;
     void setScene(std::string _scene_name = "sandbox");

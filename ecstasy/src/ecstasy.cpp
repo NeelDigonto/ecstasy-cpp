@@ -108,7 +108,10 @@ void ecstasy::app::animate() {
     last_animation_start_timestamp_ = current_timestamp;
     glfwPollEvents();
 
-    if (renderer_->beginFrame(filament_swapchain_)) {
+    const auto shouldBeginFrame = renderer_->beginFrame(filament_swapchain_);
+    log::info("shouldBeginFrame: {}", shouldBeginFrame);
+
+    if (shouldBeginFrame) {
         // log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
         scene_->animate(last_animation_time_);
         renderer_->endFrame();
