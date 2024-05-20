@@ -9,8 +9,8 @@ class Camera;
 namespace ecstasy {
 class EditorController {
   private:
-    InputController* input_controller_;
-    filament::Camera* camera_;
+    InputController& input_controller_;
+    filament::Camera& camera_;
     double x_movement_speed_;
     double y_movement_speed_;
     double z_movement_speed_;
@@ -26,7 +26,7 @@ class EditorController {
     EditorController() = delete;
     EditorController(const EditorController&) = delete;
     EditorController(EditorController&&) = delete;
-    EditorController(InputController* _input_controller, filament::Camera* _camera/* ,
+    EditorController(InputController& _input_controller, filament::Camera& _camera/* ,
                      Eigen::Vector3d _camera_position, Eigen::Vector3d _camera_target */);
     ~EditorController();
 

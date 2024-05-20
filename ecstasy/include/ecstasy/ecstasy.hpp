@@ -23,6 +23,8 @@ namespace ecstasy {
 
 class InputController;
 class EditorController;
+class RendererResourceManager;
+
 namespace scene {
 class scene;
 }
@@ -58,6 +60,7 @@ class app {
     filament::Engine* filament_engine_;
     filament::SwapChain* filament_swapchain_;
     filament::Renderer* renderer_;
+    RendererResourceManager* renderer_resource_manager_;
     scene::scene* scene_;
 
     InputController* input_controller_;

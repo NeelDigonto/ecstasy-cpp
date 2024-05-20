@@ -8,7 +8,7 @@ namespace ecstasy {
 class skybox {
   private:
     filament::Engine& filament_engine_;
-    filament::Scene* scene_;
+    filament::Scene& scene_;
     filament::Skybox* skybox_;
     filament::Texture* skybox_texture_;
     filament::Texture* ibl_texture_;
@@ -16,7 +16,7 @@ class skybox {
     filament::IndirectLight* indirect_light_;
 
   public:
-    skybox(filament::Engine& _filament_engine, filament::Scene* _scene)
+    skybox(filament::Engine& _filament_engine, filament::Scene& _scene)
         : filament_engine_{_filament_engine}, scene_{_scene} {}
 
     void buildClearColor(Eigen::Vector4d _color = {0.1, 0.125, 0.25, 1.0}) {
@@ -24,7 +24,7 @@ class skybox {
                       .color({_color.x(), _color.y(), _color.z(), _color.w()})
                       .build(filament_engine_);
 
-        scene_->setSkybox(skybox_);
+        scene_.setSkybox(skybox_);
     }
 
     void buildIBL() {
@@ -82,14 +82,14 @@ class skybox {
                               .intensity(60000.0f)
                               .build(filament_engine_);
 
-        scene_->setIndirectLight(indirect_light_);
+        scene_.setIndirectLight(indirect_light_);
 
         skybox_ =
             filament::Skybox::Builder().environment(skybox_texture_).showSun(false).build(filament_engine_);
 
-        scene_->setSkybox(skybox_);
+        scene_.setSkybox(skybox_);
     }
 
-    ~skybox() {}
+    ~skybox() { filament_engine_.destroy(skybox_); }
 };
 } // namespace ecstasy

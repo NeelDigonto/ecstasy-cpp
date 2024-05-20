@@ -66,6 +66,7 @@ ecstasy::app::app(std::string _app_name, std::uint32_t _window_width, std::uint3
 
     filament_swapchain_ = filament_engine_->createSwapChain((void*)native_window);
     renderer_ = filament_engine_->createRenderer();
+    renderer_resource_manager_ = new RendererResourceManager(*filament_engine_);
 }
 
 void ecstasy::app::setClearColor(const Eigen::Vector4d& _clear_color) noexcept {
@@ -80,7 +81,8 @@ GLFWwindow* ecstasy::app::getGLFWWindow() noexcept { return window_; }
 
 void ecstasy::app::setScene(std::string _scene_name) {
     if (_scene_name == "sandbox") {
-        scene_ = new scene::sandbox(*filament_engine_, *renderer_, input_controller_);
+        scene_ = new scene::sandbox(*filament_engine_, *renderer_, *renderer_resource_manager_,
+                                    *input_controller_);
         scene_->build();
     }
 
@@ -120,7 +122,11 @@ void ecstasy::app::animate() {
 }
 
 ecstasy::app::~app() {
+    scene_->destroy();
+    filament_engine_->destroy(renderer_);
+    filament_engine_->destroy(filament_swapchain_);
     filament_engine_->destroy(&filament_engine_);
+
 
     glfwDestroyWindow(window_);
     glfwTerminate();

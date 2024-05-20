@@ -324,8 +324,5 @@ filament::MaterialInstance* Material::createLitInstance(const std::string& _name
     return instance;
 }
 
-Material::~Material() {
-    filament_engine_.destroy(material_);
-    material_->createInstance();
-}
+Material::~Material() {}
 } // namespace ecstasy
