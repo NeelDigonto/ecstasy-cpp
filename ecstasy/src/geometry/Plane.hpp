@@ -1,6 +1,8 @@
 #pragma once
 #include <common/common.hpp>
 #include <utils/Entity.h>
+#include <filament/TransformManager.h>
+#include <geometry/Transformable.hpp>
 
 namespace filament {
 class Engine;
@@ -14,7 +16,7 @@ namespace ecstasy {
 class Material;
 class RendererResourceManager;
 
-class Plane {
+class Plane : public Transformable {
   public:
     struct GeometryOptions {
         Eigen::Vector3f dimention = Eigen::Vector3f{1., 1., 1.};
@@ -44,10 +46,6 @@ class Plane {
           GeometryOptions _geometry_options, ecstasy::Material* _material);
 
     std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
-    Plane* setTranslation(Eigen::Vector3f _translation);
-    Plane* setTotation(Eigen::Vector3f _rotation);
-    Plane* setScale(Eigen::Vector3f _scale);
-
     utils::Entity getRenderable() { return renderable_; }
 
     ~Plane();

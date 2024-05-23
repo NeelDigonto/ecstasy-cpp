@@ -4,11 +4,9 @@
 
 #include <utils/EntityManager.h>
 
-#include <utils/EntityManager.h>
 #include <filament/VertexBuffer.h>
 #include <filament/IndexBuffer.h>
 #include <filament/RenderableManager.h>
-#include <filament/TransformManager.h>
 #include <Eigen/Dense>
 
 #include <material/Material.hpp>
@@ -17,7 +15,7 @@
 ecstasy::Plane::Plane(filament::Engine& _filament_engine, RendererResourceManager& _renderer_resource_manager,
                       ecstasy::Plane::GeometryOptions _geometry_options, ecstasy::Material* _material)
     : filament_engine_(_filament_engine), renderer_resource_manager_{_renderer_resource_manager},
-      material_(_material) {
+      material_(_material), Transformable(_filament_engine.getTransformManager()) {
     const Eigen::Vector3f half_dim = _geometry_options.dimention / 2.0;
     auto& hd = half_dim;
 
@@ -25,8 +23,7 @@ ecstasy::Plane::Plane(filament::Engine& _filament_engine, RendererResourceManage
 
     material_instance_ = material_->createInstance();
 
-    utils::EntityManager& em = utils::EntityManager::get();
-    renderable_ = em.create();
+    renderable_ = getEntity();
     filament::RenderableManager::Builder(1)
         .boundingBox({{-hd.x(), -hd.y(), -hd.z()}, {hd.x(), hd.y(), hd.z()}})
         .material(0, material_instance_)
@@ -35,14 +32,9 @@ ecstasy::Plane::Plane(filament::Engine& _filament_engine, RendererResourceManage
         .priority(4)
         .build(filament_engine_, renderable_);
 
-    filament::TransformManager& tm = filament_engine_.getTransformManager();
-    tm.create(renderable_);
-    filament::TransformManager::Instance ti = tm.getInstance(renderable_);
-
-    auto raw_transform =
-        createTransform(Eigen::Vector3f{0., 0., 0.}, degreeToRad(Eigen::Vector3f{0., 0, 0.}));
-    filament::math::mat4f local_transform(*reinterpret_cast<filament::math::mat4f*>(&raw_transform));
-    tm.setTransform(ti, local_transform);
+    // setRotation({0., degreeToRad(90.0f), 0.});
+    setTranslation({10., 10., 10.});
+    computeTransform();
 }
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d> ecstasy::Plane::getBoundingBox() { return {}; }
