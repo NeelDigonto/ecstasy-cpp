@@ -1,44 +1,54 @@
 #pragma once
-#include <ecstasy/ecstasy.hpp>
+#include <common/common.hpp>
 #include <utils/Entity.h>
+#include <filament/TransformManager.h>
+#include <geometry/Transformable.hpp>
 
 namespace filament {
 class Engine;
 class VertexBuffer;
 class IndexBuffer;
-class Material;
 class MaterialInstance;
+class Scene;
 } // namespace filament
 
 namespace ecstasy {
-class box {
+class Material;
+class RendererResourceManager;
+class Plane;
+
+class Box : public Transformable {
+  public:
+    struct Options {
+        Eigen::Vector3f dimention = Eigen::Vector3f{1., 1., 1.};
+        ecstasy::Material* px_materials_;
+        ecstasy::Material* nx_materials_;
+        ecstasy::Material* py_materials_;
+        ecstasy::Material* ny_materials_;
+        ecstasy::Material* pz_materials_;
+        ecstasy::Material* nz_materials_;
+
+        bool operator==(const Options& rhs) const { return (dimention == rhs.dimention); }
+    };
+
   private:
-    static constexpr size_t WIREFRAME_OFFSET = 3 * 2 * 6;
-
-    std::vector<Eigen::Vector3f> vertices_;
-    std::vector<Eigen::Vector4f> normals_;
-    std::vector<Eigen::Vector2f> uvs_;
-    std::vector<std::uint32_t> indices_;
-
     filament::Engine& filament_engine_;
-    filament::VertexBuffer* vertex_buffer_ = nullptr;
-    filament::IndexBuffer* index_buffer_ = nullptr;
-    filament::Material const* material_ = nullptr;
-    filament::MaterialInstance* material_instance_solid_ = nullptr;
-    filament::MaterialInstance* material_instance_wireframe_ = nullptr;
-    utils::Entity solid_renderable_;
-    utils::Entity wireframe_renderable_;
+    RendererResourceManager& renderer_resource_manager_;
+    Plane* px_wall;
+    Plane* nx_wall;
+    Plane* py_wall;
+    Plane* ny_wall;
+    Plane* pz_wall;
+    Plane* nz_wall;
+    utils::Entity renderable_;
 
   public:
-    box() = delete;
-    box(filament::Engine& _filament_engine, Eigen::Vector3f _dimention, filament::Material const* _material,
-        Eigen::Vector3d _linear_color, bool _culling = true);
+    Box() = delete;
+    Box(filament::Engine& _filament_engine, RendererResourceManager& renderer_resource_manager_,
+        Options _geometry_options);
     std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
-
-    utils::Entity getSolidRenderable() { return solid_renderable_; }
-
-    utils::Entity getWireFrameRenderable() { return wireframe_renderable_; }
-
-    ~box();
+    utils::Entity getRenderable() { return renderable_; }
+    void addRenderablesToScene(filament::Scene& _scene);
+    ~Box();
 };
 } // namespace ecstasy

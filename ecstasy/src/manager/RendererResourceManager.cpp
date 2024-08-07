@@ -9,6 +9,7 @@
 #include <filament/TransformManager.h>
 #include "stb_image.h"
 #include <common/utils.hpp>
+#include <fmt/format.h>
 
 #include <filesystem>
 #include <manager/RendererResourceManager.hpp>
@@ -95,8 +96,8 @@ RendererResourceManager::getPlaneGeometryData(const ecstasy::Plane::GeometryOpti
         return place_geometry_data_it->second;
     }
 
-    static constexpr size_t WIREFRAME_OFFSET = 3 * 2 * 6;
-    const Eigen::Vector3f half_dim = _options.dimention / 2.0;
+    // static constexpr size_t WIREFRAME_OFFSET = 3 * 2 * 6;
+    const Eigen::Vector2f half_dim = _options.dimention / 2.0;
     auto& hd = half_dim;
 
     vertices = {

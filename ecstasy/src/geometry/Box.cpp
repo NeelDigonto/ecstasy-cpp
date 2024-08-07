@@ -3,136 +3,92 @@
 #include <filament/Material.h>
 
 #include <utils/EntityManager.h>
+#include <filament/Scene.h>
 
 #include <utils/EntityManager.h>
 #include <filament/VertexBuffer.h>
 #include <filament/IndexBuffer.h>
 #include <filament/RenderableManager.h>
-#include <filament/TransformManager.h>
+#include <filament/RenderableManager.h>
+#include <Eigen/Dense>
 
-ecstasy::box::box(filament::Engine& _filament_engine, Eigen::Vector3f _dimention,
-                  filament::Material const* _material, Eigen::Vector3d _linear_color, bool _culling)
-    : filament_engine_(_filament_engine), material_(_material) {
-    const Eigen::Vector3f half_dim = _dimention / 2.0;
+#include <material/Material.hpp>
+#include <manager/RendererResourceManager.hpp>
+
+ecstasy::Box::Box(filament::Engine& _filament_engine, RendererResourceManager& _renderer_resource_manager,
+                  ecstasy::Box::Options _options)
+    : filament_engine_(_filament_engine), renderer_resource_manager_{_renderer_resource_manager},
+      Transformable(_filament_engine.getTransformManager()) {
+    const Eigen::Vector3f half_dim = _options.dimention / 2.0f;
     auto& hd = half_dim;
+    auto& d = _options.dimention;
 
-    vertices_ = {
-        {-hd.x(), -hd.y(), hd.z()},  // 0. left bottom far
-        {hd.x(), -hd.y(), hd.z()},   // 1. right bottom far
-        {-hd.x(), hd.y(), hd.z()},   // 2. left top far
-        {hd.x(), hd.y(), hd.z()},    // 3. right top far
-        {-hd.x(), -hd.y(), -hd.z()}, // 4. left bottom near
-        {hd.x(), -hd.y(), -hd.z()},  // 5. right bottom near
-        {-hd.x(), hd.y(), -hd.z()},  // 6. left top near
-        {hd.x(), hd.y(), -hd.z()},   // 7. right top near
-    };
+    const auto PI_H = std::numbers::pi / 2.0;
+    const auto PI = std::numbers::pi;
+    const auto PID = std::numbers::pi * 2;
 
-    vertices_ = {
-        {hd.x(), -hd.y(), hd.z()}, // 0. px far bottom
-        {hd.x(), -hd.y(), hd.z()}, // 0. px far top
-        {hd.x(), -hd.y(), hd.z()}, // 0. px near bottom
-        {hd.x(), -hd.y(), hd.z()}, // 0. px near top
-    };
+    log::info("{}, {}", d.z(), d.y());
 
-    normals_ = {
-        getFloat4FromEuler({0.0f, 0.0f, -1.0f}), // 0. left bottom far
-        getFloat4FromEuler({0.0f, 0.0f, -1.0f}), // 1. right bottom far
-        getFloat4FromEuler({0.0f, 0.0f, -1.0f}), // 2. left top far
-        getFloat4FromEuler({0.0f, 0.0f, -1.0f}), // 3. right top far
-        getFloat4FromEuler({0.0f, 0.0f, 1.0f}),  // 4. left bottom near
-        getFloat4FromEuler({0.0f, 0.0f, 1.0f}),  // 5. right bottom near
-        getFloat4FromEuler({0.0f, 0.0f, 1.0f}),  // 6. left top near
-        getFloat4FromEuler({0.0f, 0.0f, 1.0f}),  // 7. right top near
-    };
+    px_wall = new Plane(filament_engine_, renderer_resource_manager_,
+                        Plane::GeometryOptions{.dimention = {d.z(), d.y()}, .segments = {1., 1.}},
+                        _options.px_materials_);
+    nx_wall = new Plane(filament_engine_, renderer_resource_manager_,
+                        Plane::GeometryOptions{.dimention = {d.z(), d.y()}, .segments = {1., 1.}},
+                        _options.nx_materials_);
+    py_wall = new Plane(filament_engine_, renderer_resource_manager_,
+                        Plane::GeometryOptions{.dimention = {d.x(), d.z()}, .segments = {1., 1.}},
+                        _options.py_materials_);
+    ny_wall = new Plane(filament_engine_, renderer_resource_manager_,
+                        Plane::GeometryOptions{.dimention = {d.x(), d.z()}, .segments = {1., 1.}},
+                        _options.ny_materials_);
+    pz_wall = new Plane(filament_engine_, renderer_resource_manager_,
+                        Plane::GeometryOptions{.dimention = {d.x(), d.y()}, .segments = {1., 1.}},
+                        _options.pz_materials_);
+    nz_wall = new Plane(filament_engine_, renderer_resource_manager_,
+                        Plane::GeometryOptions{.dimention = {d.x(), d.y()}, .segments = {1., 1.}},
+                        _options.nz_materials_);
 
-    uvs_ = {
-        Eigen::Vector2f{0, 0}, // 0. left bottom far
-        Eigen::Vector2f{1, 0}, // 1. right bottom far
-        Eigen::Vector2f{0, 1}, // 2. left top far
-        Eigen::Vector2f{1, 1}, // 3. right top far
-        Eigen::Vector2f{0, 0}, // 4. left bottom near
-        Eigen::Vector2f{1, 0}, // 5. right bottom near
-        Eigen::Vector2f{0, 1}, // 6. left top near
-        Eigen::Vector2f{1, 1}, // 7. right top near
-    };
+    px_wall->setParent(getTransformInstace());
+    nx_wall->setParent(getTransformInstace());
+    py_wall->setParent(getTransformInstace());
+    ny_wall->setParent(getTransformInstace());
+    pz_wall->setParent(getTransformInstace());
+    nz_wall->setParent(getTransformInstace());
 
-    indices_ = {
-        2, 0, 1, 2, 1, 3, // far
-        6, 4, 5, 6, 5, 7, // near
-        2, 0, 4, 2, 4, 6, // left
-        3, 1, 5, 3, 5, 7, // right
-        0, 4, 5, 0, 5, 1, // bottom
-        2, 6, 7, 2, 7, 3, // top
+    px_wall->setTranslationX(hd.x());
+    nx_wall->setTranslationX(-hd.x());
+    py_wall->setTranslationY(hd.y());
+    ny_wall->setTranslationY(-hd.y());
+    pz_wall->setTranslationZ(hd.z());
+    nz_wall->setTranslationZ(-hd.z());
 
-        // NOLINTBEGIN
-        // wire-frame
-        // 0, 1, 1, 3, 3, 2, 2, 0, // far
-        // 4, 5, 5, 7, 7, 6, 6, 4, // near
-        // 0, 4, 1, 5, 3, 7, 2, 6,
-        // NOLINTEND
-    };
+    px_wall->setRotationY(-PI_H);
+    nx_wall->setRotationY(PI_H);
+    py_wall->setRotationX(PI_H);
+    ny_wall->setRotationX(-PI_H);
+    pz_wall->setRotationY(PI);
+    nz_wall->setRotationY(0);
 
-    vertex_buffer_ =
-        filament::VertexBuffer::Builder()
-            .vertexCount(8)
-            .bufferCount(2)
-            .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3)
-            .attribute(filament::VertexAttribute::TANGENTS, 1, filament::VertexBuffer::AttributeType::FLOAT4)
-            .normalized(filament::VertexAttribute::TANGENTS)
-            .build(filament_engine_);
-
-    vertex_buffer_->setBufferAt(
-        filament_engine_, 0,
-        filament::VertexBuffer::BufferDescriptor(vertices_.data(),
-                                                 vertex_buffer_->getVertexCount() * sizeof(vertices_[0])));
-
-    vertex_buffer_->setBufferAt(filament_engine_, 1,
-                                filament::VertexBuffer::BufferDescriptor(
-                                    normals_.data(), vertex_buffer_->getVertexCount() * sizeof(normals_[0])));
-
-    index_buffer_ = filament::IndexBuffer::Builder().indexCount(indices_.size()).build(filament_engine_);
-
-    index_buffer_->setBuffer(filament_engine_,
-                             filament::IndexBuffer::BufferDescriptor(
-                                 indices_.data(), index_buffer_->getIndexCount() * sizeof(uint32_t)));
-
-    if (material_) {
-        material_instance_solid_ = material_->createInstance();
-        // material_instance_wireframe_ = material_->createInstance();
-        // material_instance_solid_->setParameter(
-        //     "baseColor", filament::RgbaType::LINEAR,
-        //     filament::LinearColorA{_linear_color.x(), _linear_color.y(), _linear_color.z(), 0.05f});
-        // material_instance_wireframe_->setParameter(
-        //     "baseColor", filament::RgbaType::LINEAR,
-        //     filament::LinearColorA{_linear_color.x(), _linear_color.y(), _linear_color.z(), 0.25f});
-    }
-
-    utils::EntityManager& em = utils::EntityManager::get();
-    solid_renderable_ = em.create();
-    filament::RenderableManager::Builder(1)
-        .boundingBox({{-1, -1, -1}, {1, 1, 1}})
-        .material(0, material_instance_solid_)
-        .geometry(0, filament::RenderableManager::PrimitiveType::TRIANGLES, vertex_buffer_, index_buffer_, 0,
-                  index_buffer_->getIndexCount())
-        .priority(4)
-        .culling(false)
-        .build(filament_engine_, solid_renderable_);
-
-    filament::TransformManager& tm = filament_engine_.getTransformManager();
+    px_wall->computeAndSetTransform();
+    nx_wall->computeAndSetTransform();
+    py_wall->computeAndSetTransform();
+    ny_wall->computeAndSetTransform();
+    pz_wall->computeAndSetTransform();
+    nz_wall->computeAndSetTransform();
 }
 
-std::pair<Eigen::Vector3d, Eigen::Vector3d> ecstasy::box::getBoundingBox() { return {}; }
+void ecstasy::Box::addRenderablesToScene(filament::Scene& _scene) {
+    _scene.addEntity(px_wall->getEntity());
+    _scene.addEntity(nx_wall->getEntity());
+    // _scene.addEntity(py_wall->getEntity());
+    // _scene.addEntity(ny_wall->getEntity());
+    // _scene.addEntity(pz_wall->getEntity());
+    // _scene.addEntity(nz_wall->getEntity());
+}
 
-ecstasy::box::~box() {
-    filament_engine_.destroy(vertex_buffer_);
-    filament_engine_.destroy(index_buffer_);
-    filament_engine_.destroy(material_instance_solid_);
-    filament_engine_.destroy(material_instance_wireframe_);
+std::pair<Eigen::Vector3d, Eigen::Vector3d> ecstasy::Box::getBoundingBox() { return {}; }
+
+ecstasy::Box::~Box() {
     // We don't own the material, only instances
-    filament_engine_.destroy(solid_renderable_);
-    filament_engine_.destroy(wireframe_renderable_);
-
-    utils::EntityManager& em = utils::EntityManager::get();
-    em.destroy(solid_renderable_);
-    em.destroy(wireframe_renderable_);
+    filament_engine_.destroy(renderable_);
 }

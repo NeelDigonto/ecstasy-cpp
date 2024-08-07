@@ -30,9 +30,15 @@ class Transformable {
         transform_manager_.setParent(transform_instance_, _parent);
     }
     void setTranslation(Eigen::Vector3f _translation) { translation_ = _translation; }
+    void setTranslationX(float _x_translation) { translation_.x() = _x_translation; }
+    void setTranslationY(float _y_translation) { translation_.y() = _y_translation; }
+    void setTranslationZ(float _z_translation) { translation_.z() = _z_translation; }
     void setRotation(Eigen::Vector3f _rotation) { rotation_ = _rotation; }
+    void setRotationX(float _x_rotation) { rotation_.x() = _x_rotation; }
+    void setRotationY(float _y_rotation) { rotation_.y() = _y_rotation; }
+    void setRotationZ(float _z_rotation) { rotation_.z() = _z_rotation; }
     void setScale(Eigen::Vector3f _scale) { scale_ = _scale; }
-    void computeTransform() {
+    void computeAndSetTransform() {
         Eigen::Transform<float, 3, Eigen::Affine> t;
         t = Eigen::Translation<float, 3>(translation_);
         t.rotate(Eigen::AngleAxisf(rotation_.x(), Eigen::Vector3f::UnitX()));

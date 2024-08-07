@@ -54,6 +54,7 @@
 #include "stb_image.h"
 #include <skybox/skybox.hpp>
 #include <geometry/Plane.hpp>
+#include <geometry/Box.hpp>
 
 #include <material/Material.hpp>
 #include <manager/RendererResourceManager.hpp>
@@ -83,6 +84,7 @@ class sandbox : public scene {
     utils::Entity renderable_;
 
     Plane* plane_;
+    Box* box_;
 
   public:
     sandbox() = delete;
@@ -127,11 +129,24 @@ class sandbox : public scene {
                                                       .normalMap = "./xepkaecs_2K_Normal.jpg",
                                                       .roughness = "./xepkaecs_2K_Roughness.jpg"});
 
-        plane_ = new Plane(filament_engine_, renderer_resource_manager_,
-                           Plane::GeometryOptions{.dimention = {10, 2.0, 0.2}, .segments = {1., 1., 1.}},
-                           material_);
+        /* plane_ = new Plane(filament_engine_, renderer_resource_manager_,
+                           Plane::GeometryOptions{.dimention = {10, 2.0}, .segments = {1., 1.}}, material_);
+         */
 
-        scene_->addEntity(plane_->getRenderable());
+        // scene_->addEntity(plane_->getRenderable());
+        // 10, 2.0, 0.2
+
+        box_ = new Box(filament_engine_, renderer_resource_manager_,
+                       Box::Options{
+                           .dimention = Eigen::Vector3f{10.0, 2.0, 0.2},
+                           .px_materials_ = material_,
+                           .nx_materials_ = material_,
+                           .py_materials_ = material_,
+                           .ny_materials_ = material_,
+                           .pz_materials_ = material_,
+                           .nz_materials_ = material_,
+                       });
+        box_->addRenderablesToScene(*scene_);
     }
 
     void build() {}

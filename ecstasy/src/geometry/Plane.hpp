@@ -8,7 +8,6 @@ namespace filament {
 class Engine;
 class VertexBuffer;
 class IndexBuffer;
-class Material;
 class MaterialInstance;
 } // namespace filament
 
@@ -19,8 +18,8 @@ class RendererResourceManager;
 class Plane : public Transformable {
   public:
     struct GeometryOptions {
-        Eigen::Vector3f dimention = Eigen::Vector3f{1., 1., 1.};
-        Eigen::Vector3f segments = Eigen::Vector3f{1., 1., 1.};
+        Eigen::Vector2f dimention = Eigen::Vector3f{1., 1.};
+        Eigen::Vector2f segments = Eigen::Vector3f{1., 1.};
 
         bool operator==(const GeometryOptions& rhs) const {
             return (dimention == rhs.dimention) && (segments == rhs.segments);
@@ -44,7 +43,6 @@ class Plane : public Transformable {
     Plane() = delete;
     Plane(filament::Engine& _filament_engine, RendererResourceManager& renderer_resource_manager_,
           GeometryOptions _geometry_options, ecstasy::Material* _material);
-
     std::pair<Eigen::Vector3d, Eigen::Vector3d> getBoundingBox();
     utils::Entity getRenderable() { return renderable_; }
 
