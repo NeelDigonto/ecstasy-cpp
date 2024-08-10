@@ -14,7 +14,7 @@
 ecstasy::EditorController::EditorController(InputController& _input_controller, filament::Camera& _camera)
     : input_controller_{_input_controller}, camera_{_camera} {
 
-    x_movement_speed_ = 1.0E-4;
+    x_movement_speed_ = 2.0E-5;
     y_movement_speed_ = 2.0E-5;
     z_movement_speed_ = 1.0E-4;
     mouse_wheel_zoom_speed_ = 5.0E-2;

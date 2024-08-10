@@ -19,7 +19,7 @@ class Plane : public Transformable {
   public:
     struct GeometryOptions {
         Eigen::Vector2f dimention = Eigen::Vector3f{1., 1.};
-        Eigen::Vector2f segments = Eigen::Vector3f{1., 1.};
+        Eigen::Vector2i segments = Eigen::Vector3f{1, 1};
 
         bool operator==(const GeometryOptions& rhs) const {
             return (dimention == rhs.dimention) && (segments == rhs.segments);

@@ -40,6 +40,7 @@ class Box : public Transformable {
     Plane* ny_wall;
     Plane* pz_wall;
     Plane* nz_wall;
+    Plane* dbg_wall;
     utils::Entity renderable_;
 
   public:

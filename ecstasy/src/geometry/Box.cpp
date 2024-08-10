@@ -29,24 +29,31 @@ ecstasy::Box::Box(filament::Engine& _filament_engine, RendererResourceManager& _
 
     log::info("{}, {}", d.z(), d.y());
 
+    dbg_wall =
+        new Plane(filament_engine_, renderer_resource_manager_,
+                  Plane::GeometryOptions{.dimention = {1, 1}, .segments = {1, 1}}, _options.px_materials_);
     px_wall = new Plane(filament_engine_, renderer_resource_manager_,
-                        Plane::GeometryOptions{.dimention = {d.z(), d.y()}, .segments = {1., 1.}},
+                        Plane::GeometryOptions{.dimention = {d.z(), d.y()}, .segments = {1, 1}},
                         _options.px_materials_);
     nx_wall = new Plane(filament_engine_, renderer_resource_manager_,
-                        Plane::GeometryOptions{.dimention = {d.z(), d.y()}, .segments = {1., 1.}},
+                        Plane::GeometryOptions{.dimention = {d.z(), d.y()}, .segments = {1, 1}},
                         _options.nx_materials_);
     py_wall = new Plane(filament_engine_, renderer_resource_manager_,
-                        Plane::GeometryOptions{.dimention = {d.x(), d.z()}, .segments = {1., 1.}},
+                        Plane::GeometryOptions{.dimention = {d.x(), d.z()}, .segments = {1, 1}},
                         _options.py_materials_);
     ny_wall = new Plane(filament_engine_, renderer_resource_manager_,
-                        Plane::GeometryOptions{.dimention = {d.x(), d.z()}, .segments = {1., 1.}},
+                        Plane::GeometryOptions{.dimention = {d.x(), d.z()}, .segments = {1, 1}},
                         _options.ny_materials_);
     pz_wall = new Plane(filament_engine_, renderer_resource_manager_,
-                        Plane::GeometryOptions{.dimention = {d.x(), d.y()}, .segments = {1., 1.}},
+                        Plane::GeometryOptions{.dimention = {d.x(), d.y()}, .segments = {1, 1}},
                         _options.pz_materials_);
     nz_wall = new Plane(filament_engine_, renderer_resource_manager_,
-                        Plane::GeometryOptions{.dimention = {d.x(), d.y()}, .segments = {1., 1.}},
+                        Plane::GeometryOptions{.dimention = {d.x(), d.y()}, .segments = {1, 1}},
                         _options.nz_materials_);
+
+    dbg_wall = new Plane(filament_engine_, renderer_resource_manager_,
+                         Plane::GeometryOptions{.dimention = {10., 10.}, .segments = {1, 1}},
+                         _options.px_materials_);
 
     px_wall->setParent(getTransformInstace());
     nx_wall->setParent(getTransformInstace());
@@ -75,6 +82,7 @@ ecstasy::Box::Box(filament::Engine& _filament_engine, RendererResourceManager& _
     ny_wall->computeAndSetTransform();
     pz_wall->computeAndSetTransform();
     nz_wall->computeAndSetTransform();
+    dbg_wall->computeAndSetTransform();
 }
 
 void ecstasy::Box::addRenderablesToScene(filament::Scene& _scene) {
@@ -83,7 +91,8 @@ void ecstasy::Box::addRenderablesToScene(filament::Scene& _scene) {
     // _scene.addEntity(py_wall->getEntity());
     // _scene.addEntity(ny_wall->getEntity());
     // _scene.addEntity(pz_wall->getEntity());
-    // _scene.addEntity(nz_wall->getEntity());
+    _scene.addEntity(nz_wall->getEntity());
+    _scene.addEntity(dbg_wall->getEntity());
 }
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d> ecstasy::Box::getBoundingBox() { return {}; }

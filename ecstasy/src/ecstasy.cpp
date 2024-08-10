@@ -111,7 +111,7 @@ void ecstasy::app::animate() {
     glfwPollEvents();
 
     const auto shouldBeginFrame = renderer_->beginFrame(filament_swapchain_);
-    log::info("shouldBeginFrame: {}", shouldBeginFrame);
+    // log::info("shouldBeginFrame: {}", shouldBeginFrame);
 
     if (shouldBeginFrame) {
         // log::info("{}us", getLastAnimationTime<std::chrono::microseconds>());
@@ -126,7 +126,6 @@ ecstasy::app::~app() {
     filament_engine_->destroy(renderer_);
     filament_engine_->destroy(filament_swapchain_);
     filament_engine_->destroy(&filament_engine_);
-
 
     glfwDestroyWindow(window_);
     glfwTerminate();

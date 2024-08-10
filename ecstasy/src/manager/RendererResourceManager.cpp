@@ -92,9 +92,9 @@ ecstasy::Plane::GeometryData
 RendererResourceManager::getPlaneGeometryData(const ecstasy::Plane::GeometryOptions& _options) {
     auto place_geometry_data_it = plane_geometry_data_cache_.find(_options);
 
-    if (place_geometry_data_it != std::end(plane_geometry_data_cache_)) {
-        return place_geometry_data_it->second;
-    }
+    // if (place_geometry_data_it != std::end(plane_geometry_data_cache_)) {
+    //     return place_geometry_data_it->second;
+    // }
 
     // static constexpr size_t WIREFRAME_OFFSET = 3 * 2 * 6;
     const Eigen::Vector2f half_dim = _options.dimention / 2.0;
